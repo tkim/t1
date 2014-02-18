@@ -23,5 +23,7 @@ The T1 Multi Asset System solves for this
 Note for Developers
 -------------------
 The T1 system works on an Exception Basis with easy to follow maintenance. This is opposite to existing platforms.
+
 It is easy to write software so that the Asset Manager has to hire more dedicated staff.
-Please be cognisant of this fact when adding software and design for the systematic and not user processing.
+
+Please be cognisant of this fact when adding software and design for systematic and not user processing.
