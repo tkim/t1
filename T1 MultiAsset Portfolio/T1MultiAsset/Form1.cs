@@ -4040,6 +4040,17 @@ namespace T1MultiAsset
 
         } //aboutToolStripMenuItem_Click()
 
+        private void maintainCommissiontoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // open an instance the connect form so the user
+            // can define a new connection
+            Commission f = new Commission();
+            f = (Commission)SystemLibrary.FormExists(f, false);
+            f.BringToFront();
+            f.FromParent(this);
+            f.Show(); //(this);
+
+        } //maintainCommissiontoolStripMenuItem_Click()
 
         private void databaseConnectionToolStripMenuItem_Click(object sender, EventArgs e)
         {

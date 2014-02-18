@@ -4623,7 +4623,7 @@ namespace T1MultiAsset
         public static Form FormExists(Form inForm, Boolean CloseFormDown)
         {
             // Local Variables
-            Form RetVal = null;
+            Form RetVal = inForm;
 
             // Ensure only 1 version of a form is open
             for (int i = 0; i < Application.OpenForms.Count; i++)

@@ -28,23 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lb_ActionNeeded = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -63,22 +63,6 @@
             this.VATRate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bt_SaveExchangeFees = new System.Windows.Forms.Button();
             this.dg_Broker = new System.Windows.Forms.DataGridView();
-            this._BrokerID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ExtBrokerID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._Exchange = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.BrokerName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IsInternal = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Contact = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EmailSalutation = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Email = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Phone = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Fax = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IsFuture = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.EquityCommRate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FutureComm = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MinimumFee = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DecimalPlaces = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IsActive = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.bt_SaveBroker = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tp_MaintainBroker = new System.Windows.Forms.TabPage();
@@ -110,6 +94,23 @@
             this.bfm_crncy = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bfm_ExtID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bt_SavedBrokerFundMapping = new System.Windows.Forms.Button();
+            this._BrokerID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ExtBrokerID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._Exchange = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.BrokerName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IsInternal = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Contact = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EmailSalutation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Email = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Phone = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Fax = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IsFuture = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.CommModel = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.EquityCommRate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FutureComm = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MinimumFee = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DecimalPlaces = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IsActive = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dg_MapBroker)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -237,9 +238,9 @@
             // 
             // dg_ExchangeFees
             // 
-            dataGridViewCellStyle18.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dg_ExchangeFees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dg_ExchangeFees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dg_ExchangeFees.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.dg_ExchangeFees.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -249,14 +250,14 @@
             this.StampDutyRate,
             this.RoundUp,
             this.VATRate});
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle22.ForeColor = System.Drawing.Color.DarkGreen;
-            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dg_ExchangeFees.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.DarkGreen;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dg_ExchangeFees.DefaultCellStyle = dataGridViewCellStyle5;
             this.dg_ExchangeFees.Location = new System.Drawing.Point(6, 35);
             this.dg_ExchangeFees.Name = "dg_ExchangeFees";
             this.dg_ExchangeFees.Size = new System.Drawing.Size(665, 294);
@@ -278,30 +279,30 @@
             // 
             // StampDutyRate
             // 
-            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle19.Format = "0.00%";
-            dataGridViewCellStyle19.NullValue = "0";
-            this.StampDutyRate.DefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.Format = "0.00%";
+            dataGridViewCellStyle2.NullValue = "0";
+            this.StampDutyRate.DefaultCellStyle = dataGridViewCellStyle2;
             this.StampDutyRate.HeaderText = "Stamp Rate %";
             this.StampDutyRate.Name = "StampDutyRate";
             this.StampDutyRate.ToolTipText = "Stamp Duty Rate. Eg  0.1%";
             // 
             // RoundUp
             // 
-            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle20.Format = "N0";
-            dataGridViewCellStyle20.NullValue = "0";
-            this.RoundUp.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.Format = "N0";
+            dataGridViewCellStyle3.NullValue = "0";
+            this.RoundUp.DefaultCellStyle = dataGridViewCellStyle3;
             this.RoundUp.HeaderText = "RoundUp Value";
             this.RoundUp.Name = "RoundUp";
             this.RoundUp.ToolTipText = "Round Gross Value up to nearest say $100 = 100";
             // 
             // VATRate
             // 
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle21.Format = "0.00%";
-            dataGridViewCellStyle21.NullValue = "0";
-            this.VATRate.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "0.00%";
+            dataGridViewCellStyle4.NullValue = "0";
+            this.VATRate.DefaultCellStyle = dataGridViewCellStyle4;
             this.VATRate.HeaderText = "VAT/GST Rate";
             this.VATRate.Name = "VATRate";
             this.VATRate.ToolTipText = "VAT or GST on Commisions. Eg. UK is 20%";
@@ -325,8 +326,8 @@
             this.dg_Broker.AllowUserToDeleteRows = false;
             this.dg_Broker.AllowUserToResizeColumns = false;
             this.dg_Broker.AllowUserToResizeRows = false;
-            dataGridViewCellStyle23.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.dg_Broker.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.dg_Broker.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle6;
             this.dg_Broker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -344,6 +345,7 @@
             this.Phone,
             this.Fax,
             this.IsFuture,
+            this.CommModel,
             this.EquityCommRate,
             this.FutureComm,
             this.MinimumFee,
@@ -357,147 +359,6 @@
             this.dg_Broker.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg_Broker_CellEndEdit);
             this.dg_Broker.DragEnter += new System.Windows.Forms.DragEventHandler(this.dg_Broker_DragEnter);
             this.dg_Broker.DragDrop += new System.Windows.Forms.DragEventHandler(this.dg_Broker_DragDrop);
-            // 
-            // _BrokerID
-            // 
-            this._BrokerID.Frozen = true;
-            this._BrokerID.HeaderText = "BrokerID";
-            this._BrokerID.Name = "_BrokerID";
-            this._BrokerID.Visible = false;
-            this._BrokerID.Width = 74;
-            // 
-            // ExtBrokerID
-            // 
-            this.ExtBrokerID.Frozen = true;
-            this.ExtBrokerID.HeaderText = "ExtBrokerID";
-            this.ExtBrokerID.MaxInputLength = 256;
-            this.ExtBrokerID.Name = "ExtBrokerID";
-            this.ExtBrokerID.ToolTipText = "Enter the Custodian\'s BrokerID for reporting & matching";
-            this.ExtBrokerID.Width = 89;
-            // 
-            // _Exchange
-            // 
-            this._Exchange.Frozen = true;
-            this._Exchange.HeaderText = "Exchange";
-            this._Exchange.Name = "_Exchange";
-            this._Exchange.Visible = false;
-            this._Exchange.Width = 80;
-            // 
-            // BrokerName
-            // 
-            this.BrokerName.Frozen = true;
-            this.BrokerName.HeaderText = "Broker Name";
-            this.BrokerName.Name = "BrokerName";
-            this.BrokerName.ToolTipText = "Enter the Name you want to show for this Broker";
-            this.BrokerName.Width = 94;
-            // 
-            // IsInternal
-            // 
-            this.IsInternal.FalseValue = "N";
-            this.IsInternal.HeaderText = "Internal";
-            this.IsInternal.Name = "IsInternal";
-            this.IsInternal.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.IsInternal.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.IsInternal.ToolTipText = "Use Internal Brokers for x-ing between Portfolios within a Fund/changing Strategi" +
-                "es for attribution.";
-            this.IsInternal.TrueValue = "Y";
-            this.IsInternal.Width = 67;
-            // 
-            // Contact
-            // 
-            this.Contact.HeaderText = "Contact Name";
-            this.Contact.Name = "Contact";
-            this.Contact.ToolTipText = "Who is the Contract Note details going to";
-            // 
-            // EmailSalutation
-            // 
-            this.EmailSalutation.HeaderText = "EmailSalutation";
-            this.EmailSalutation.Name = "EmailSalutation";
-            this.EmailSalutation.ToolTipText = "The header text to the email. Eg Dear Bob,";
-            this.EmailSalutation.Width = 104;
-            // 
-            // Email
-            // 
-            this.Email.HeaderText = "Email";
-            this.Email.Name = "Email";
-            this.Email.ToolTipText = "What is the email address to send splits for a  Contract Note ";
-            this.Email.Width = 57;
-            // 
-            // Phone
-            // 
-            this.Phone.HeaderText = "Phone";
-            this.Phone.Name = "Phone";
-            this.Phone.Width = 63;
-            // 
-            // Fax
-            // 
-            this.Fax.HeaderText = "Fax";
-            this.Fax.Name = "Fax";
-            this.Fax.Width = 49;
-            // 
-            // IsFuture
-            // 
-            this.IsFuture.FalseValue = "N";
-            this.IsFuture.HeaderText = "IsFuture";
-            this.IsFuture.Name = "IsFuture";
-            this.IsFuture.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.IsFuture.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.IsFuture.ToolTipText = "Is the is Future accountg?";
-            this.IsFuture.TrueValue = "Y";
-            this.IsFuture.Width = 70;
-            // 
-            // EquityCommRate
-            // 
-            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle24.Format = "0.00%";
-            dataGridViewCellStyle24.NullValue = "0.00%";
-            this.EquityCommRate.DefaultCellStyle = dataGridViewCellStyle24;
-            this.EquityCommRate.HeaderText = "EquityCommRate";
-            this.EquityCommRate.Name = "EquityCommRate";
-            this.EquityCommRate.ToolTipText = "Equity Commision Rate. eg. 0.1%";
-            this.EquityCommRate.Width = 113;
-            // 
-            // FutureComm
-            // 
-            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle25.Format = "C2";
-            this.FutureComm.DefaultCellStyle = dataGridViewCellStyle25;
-            this.FutureComm.HeaderText = "FutureComm";
-            this.FutureComm.Name = "FutureComm";
-            this.FutureComm.ToolTipText = "Future $ charge per contract";
-            this.FutureComm.Width = 91;
-            // 
-            // MinimumFee
-            // 
-            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle26.Format = "C2";
-            dataGridViewCellStyle26.NullValue = "0";
-            this.MinimumFee.DefaultCellStyle = dataGridViewCellStyle26;
-            this.MinimumFee.HeaderText = "MinimumFee";
-            this.MinimumFee.Name = "MinimumFee";
-            this.MinimumFee.ToolTipText = "Is ther a minimum contract not fee? ie. $75";
-            this.MinimumFee.Width = 91;
-            // 
-            // DecimalPlaces
-            // 
-            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle27.Format = "N0";
-            dataGridViewCellStyle27.NullValue = "2";
-            this.DecimalPlaces.DefaultCellStyle = dataGridViewCellStyle27;
-            this.DecimalPlaces.HeaderText = "DecimalPlaces";
-            this.DecimalPlaces.Name = "DecimalPlaces";
-            this.DecimalPlaces.ToolTipText = "The number of decimal place to report";
-            this.DecimalPlaces.Width = 102;
-            // 
-            // IsActive
-            // 
-            this.IsActive.FalseValue = "N";
-            this.IsActive.HeaderText = "Active";
-            this.IsActive.Name = "IsActive";
-            this.IsActive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.IsActive.ToolTipText = "Use this to mark a broker inactive or active";
-            this.IsActive.TrueValue = "Y";
-            this.IsActive.Width = 62;
             // 
             // bt_SaveBroker
             // 
@@ -571,8 +432,8 @@
             this.dg_MissingBroker.AllowUserToDeleteRows = false;
             this.dg_MissingBroker.AllowUserToResizeColumns = false;
             this.dg_MissingBroker.AllowUserToResizeRows = false;
-            dataGridViewCellStyle28.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.dg_MissingBroker.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle28;
+            dataGridViewCellStyle11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.dg_MissingBroker.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle11;
             this.dg_MissingBroker.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.dg_MissingBroker.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
@@ -709,10 +570,10 @@
             // 
             // mb_EquityCommRate
             // 
-            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle29.Format = "0.00%";
-            dataGridViewCellStyle29.NullValue = "0.00%";
-            this.mb_EquityCommRate.DefaultCellStyle = dataGridViewCellStyle29;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle12.Format = "0.00%";
+            dataGridViewCellStyle12.NullValue = "0.00%";
+            this.mb_EquityCommRate.DefaultCellStyle = dataGridViewCellStyle12;
             this.mb_EquityCommRate.HeaderText = "EquityCommRate";
             this.mb_EquityCommRate.Name = "mb_EquityCommRate";
             this.mb_EquityCommRate.ReadOnly = true;
@@ -721,9 +582,9 @@
             // 
             // mb_FutureComm
             // 
-            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle30.Format = "C2";
-            this.mb_FutureComm.DefaultCellStyle = dataGridViewCellStyle30;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle13.Format = "C2";
+            this.mb_FutureComm.DefaultCellStyle = dataGridViewCellStyle13;
             this.mb_FutureComm.HeaderText = "FutureComm";
             this.mb_FutureComm.Name = "mb_FutureComm";
             this.mb_FutureComm.ReadOnly = true;
@@ -732,10 +593,10 @@
             // 
             // mb_MinimumFee
             // 
-            dataGridViewCellStyle31.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle31.Format = "C2";
-            dataGridViewCellStyle31.NullValue = "0";
-            this.mb_MinimumFee.DefaultCellStyle = dataGridViewCellStyle31;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle14.Format = "C2";
+            dataGridViewCellStyle14.NullValue = "0";
+            this.mb_MinimumFee.DefaultCellStyle = dataGridViewCellStyle14;
             this.mb_MinimumFee.HeaderText = "MinimumFee";
             this.mb_MinimumFee.Name = "mb_MinimumFee";
             this.mb_MinimumFee.ReadOnly = true;
@@ -744,10 +605,10 @@
             // 
             // mb_DecimalPlaces
             // 
-            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle32.Format = "N0";
-            dataGridViewCellStyle32.NullValue = "2";
-            this.mb_DecimalPlaces.DefaultCellStyle = dataGridViewCellStyle32;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle15.Format = "N0";
+            dataGridViewCellStyle15.NullValue = "2";
+            this.mb_DecimalPlaces.DefaultCellStyle = dataGridViewCellStyle15;
             this.mb_DecimalPlaces.HeaderText = "DecimalPlaces";
             this.mb_DecimalPlaces.Name = "mb_DecimalPlaces";
             this.mb_DecimalPlaces.ReadOnly = true;
@@ -808,9 +669,9 @@
             // 
             // dg_BrokerFundMapping
             // 
-            dataGridViewCellStyle33.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            dataGridViewCellStyle33.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dg_BrokerFundMapping.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle33;
+            dataGridViewCellStyle16.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dg_BrokerFundMapping.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle16;
             this.dg_BrokerFundMapping.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -820,14 +681,14 @@
             this.bfm_FundID,
             this.bfm_crncy,
             this.bfm_ExtID});
-            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle34.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle34.ForeColor = System.Drawing.Color.DarkGreen;
-            dataGridViewCellStyle34.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle34.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle34.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dg_BrokerFundMapping.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.Color.DarkGreen;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dg_BrokerFundMapping.DefaultCellStyle = dataGridViewCellStyle17;
             this.dg_BrokerFundMapping.Location = new System.Drawing.Point(6, 35);
             this.dg_BrokerFundMapping.Name = "dg_BrokerFundMapping";
             this.dg_BrokerFundMapping.Size = new System.Drawing.Size(839, 368);
@@ -867,6 +728,156 @@
             this.bt_SavedBrokerFundMapping.Text = "Save";
             this.bt_SavedBrokerFundMapping.UseVisualStyleBackColor = true;
             this.bt_SavedBrokerFundMapping.Click += new System.EventHandler(this.bt_SavedBrokerFundMapping_Click);
+            // 
+            // _BrokerID
+            // 
+            this._BrokerID.Frozen = true;
+            this._BrokerID.HeaderText = "BrokerID";
+            this._BrokerID.Name = "_BrokerID";
+            this._BrokerID.Visible = false;
+            this._BrokerID.Width = 74;
+            // 
+            // ExtBrokerID
+            // 
+            this.ExtBrokerID.Frozen = true;
+            this.ExtBrokerID.HeaderText = "ExtBrokerID";
+            this.ExtBrokerID.MaxInputLength = 256;
+            this.ExtBrokerID.Name = "ExtBrokerID";
+            this.ExtBrokerID.ToolTipText = "Enter the Custodian\'s BrokerID for reporting & matching";
+            this.ExtBrokerID.Width = 89;
+            // 
+            // _Exchange
+            // 
+            this._Exchange.Frozen = true;
+            this._Exchange.HeaderText = "Exchange";
+            this._Exchange.Name = "_Exchange";
+            this._Exchange.Visible = false;
+            this._Exchange.Width = 80;
+            // 
+            // BrokerName
+            // 
+            this.BrokerName.Frozen = true;
+            this.BrokerName.HeaderText = "Broker Name";
+            this.BrokerName.Name = "BrokerName";
+            this.BrokerName.ToolTipText = "Enter the Name you want to show for this Broker";
+            this.BrokerName.Width = 94;
+            // 
+            // IsInternal
+            // 
+            this.IsInternal.FalseValue = "N";
+            this.IsInternal.HeaderText = "Internal";
+            this.IsInternal.Name = "IsInternal";
+            this.IsInternal.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.IsInternal.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.IsInternal.ToolTipText = "Use Internal Brokers for x-ing between Portfolios within a Fund/changing Strategi" +
+                "es for attribution.";
+            this.IsInternal.TrueValue = "Y";
+            this.IsInternal.Width = 67;
+            // 
+            // Contact
+            // 
+            this.Contact.HeaderText = "Contact Name";
+            this.Contact.Name = "Contact";
+            this.Contact.ToolTipText = "Who is the Contract Note details going to";
+            // 
+            // EmailSalutation
+            // 
+            this.EmailSalutation.HeaderText = "EmailSalutation";
+            this.EmailSalutation.Name = "EmailSalutation";
+            this.EmailSalutation.ToolTipText = "The header text to the email. Eg Dear Bob,";
+            this.EmailSalutation.Width = 104;
+            // 
+            // Email
+            // 
+            this.Email.HeaderText = "Email";
+            this.Email.Name = "Email";
+            this.Email.ToolTipText = "What is the email address to send splits for a  Contract Note ";
+            this.Email.Width = 57;
+            // 
+            // Phone
+            // 
+            this.Phone.HeaderText = "Phone";
+            this.Phone.Name = "Phone";
+            this.Phone.Width = 63;
+            // 
+            // Fax
+            // 
+            this.Fax.HeaderText = "Fax";
+            this.Fax.Name = "Fax";
+            this.Fax.Width = 49;
+            // 
+            // IsFuture
+            // 
+            this.IsFuture.FalseValue = "N";
+            this.IsFuture.HeaderText = "IsFuture";
+            this.IsFuture.Name = "IsFuture";
+            this.IsFuture.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.IsFuture.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.IsFuture.ToolTipText = "Is the is Future accountg?";
+            this.IsFuture.TrueValue = "Y";
+            this.IsFuture.Width = 70;
+            // 
+            // CommModel
+            // 
+            this.CommModel.HeaderText = "Commission Model";
+            this.CommModel.MinimumWidth = 150;
+            this.CommModel.Name = "CommModel";
+            this.CommModel.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.CommModel.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.CommModel.Width = 150;
+            // 
+            // EquityCommRate
+            // 
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle7.Format = "0.00%";
+            dataGridViewCellStyle7.NullValue = "0.00%";
+            this.EquityCommRate.DefaultCellStyle = dataGridViewCellStyle7;
+            this.EquityCommRate.HeaderText = "EquityCommRate";
+            this.EquityCommRate.Name = "EquityCommRate";
+            this.EquityCommRate.ToolTipText = "Equity Commision Rate. eg. 0.1%";
+            this.EquityCommRate.Width = 113;
+            // 
+            // FutureComm
+            // 
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle8.Format = "C2";
+            this.FutureComm.DefaultCellStyle = dataGridViewCellStyle8;
+            this.FutureComm.HeaderText = "FutureComm";
+            this.FutureComm.Name = "FutureComm";
+            this.FutureComm.ToolTipText = "Future $ charge per contract";
+            this.FutureComm.Width = 91;
+            // 
+            // MinimumFee
+            // 
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle9.Format = "C2";
+            dataGridViewCellStyle9.NullValue = "0";
+            this.MinimumFee.DefaultCellStyle = dataGridViewCellStyle9;
+            this.MinimumFee.HeaderText = "MinimumFee";
+            this.MinimumFee.Name = "MinimumFee";
+            this.MinimumFee.ToolTipText = "Is ther a minimum contract not fee? ie. $75";
+            this.MinimumFee.Width = 91;
+            // 
+            // DecimalPlaces
+            // 
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle10.Format = "N0";
+            dataGridViewCellStyle10.NullValue = "2";
+            this.DecimalPlaces.DefaultCellStyle = dataGridViewCellStyle10;
+            this.DecimalPlaces.HeaderText = "DecimalPlaces";
+            this.DecimalPlaces.Name = "DecimalPlaces";
+            this.DecimalPlaces.ToolTipText = "The number of decimal place to report";
+            this.DecimalPlaces.Width = 102;
+            // 
+            // IsActive
+            // 
+            this.IsActive.FalseValue = "N";
+            this.IsActive.HeaderText = "Active";
+            this.IsActive.Name = "IsActive";
+            this.IsActive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.IsActive.ToolTipText = "Use this to mark a broker inactive or active";
+            this.IsActive.TrueValue = "Y";
+            this.IsActive.Width = 62;
             // 
             // BrokerMaintenance
             // 
@@ -937,22 +948,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn mb_FutureComm;
         private System.Windows.Forms.DataGridViewTextBoxColumn mb_MinimumFee;
         private System.Windows.Forms.DataGridViewTextBoxColumn mb_DecimalPlaces;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _BrokerID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ExtBrokerID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _Exchange;
-        private System.Windows.Forms.DataGridViewTextBoxColumn BrokerName;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn IsInternal;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Contact;
-        private System.Windows.Forms.DataGridViewTextBoxColumn EmailSalutation;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Email;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Phone;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Fax;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn IsFuture;
-        private System.Windows.Forms.DataGridViewTextBoxColumn EquityCommRate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FutureComm;
-        private System.Windows.Forms.DataGridViewTextBoxColumn MinimumFee;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DecimalPlaces;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn IsActive;
         private System.Windows.Forms.DataGridViewTextBoxColumn Broker;
         private System.Windows.Forms.DataGridViewTextBoxColumn StrategyType;
         private System.Windows.Forms.DataGridViewTextBoxColumn TranAccount;
@@ -965,6 +960,23 @@
         private System.Windows.Forms.DataGridViewComboBoxColumn bfm_FundID;
         private System.Windows.Forms.DataGridViewTextBoxColumn bfm_crncy;
         private System.Windows.Forms.DataGridViewTextBoxColumn bfm_ExtID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _BrokerID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ExtBrokerID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _Exchange;
+        private System.Windows.Forms.DataGridViewTextBoxColumn BrokerName;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn IsInternal;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Contact;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EmailSalutation;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Email;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Phone;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Fax;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn IsFuture;
+        private System.Windows.Forms.DataGridViewComboBoxColumn CommModel;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EquityCommRate;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FutureComm;
+        private System.Windows.Forms.DataGridViewTextBoxColumn MinimumFee;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DecimalPlaces;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn IsActive;
 
     }
 }

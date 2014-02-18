@@ -13,6 +13,7 @@ namespace T1MultiAsset
     {
         public DataTable dt_ParentFund;
         public DataTable dt_Broker;
+        public DataTable dt_CommModel;
         public DataTable dt_BrokerMapping = new DataTable();
         public DataTable dt_BrokerFundMapping;
         public DataTable dt_ExchangeFees;
@@ -63,7 +64,16 @@ namespace T1MultiAsset
             // Local Variables
             String mySql;
 
-            mySql = "Select BrokerID, ExtBrokerID, Exchange, BrokerName, IsInternal, Contact, EmailSalutation, Email, Phone, Fax, IsFuture, EquityCommRate, FutureComm, MinimumFee, DecimalPlaces, IsActive " +
+            mySql = "Select CommModel From Commission Group By CommModel Order By CommModel";
+            dt_CommModel = SystemLibrary.SQLSelectToDataTable(mySql);
+
+            DataGridViewComboBoxColumn dcb = (DataGridViewComboBoxColumn)dg_Broker.Columns["CommModel"];
+            dcb.DataSource = dt_CommModel;
+            dcb.DisplayMember = "CommModel";
+            dcb.ValueMember = "CommModel";
+            dcb.DataPropertyName = "CommModel";
+
+            mySql = "Select BrokerID, ExtBrokerID, Exchange, BrokerName, IsInternal, Contact, EmailSalutation, Email, Phone, Fax, IsFuture, EquityCommRate, FutureComm, MinimumFee, DecimalPlaces, IsActive, CommModel " +
                     "from	Broker " +
                     "Order by BrokerName, Exchange, ExtBrokerID ";
             dt_Broker = SystemLibrary.SQLSelectToDataTable(mySql);
@@ -88,6 +98,7 @@ namespace T1MultiAsset
                 dg_Broker["MinimumFee", myRow].Value = dr["MinimumFee"];
                 dg_Broker["DecimalPlaces", myRow].Value = dr["DecimalPlaces"];
                 dg_Broker["IsActive", myRow].Value = dr["IsActive"];
+                dg_Broker["CommModel", myRow].Value = dr["CommModel"];
             }
 
         } //LoadBroker()
@@ -259,6 +270,8 @@ namespace T1MultiAsset
                     DataRow[] df = dt_load.Select("BrokerID=" + dgr.Cells["_BrokerID"].Value.ToString());
                     if (df.Length > 0)
                     {
+                        if (SystemLibrary.ToString(dgr.Cells["IsActive"].Value).Length == 0)
+                            dgr.Cells["IsActive"].Value = "N";
                         df[0]["BrokerID"] = dgr.Cells["_BrokerID"].Value;
                         df[0]["ExtBrokerID"] = dgr.Cells["ExtBrokerID"].Value;
                         df[0]["Exchange"] = dgr.Cells["_Exchange"].Value;
@@ -275,6 +288,7 @@ namespace T1MultiAsset
                         df[0]["MinimumFee"] = dgr.Cells["MinimumFee"].Value;
                         df[0]["DecimalPlaces"] = dgr.Cells["DecimalPlaces"].Value;
                         df[0]["IsActive"] = dgr.Cells["IsActive"].Value;
+                        df[0]["CommModel"] = dgr.Cells["CommModel"].Value;
                     }
                 }
             }

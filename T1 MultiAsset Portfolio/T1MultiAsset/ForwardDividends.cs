@@ -15,7 +15,7 @@ namespace T1MultiAsset
         // Public Variables
         public Form1 ParentForm1;
         DataTable dt_Dividends;
-        DataTable dt_ML_E239_Divs;
+        DataTable dt_Prime_Divs;
         DataTable dt_Transactions;
         Object LastValue;
         Hashtable DeletedData = new Hashtable();
@@ -68,36 +68,32 @@ namespace T1MultiAsset
         private void LoadMissingDivs()
         {
             // Local Variables
-            String mySql;
+            String mySql = "Exec sp_LoadMissingDivs";
+            
+            dt_Prime_Divs = SystemLibrary.SQLSelectToDataTable(mySql);
 
+            tb_TotalAmount.Text = SystemLibrary.ToDecimal(dt_Prime_Divs.Compute("Sum(Amount)","")).ToString("$#,###.00");
 
-            mySql = "Select	ML_E239.Reconcilled, ML_E239.Reason, Fund.ShortName Fund, ML_E239.BBG_Ticker, " +
-                    "       Round((isNull(ML_E239.Amount,0) + isNull(ML_E239.Withholding_Tax_Amount,0))/ML_E239.Eligible_Quantity,7) as DPS, " +
-                    "       Round((isNull(ML_E239.Amount,0))/ML_E239.Eligible_Quantity,7) as [Post Tax DPS], " +
-                    "       ML_E239.Amount, ML_E239.Ex_Dividend_Date as [Ex Date], " +
-                    "       ML_E239.Pay_Date as [Payable Date], ML_E239.Transaction_Description as Description, Fund.FundName, " +
-                    "       ML_E239.Quantity, ML_E239.GPB_Transaction_ID, Fund.FundID, ML_E239.Withholding_Percent " +
-                    "From	ML_E239, " +
-                    "		Fund " +
-                    "Where	isNUll(ML_E239.Reconcilled,'N') = 'N' " +
-                    "And		ML_E239.Transaction_Type in ('Dividend Inc','CA Deposit','Dividend Exp') " +
-                    "and		Fund.Active = 'Y' " +
-                    "And		Fund.FundID = ML_E239.FundID " +
-                    "Order by ML_E239.Ex_Dividend_Date ";
-            dt_ML_E239_Divs = SystemLibrary.SQLSelectToDataTable(mySql);
-
-            tb_TotalAmount.Text = SystemLibrary.ToDecimal(dt_ML_E239_Divs.Compute("Sum(Amount)","")).ToString("$#,###.00");
-
-            if (dt_ML_E239_Divs.Rows.Count > 0)
+            if (dt_Prime_Divs.Rows.Count > 0)
             {
-                // Force the ML Prime file to be reprocessed to see if this clears the problem.
+                // Force the Prime file to be reprocessed to see if this clears the problem.
                 // As this takes a few seconds, better to call mySQL twice on occasions where there are problems, rather than each time we enter divs screen
-                SystemLibrary.SQLExecute("Exec sp_ML_Process_File '', 'ML_E239' ");
-                dt_ML_E239_Divs = SystemLibrary.SQLSelectToDataTable(mySql);
+                DataRow[] dr = dt_Prime_Divs.Select("CustodianName='Merrill Lynch'");
+                if (dr.Length>0)
+                    SystemLibrary.SQLExecute("Exec sp_ML_Process_File '', 'ML_E239' ");
+
+                dr = dt_Prime_Divs.Select("CustodianName='SCOTIA'");
+                if (dr.Length > 0)
+                {
+                    SystemLibrary.SQLExecute("Exec sp_Scotia_Process_File '', 'SCOTIA_CASHSTMNT'");
+                    SystemLibrary.SQLExecute("Exec sp_Scotia_Process_File '', 'SCOTIA_ACCTHIST'");
+                }
+                
+                dt_Prime_Divs = SystemLibrary.SQLSelectToDataTable(mySql);
             }
 
-            dg_MissingDivs.DataSource = dt_ML_E239_Divs;
-            if (dt_ML_E239_Divs.Rows.Count == 0)
+            dg_MissingDivs.DataSource = dt_Prime_Divs;
+            if (dt_Prime_Divs.Rows.Count == 0)
             {
                 splitContainer1.Panel2.Enabled = false;
                 splitContainer1.IsSplitterFixed = true;
@@ -384,16 +380,37 @@ namespace T1MultiAsset
 
         private void bt_Reconcile_Click(object sender, EventArgs e)
         {
+            String mySql = "";
             HasChanged = true;
             for (int i = 0; i < dg_MissingDivs.Rows.Count; i++)
             {
                 if (dg_MissingDivs["Reconcilled", i].Value.ToString() == "Y")
                 {
-                    String mySql = "Update ML_E239 " +
-                                   "Set Reconcilled = 'Y', Reason = 'Manual: " + SystemLibrary.f_Now().ToString("d-MMM-yyyy HH:mm") + "' " +
-                                   "Where isNull(Reconcilled,'N') = 'N' " +
-                                   "And     GPB_Transaction_ID = '" + dg_MissingDivs["GPB_Transaction_ID", i].Value.ToString() + "' ";
-                    SystemLibrary.SQLExecute(mySql);
+                    String CustodianName = SystemLibrary.ToString(dg_MissingDivs["CustodianName", i].Value);
+                    switch (CustodianName)
+                    {
+                        case "Merrill Lynch":
+                            mySql = "Update ML_E239 " +
+                                    "Set Reconcilled = 'Y', Reason = 'Manual: " + SystemLibrary.f_Now().ToString("d-MMM-yyyy HH:mm") + "' " +
+                                    "Where isNull(Reconcilled,'N') = 'N' " +
+                                    "And     GPB_Transaction_ID = '" + dg_MissingDivs["GPB_Transaction_ID", i].Value.ToString() + "' ";
+                            SystemLibrary.SQLExecute(mySql);
+                            break;
+                        case "SCOTIA":
+                            mySql = "Update SCOTIA_CASHSTMNT " +
+                                    "Set Reconcilled = 'Y', Reason = 'Manual: " + SystemLibrary.f_Now().ToString("d-MMM-yyyy HH:mm") + "' " +
+                                    "Where   isNull(Reconcilled,'N') = 'N' " +
+                                    "And	 Trans_Type = 'Cash Events' " +
+                                    "And     Tckt = '" + dg_MissingDivs["GPB_Transaction_ID", i].Value.ToString() + "' ";
+                            SystemLibrary.SQLExecute(mySql);
+                            mySql = "Update Scotia_AcctHist " +
+                                    "Set Reconcilled = 'Y', Reason = 'Manual: " + SystemLibrary.f_Now().ToString("d-MMM-yyyy HH:mm") + "' " +
+                                    "Where   isNull(Reconcilled,'N') = 'N' " +
+                                    "And	 Trad_Type = 'Cash Event' " +
+                                    "And     ID = '" + dg_MissingDivs["GPB_Transaction_ID", i].Value.ToString() + "' ";
+                            SystemLibrary.SQLExecute(mySql);
+                            break;
+                    }
                 }
             }
             LoadMissingDivs();
@@ -479,12 +496,20 @@ namespace T1MultiAsset
 
         private void dg_MissingDivs_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
+            // Local Variables
+            DateTime ExDate; // SCOTIA can have no ExDate on their record.
+
+            if (dg_MissingDivs["Ex Date", e.RowIndex].Value == DBNull.Value)
+                ExDate = DateTime.MaxValue;
+            else
+                ExDate = Convert.ToDateTime(dg_MissingDivs["Ex Date", e.RowIndex].Value);
+
             if (Div.BBG_Ticker != null && !(Div.ParentFundID == SystemLibrary.ToInt32(dg_MissingDivs["FundID", e.RowIndex].Value)
                                               && Div.BBG_Ticker == SystemLibrary.ToString(dg_MissingDivs["BBG_Ticker", e.RowIndex].Value)
-                                              && Div.RecordDate == Convert.ToDateTime(dg_MissingDivs["Ex Date", e.RowIndex].Value)
-                                              &&  Div.EffectiveDate == Convert.ToDateTime(dg_MissingDivs["Payable Date", e.RowIndex].Value)
-                                              &&  Div.Quantity == SystemLibrary.ToDecimal(dg_MissingDivs["Quantity", e.RowIndex].Value)
-                                              &&  Div.Amount == SystemLibrary.ToDecimal(dg_MissingDivs["Amount", e.RowIndex].Value)
+                                              && Div.RecordDate == ExDate
+                                              && Div.EffectiveDate == Convert.ToDateTime(dg_MissingDivs["Payable Date", e.RowIndex].Value)
+                                              && Div.Quantity == SystemLibrary.ToDecimal(dg_MissingDivs["Quantity", e.RowIndex].Value)
+                                              && Div.Amount == SystemLibrary.ToDecimal(dg_MissingDivs["Amount", e.RowIndex].Value)
                                              )
                 )
             {
@@ -496,7 +521,7 @@ namespace T1MultiAsset
         {
             // Local Variables
             String mySql;
-
+            String RecordDateString;
 
 
             // Make sure its a valid row
@@ -505,7 +530,16 @@ namespace T1MultiAsset
 
             Div.ParentFundID = SystemLibrary.ToInt32(dg_MissingDivs["FundID", inRow].Value);
             Div.BBG_Ticker = SystemLibrary.ToString(dg_MissingDivs["BBG_Ticker", inRow].Value);
-            Div.RecordDate = Convert.ToDateTime(dg_MissingDivs["Ex Date", inRow].Value);
+            if (dg_MissingDivs["Ex Date", inRow].Value == DBNull.Value)
+            {
+                Div.RecordDate = DateTime.MinValue;
+                RecordDateString = " ";
+            }
+            else
+            {
+                Div.RecordDate = Convert.ToDateTime(dg_MissingDivs["Ex Date", inRow].Value);
+                RecordDateString = "And	Transactions.RecordDate = '" + Div.RecordDate.ToString("dd-MMM-yyyy") + "'  ";
+            }
             Div.EffectiveDate = Convert.ToDateTime(dg_MissingDivs["Payable Date", inRow].Value);
             Div.Quantity = SystemLibrary.ToDecimal(dg_MissingDivs["Quantity", inRow].Value);
             Div.Amount = SystemLibrary.ToDecimal(dg_MissingDivs["Amount", inRow].Value);
@@ -516,7 +550,7 @@ namespace T1MultiAsset
                     "       Fund pf " +
                     "where	Transactions.TranType = 'Dividend' " +
                     "And	Transactions.Description like 'Div: %" + Div.BBG_Ticker + "%'  " +
-                    "And	Transactions.RecordDate = '" + Div.RecordDate.ToString("dd-MMM-yyyy") + "'  " +
+                    RecordDateString +
                     "And	Transactions.EffectiveDate = '" + Div.EffectiveDate.ToString("dd-MMM-yyyy") + "'  " +
                     "And	Fund.FundID = Transactions.FundID " +
                     "And    pf.FundID = Fund.ParentFundID " +
@@ -558,6 +592,8 @@ namespace T1MultiAsset
                 String mySql = "Update Transactions Set Amount = " + dg_Transactions["Amount", 0].Value.ToString() + " Where TranID = " + dg_Transactions["TranID", 0].Value.ToString();
                 SystemLibrary.SQLExecute(mySql);
                 SystemLibrary.SQLExecute("Exec sp_ML_Process_File '', 'ML_E239'");
+                SystemLibrary.SQLExecute("Exec sp_Scotia_Process_File '', 'SCOTIA_CASHSTMNT'");
+                SystemLibrary.SQLExecute("Exec sp_Scotia_Process_File '', 'SCOTIA_ACCTHIST'");
                 SystemLibrary.SQLExecute("Exec sp_Calc_Profit_RebuildFrom '" + Div.EffectiveDate.ToString("dd-MMM-yyyy") + "' ");
                 SystemLibrary.SQLExecute("Exec sp_SOD_Positions ");
                 dt_Transactions.Rows.Clear();
