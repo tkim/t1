@@ -18,3 +18,10 @@ The T1 Multi Asset System solves for this
 
 - T1 leverages off the fact that almost all transactions today are electronic; 
    And that avoiding human intervention takes away human-error.
+
+
+Note for Developers
+-------------------
+The T1 system works on an Exception Basis with easy to follow maintenance. This is opposite to existing platforms.
+It is easy to write software so that the Asset Manager has to hire more dedicated staff.
+Please be cognisant of this fact when adding software and design for the systematic and not user processing.
