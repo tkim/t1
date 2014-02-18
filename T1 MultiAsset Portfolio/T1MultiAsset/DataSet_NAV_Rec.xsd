@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DataSet_NAV_Rec" targetNamespace="http://tempuri.org/DataSet_NAV_Rec.xsd" xmlns:mstns="http://tempuri.org/DataSet_NAV_Rec.xsd" xmlns="http://tempuri.org/DataSet_NAV_Rec.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DataSet_NAV_Rec" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="DataSet_NAV_Rec" msprop:Generator_UserDSName="DataSet_NAV_Rec" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="NAV_Rec" msprop:Generator_UserTableName="NAV_Rec" msprop:Generator_RowDeletedName="NAV_RecRowDeleted" msprop:Generator_TableClassName="NAV_RecDataTable" msprop:Generator_RowChangedName="NAV_RecRowChanged" msprop:Generator_RowClassName="NAV_RecRow" msprop:Generator_RowChangingName="NAV_RecRowChanging" msprop:Generator_RowEvArgName="NAV_RecRowChangeEvent" msprop:Generator_RowEvHandlerName="NAV_RecRowChangeEventHandler" msprop:Generator_TablePropName="NAV_Rec" msprop:Generator_TableVarName="tableNAV_Rec" msprop:Generator_RowDeletingName="NAV_RecRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Description" msprop:Generator_UserColumnName="Description" msprop:Generator_ColumnPropNameInRow="Description" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="Amount" msprop:Generator_UserColumnName="Amount" msprop:Generator_ColumnPropNameInRow="Amount" msprop:Generator_ColumnVarNameInTable="columnAmount" msprop:Generator_ColumnPropNameInTable="AmountColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="NAV_x0020_EOD" msprop:Generator_UserColumnName="NAV EOD" msprop:Generator_ColumnPropNameInRow="NAV_EOD" msprop:Generator_ColumnVarNameInTable="columnNAV_EOD" msprop:Generator_ColumnPropNameInTable="NAV_EODColumn" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

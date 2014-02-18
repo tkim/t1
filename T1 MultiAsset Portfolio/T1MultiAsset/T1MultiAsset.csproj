@@ -1,0 +1,833 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7579FC60-CF8D-432A-BBA8-5D437E403B24}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>T1MultiAsset</RootNamespace>
+    <AssemblyName>T1MultiAsset</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>T1MultiAsset.ico</ApplicationIcon>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ManifestCertificateThumbprint>F6FA04A3CC09D038D82F5C44D472C70C36E7A751</ManifestCertificateThumbprint>
+    <ManifestKeyFile>T1MultiAsset_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bloomberglp.Blpapi, Version=3.5.1.1, Culture=neutral, PublicKeyToken=ec3efa8c033c2bc5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\BLP\API\APIv3\DotnetAPI\v3.5.1.1\lib\Bloomberglp.Blpapi.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.Enterprise.Framework, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.Enterprise.InfoStore, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.ReportSource, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.Shared, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="FontBox-0.1.0-dev, Version=0.0.0.0, Culture=neutral" />
+    <Reference Include="IKVM.GNU.Classpath, Version=0.30.0.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58" />
+    <Reference Include="IKVM.Runtime, Version=0.30.0.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="Microsoft.Office.Interop.Word, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="Microsoft.ReportViewer.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="NDde, Version=2.1.563.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="PDFBox-0.7.3, Version=0.0.0.0, Culture=neutral" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.DirectoryServices.AccountManagement">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Windows\assembly\GAC_MSIL\System.Web.Services\2.0.0.0__b03f5f7f11d50a3a\System.Web.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutBox1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutBox1.Designer.cs">
+      <DependentUpon>AboutBox1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ASICShortReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ASICShortReport.Designer.cs">
+      <DependentUpon>ASICShortReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Bloomberg Realtime.cs" />
+    <Compile Include="BrokerMaintenance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BrokerMaintenance.Designer.cs">
+      <DependentUpon>BrokerMaintenance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChartOfAccounts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChartOfAccounts.Designer.cs">
+      <DependentUpon>ChartOfAccounts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommissionSummary.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CommissionSummary.Designer.cs">
+      <DependentUpon>CommissionSummary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrystalReport1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CrystalReport1.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CrystalReport3.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CrystalReport3.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="cr_BalanceSheet.cs">
+      <DependentUpon>cr_BalanceSheet.rpt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="cr_NAV_Rec.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cr_NAV_Rec.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="cr_ProfitLoss.cs">
+      <DependentUpon>cr_ProfitLoss.rpt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="cr_TrialBalance.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>cr_TrialBalance.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataSet_ChartOfAccounts.cs">
+      <DependentUpon>DataSet_ChartOfAccounts.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataSet_ChartOfAccounts.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSet_ChartOfAccounts.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSet_NAV_Rec.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSet_NAV_Rec.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DataSet_TaxParcels.cs">
+      <DependentUpon>DataSet_TaxParcels.xsd</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataSet_TaxParcels.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSet_TaxParcels.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DBConnect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DBConnect.Designer.cs">
+      <DependentUpon>DBConnect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DefineInterestAccrual.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefineInterestAccrual.Designer.cs">
+      <DependentUpon>DefineInterestAccrual.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DGVPrinter.cs" />
+    <Compile Include="EMSX API.cs" />
+    <Compile Include="EMSX_MULTI_Override.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EMSX_MULTI_Override.Designer.cs">
+      <DependentUpon>EMSX_MULTI_Override.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EOD Prices.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EOD Prices.Designer.cs">
+      <DependentUpon>EOD Prices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExcelImport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FillWithoutOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FillWithoutOrder.Designer.cs">
+      <DependentUpon>FillWithoutOrder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ForwardDividends.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ForwardDividends.Designer.cs">
+      <DependentUpon>ForwardDividends.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FTP_MLPrime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FTP_MLPrime.Designer.cs">
+      <DependentUpon>FTP_MLPrime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FTP_Parameters.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FTP_Parameters.Designer.cs">
+      <DependentUpon>FTP_Parameters.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FTP_ScotiaPrime.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FTP_ScotiaPrime.Designer.cs">
+      <DependentUpon>FTP_ScotiaPrime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FutureMargins.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FutureMargins.Designer.cs">
+      <DependentUpon>FutureMargins.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FuturesExplainWireTransfer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FuturesExplainWireTransfer.Designer.cs">
+      <DependentUpon>FuturesExplainWireTransfer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportData.Designer.cs">
+      <DependentUpon>ImportData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InterestApportion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InterestApportion.Designer.cs">
+      <DependentUpon>InterestApportion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="JournalCapitalMovement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="JournalCapitalMovement.Designer.cs">
+      <DependentUpon>JournalCapitalMovement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MaintainFunds.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MaintainFunds.Designer.cs">
+      <DependentUpon>MaintainFunds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MissingSecurities.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MissingSecurities.Designer.cs">
+      <DependentUpon>MissingSecurities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MissingSettlementDate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MissingSettlementDate.Designer.cs">
+      <DependentUpon>MissingSettlementDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MLFutures_Balance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MLFutures_Balance.Designer.cs">
+      <DependentUpon>MLFutures_Balance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MLFuture_Reconcile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MLFuture_Reconcile.Designer.cs">
+      <DependentUpon>MLFuture_Reconcile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MLPrime_Balance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MLPrime_Balance.Designer.cs">
+      <DependentUpon>MLPrime_Balance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MLPrime_Reconcile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MLPrime_Reconcile.Designer.cs">
+      <DependentUpon>MLPrime_Reconcile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NAVReconcileReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NAVReconcileReport.Designer.cs">
+      <DependentUpon>NAVReconcileReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OvernightPrices.cs" />
+    <Compile Include="PortTabLayout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PortTabLayout.Designer.cs">
+      <DependentUpon>PortTabLayout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PostGSTAccrual.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PostGSTAccrual.Designer.cs">
+      <DependentUpon>PostGSTAccrual.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PrintDGV.cs" />
+    <Compile Include="PrintOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PrintOptions.designer.cs">
+      <DependentUpon>PrintOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessFundClosedTransactions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessFundClosedTransactions.Designer.cs">
+      <DependentUpon>ProcessFundClosedTransactions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessJournals.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessJournals.Designer.cs">
+      <DependentUpon>ProcessJournals.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessOrders.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessOrders.Designer.cs">
+      <DependentUpon>ProcessOrders.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessTrades.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessTrades.Designer.cs">
+      <DependentUpon>ProcessTrades.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessUnallocatedTransactions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessUnallocatedTransactions.Designer.cs">
+      <DependentUpon>ProcessUnallocatedTransactions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AboutBox1.resx">
+      <DependentUpon>AboutBox1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ASICShortReport.resx">
+      <DependentUpon>ASICShortReport.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BrokerMaintenance.resx">
+      <DependentUpon>BrokerMaintenance.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChartOfAccounts.resx">
+      <DependentUpon>ChartOfAccounts.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CommissionSummary.resx">
+      <DependentUpon>CommissionSummary.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CrystalReport1.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>CrystalReport1.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CrystalReport3.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>CrystalReport3.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="cr_BalanceSheet.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>cr_BalanceSheet.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="cr_NAV_Rec.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>cr_NAV_Rec.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="cr_ProfitLoss.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>cr_ProfitLoss.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="cr_TrialBalance.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>cr_TrialBalance.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DBConnect.resx">
+      <DependentUpon>DBConnect.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefineInterestAccrual.resx">
+      <DependentUpon>DefineInterestAccrual.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EMSX_MULTI_Override.resx">
+      <DependentUpon>EMSX_MULTI_Override.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EOD Prices.resx">
+      <DependentUpon>EOD Prices.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FillWithoutOrder.resx">
+      <DependentUpon>FillWithoutOrder.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ForwardDividends.resx">
+      <DependentUpon>ForwardDividends.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FTP_MLPrime.resx">
+      <DependentUpon>FTP_MLPrime.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FTP_Parameters.resx">
+      <DependentUpon>FTP_Parameters.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FutureMargins.resx">
+      <DependentUpon>FutureMargins.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FuturesExplainWireTransfer.resx">
+      <DependentUpon>FuturesExplainWireTransfer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportData.resx">
+      <DependentUpon>ImportData.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InterestApportion.resx">
+      <DependentUpon>InterestApportion.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JournalCapitalMovement.resx">
+      <DependentUpon>JournalCapitalMovement.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MaintainFunds.resx">
+      <DependentUpon>MaintainFunds.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MissingSecurities.resx">
+      <DependentUpon>MissingSecurities.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MissingSettlementDate.resx">
+      <DependentUpon>MissingSettlementDate.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MLFutures_Balance.resx">
+      <DependentUpon>MLFutures_Balance.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MLFuture_Reconcile.resx">
+      <DependentUpon>MLFuture_Reconcile.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MLPrime_Balance.resx">
+      <DependentUpon>MLPrime_Balance.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MLPrime_Reconcile.resx">
+      <DependentUpon>MLPrime_Reconcile.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NAVReconcileReport.resx">
+      <DependentUpon>NAVReconcileReport.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PortTabLayout.resx">
+      <DependentUpon>PortTabLayout.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PostGSTAccrual.resx">
+      <DependentUpon>PostGSTAccrual.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PrintOptions.resx">
+      <DependentUpon>PrintOptions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessFundClosedTransactions.resx">
+      <DependentUpon>ProcessFundClosedTransactions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessJournals.resx">
+      <DependentUpon>ProcessJournals.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessOrders.resx">
+      <DependentUpon>ProcessOrders.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessTrades.resx">
+      <DependentUpon>ProcessTrades.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessUnallocatedTransactions.resx">
+      <DependentUpon>ProcessUnallocatedTransactions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report1.rdlc" />
+    <EmbeddedResource Include="ReportAccounts.resx">
+      <DependentUpon>ReportAccounts.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportBorrow.resx">
+      <DependentUpon>ReportBorrow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportPosition.resx">
+      <DependentUpon>ReportPosition.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportProfit.resx">
+      <DependentUpon>ReportProfit.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportTrade.resx">
+      <DependentUpon>ReportTrade.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Report_BalanceSheet.rdlc" />
+    <EmbeddedResource Include="Report_BalanceSheet1.rdlc" />
+    <EmbeddedResource Include="Report_TaxParcels.rdlc" />
+    <EmbeddedResource Include="Report_test.rdlc" />
+    <EmbeddedResource Include="SetDebugLevel.resx">
+      <DependentUpon>SetDebugLevel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ShowFillStatus.resx">
+      <DependentUpon>ShowFillStatus.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SMTP Setup.resx">
+      <DependentUpon>SMTP Setup.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StockLoanFeeApportion.resx">
+      <DependentUpon>StockLoanFeeApportion.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SystemIntegrity.resx">
+      <DependentUpon>SystemIntegrity.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Transactions.resx">
+      <DependentUpon>Transactions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Registry.cs" />
+    <Compile Include="ReportAccounts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportAccounts.Designer.cs">
+      <DependentUpon>ReportAccounts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportBorrow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportBorrow.Designer.cs">
+      <DependentUpon>ReportBorrow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportPosition.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportPosition.designer.cs">
+      <DependentUpon>ReportPosition.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportProfit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportProfit.Designer.cs">
+      <DependentUpon>ReportProfit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportTrade.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportTrade.Designer.cs">
+      <DependentUpon>ReportTrade.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RTDClient.cs" />
+    <Compile Include="SendToBloomberg.cs" />
+    <Compile Include="SetDebugLevel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetDebugLevel.Designer.cs">
+      <DependentUpon>SetDebugLevel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ShowFillStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ShowFillStatus.Designer.cs">
+      <DependentUpon>ShowFillStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SMTP Setup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SMTP Setup.Designer.cs">
+      <DependentUpon>SMTP Setup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StockLoanFeeApportion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StockLoanFeeApportion.Designer.cs">
+      <DependentUpon>StockLoanFeeApportion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SystemIntegrity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SystemIntegrity.Designer.cs">
+      <DependentUpon>SystemIntegrity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SystemLibrary.cs" />
+    <Compile Include="Transactions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Transactions.Designer.cs">
+      <DependentUpon>Transactions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TreeViewCodeTA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\windows-calculator.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="BBRTDLib">
+      <Guid>{FCCD4FBC-2ABF-45AC-B1D8-089BB76A8D8D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="BLP_DATA_CTRLLib">
+      <Guid>{F2303253-4969-11D1-B305-00805F815CBF}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>6</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="T1MultiAsset_TemporaryKey.pfx" />
+    <None Include="Resources\increase-font-size-00.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="T1MultiAsset.ico" />
+    <None Include="DataSet_ChartOfAccounts.xsc">
+      <DependentUpon>DataSet_ChartOfAccounts.xsd</DependentUpon>
+    </None>
+    <None Include="DataSet_ChartOfAccounts.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSet_ChartOfAccounts.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="DataSet_ChartOfAccounts.xss">
+      <DependentUpon>DataSet_ChartOfAccounts.xsd</DependentUpon>
+    </None>
+    <None Include="DataSet_NAV_Rec.xsc">
+      <DependentUpon>DataSet_NAV_Rec.xsd</DependentUpon>
+    </None>
+    <None Include="DataSet_NAV_Rec.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSet_NAV_Rec.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="DataSet_NAV_Rec.xss">
+      <DependentUpon>DataSet_NAV_Rec.xsd</DependentUpon>
+    </None>
+    <None Include="DataSet_TaxParcels.xsc">
+      <DependentUpon>DataSet_TaxParcels.xsd</DependentUpon>
+    </None>
+    <None Include="DataSet_TaxParcels.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSet_TaxParcels.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="DataSet_TaxParcels.xss">
+      <DependentUpon>DataSet_TaxParcels.xsd</DependentUpon>
+    </None>
+    <None Include="Properties\DataSources\Form1.datasource" />
+    <None Include="Resources\Beta.png" />
+    <None Include="Resources\Printer1.jpg" />
+    <None Include="Resources\Printer.jpg" />
+    <None Include="Resources\Printer-Icon.jpg" />
+    <None Include="Resources\refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="System.Windows.Forms.DataVisualization">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{967B4E0D-AD0C-4609-AB67-0FA40C0206D8}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

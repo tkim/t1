@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="T1MultiAsset.SystemLibrary">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="T1MultiAsset.SystemLibrary.ProtectStruct" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SystemLibrary.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="T1MultiAsset.SystemLibrary.FTPStruct" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SystemLibrary.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="T1MultiAsset.SystemLibrary.DBStruct" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SystemLibrary.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AABKQACEgBAEQAJAwkAECBAgAEAqQARAAUAAgAACQAA=</HashCode>
+      <FileName>SystemLibrary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
