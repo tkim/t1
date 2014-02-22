@@ -27,3 +27,14 @@ The T1 system works on an Exception Basis with easy to follow maintenance. This 
 It is easy to write software so that the Asset Manager has to hire more dedicated staff.
 
 Please be cognisant of this fact when adding software and design for systematic and not user processing.
+
+
+Installation Instructions
+-------------------------
+1) Fork T1 from github
+
+2) Install Microsoft Charts
+
+3) Run...
+
+2)
