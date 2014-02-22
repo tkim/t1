@@ -29,12 +29,17 @@ It is easy to write software so that the Asset Manager has to hire more dedicate
 Please be cognisant of this fact when adding software and design for systematic and not user processing.
 
 
-Installation Instructions
--------------------------
+Installation Instructions for Developers
+----------------------------------------
 1) Fork T1 from github
 
 2) Install Microsoft Charts
 
 3) Run...
 
-2)
+
+Installation Instructions for Users
+----------------------------------------
+1) Fork T1 from github
+
+2) Install Crystal Reports
