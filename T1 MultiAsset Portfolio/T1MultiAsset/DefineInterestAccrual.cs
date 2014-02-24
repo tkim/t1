@@ -298,6 +298,12 @@ namespace T1MultiAsset
             LoadCrncy();
         }
 
+        private void cb_crncy_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            myCrncy = SystemLibrary.ToString(((DataRowView)(cb_crncy.SelectedItem)).Row.ItemArray[0].ToString());
+
+        } //cb_crncy_SelectedIndexChanged()
+
         private void bt_Request_Click(object sender, EventArgs e)
         {
             // Local Variables
@@ -479,5 +485,6 @@ namespace T1MultiAsset
             ParentForm1.SetColumn(dg_AccountInterest, "EarnSpread", e.RowIndex);
 
         } //dg_AccountInterest_CellEndEdit()
+
     }
 }

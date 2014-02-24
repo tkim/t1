@@ -329,6 +329,10 @@ namespace T1MultiAsset
 
             frm.SetFlags(isBloombergEMSXFileConfigured, isScotiaPrimeConfigured, isMLPrimeConfigured, isMLFuturesConfigured);
             
+            // See if need to force higher levels of sp_actionsNeeded (every 5 minutes)
+            if (SystemLibrary.f_Now().Subtract(SystemLibrary.SQLSelectDateTime("Select ActionTime From ActionsNeeded_Log Where ActionText = 'RunLevel=200'", DateTime.MinValue)).TotalSeconds >= 300)
+                SystemLibrary.SQLExecute("Exec sp_ActionsNeeded 200, 'N'");
+
             // Indicate thread complete
             frm.isCheckForBloombergEMSXFileRunning = false;
 

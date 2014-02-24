@@ -22,6 +22,7 @@ using System.Reflection; // RTD
 using System.Threading;  // Threads
 using PrintDataGrid;
 using OvernightPrices;
+using System.Net.Mail;
 
 
 
@@ -344,7 +345,7 @@ namespace T1MultiAsset
                 else
                     button4.Visible = false;
 
-                //button4.Visible = true;
+                button4.Visible = true;
 
                 // SOme objects Need to be called after the form has been created. Hence the Load event.
                 PositionLoad();
@@ -2371,10 +2372,14 @@ namespace T1MultiAsset
             }
             else
             {
+                Color myColour;
                 if (SystemLibrary.ToDouble(dgr[ColName, myRow].Value) < 0)
-                    dgr[ColName, myRow].Style.ForeColor = Color.Red;
+                    myColour = Color.Red;
                 else
-                    dgr[ColName, myRow].Style.ForeColor = Color.Green;
+                    myColour = Color.Green;
+
+                if (dgr[ColName, myRow].Style.ForeColor != myColour)
+                    dgr[ColName, myRow].Style.ForeColor = myColour;
             }
         } // SetColumn()
 
@@ -2427,15 +2432,25 @@ namespace T1MultiAsset
 
         public void SetValueRG(DataGridViewRow dgr, String myColumn, Decimal myValue)
         {
+            // Local Variables
+            Color myColour;
             try
             {
-                dgr.Cells[myColumn].Value = myValue;
+                if (SystemLibrary.ToDecimal(dgr.Cells[myColumn].Value) != myValue)
+                    dgr.Cells[myColumn].Value = myValue;
+                /*
+                 * Colin Ritchie; 22-Feb-2014
+                 * Trying to use the dg_Port_CellPainting() event
+                 * If this works then need to search for all references of this call and add the same event to dg_Header & dg_Port_Transpose
+                 */
                 if (myValue < 0)
-                    dgr.Cells[myColumn].Style.ForeColor = Color.Red;
+                    myColour = Color.Red;
                 else if (myValue > 0)
-                    dgr.Cells[myColumn].Style.ForeColor = Color.Green;
+                    myColour = Color.Green;
                 else
-                    dgr.Cells[myColumn].Style.ForeColor = Color.Black;
+                    myColour = Color.Black;
+                if (dgr.Cells[myColumn].Style.ForeColor != myColour)
+                    dgr.Cells[myColumn].Style.ForeColor = myColour;
             }
             catch (Exception e)
             {
@@ -2514,9 +2529,13 @@ namespace T1MultiAsset
             Decimal PL_Exec;
             Decimal PL_Diff;
             Decimal Value_Prev;
+            Decimal LocalValue;
             Decimal Value;
             Decimal Value_SOD;
             Decimal Value_Filled;
+            Decimal Exposure;
+            Decimal Pct_FUM;
+            Decimal Pct_SOD;
             Decimal FXRate = -12345;
             Decimal PCT_Change;
             Decimal Price;
@@ -2569,53 +2588,123 @@ namespace T1MultiAsset
                         Qty_Order = SystemLibrary.ToDecimal(dg_in[j].Cells["Qty_Order"].Value);
                         Qty_Fill = SystemLibrary.ToDecimal(dg_in[j].Cells["Qty_Fill"].Value);
                         Div_Adjusted = SystemLibrary.ToDecimal(dg_in[j].Cells["Div_Adjusted"].Value);
-                        SetValueRG(dg_in[j], "LocalValue", SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value))));
+                        LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value)));
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["LocalValue"].Value),2) != Math.Round(LocalValue,2))
+                            dg_in[j].Cells["LocalValue"].Value = LocalValue;
+                        //SetValueRG(dg_in[j], "LocalValue", SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value))));
                         Value_Filled = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Fill)) * FXRate;
                         Value_Prev = SystemLibrary.ToDecimal(dg_in[j].Cells["Value"].Value);
                         Value = SystemLibrary.ToDecimal(dg_in[j].Cells["LocalValue"].Value) * FXRate;
                         Value_SOD = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity)) * FXRate;
                         Gross_Amount = Gross_Amount - Math.Abs(Value_Prev) + Math.Abs(Value);
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2412: SetCalc(" + myTicker + ")");
-                        SetValueRG(dg_in[j], "Value", Value);
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Value"].Value), 2) != Math.Round(Value, 2))
+                            dg_in[j].Cells["Value"].Value = Value;
+                        //SetValueRG(dg_in[j], "Value", Value);
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2414: SetCalc(" + myTicker + ")");
                         if (Fund_Amount != 0)
                         {
-                            SetValueRG(dg_in[j], @"% FUM", Value / Fund_Amount);
-                            SetValueRG(dg_in[j], @"% SOD", Value_SOD / Fund_Amount);
+                            Pct_FUM = Value / Fund_Amount;
+                            Pct_SOD = Value_SOD / Fund_Amount;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% FUM"].Value),4) != Math.Round(Pct_FUM,4))
+                                dg_in[j].Cells[@"% FUM"].Value = Pct_FUM;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% SOD"].Value),4) != Math.Round(Pct_SOD,4))
+                                dg_in[j].Cells[@"% SOD"].Value = Pct_SOD;
+                            //SetValueRG(dg_in[j], @"% FUM", Value / Fund_Amount);
+                            //SetValueRG(dg_in[j], @"% SOD", Value_SOD / Fund_Amount);
                         }
                         // TODO (4) Exposure calc needs to be changed for options - ie. Using Underlying price & Delta. (Now Exposures = Value)
                         // TODO (4) Exposure then needs to be used for %FUM & %GROSS
-                        SetValueRG(dg_in[j], "Exposure", Value * FXRate);
-                        SetValueRG(dg_in[j], "Exposure_Filled", Value_Filled);
+                        Exposure = Value * FXRate;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Exposure"].Value),2) != Math.Round(Exposure,2))
+                            dg_in[j].Cells["Exposure"].Value = Exposure;
+                        if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Exposure_Filled"].Value),2) != Math.Round(Value_Filled,2))
+                            dg_in[j].Cells["Exposure_Filled"].Value = Value_Filled;
+                        //SetValueRG(dg_in[j], "Exposure", Value * FXRate);
+                        //SetValueRG(dg_in[j], "Exposure_Filled", Value_Filled);
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2424: SetCalc(" + myTicker + ")");
 
                         // MTD, et al P&L's rely on Todays data, so extract the old values for PL_DAY & PL_EXEC before updating
                         PL_Today_Prev = SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Day"].Value) + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Exec"].Value);
                         PL_Day = (Quantity * POS_Mult_Factor * (Price - (Prev_Close - Div_Adjusted))) * FXRate;
                         PL_Exec = (Qty_Fill * POS_Mult_Factor * (Price - SystemLibrary.ToDecimal(dg_in[j].Cells["Avg_Price"].Value))) * FXRate;
-                        SetValueRG(dg_in[j], "PL_Day", PL_Day);
-                        SetValueRG(dg_in[j], "PL_Exec", PL_Exec);
+                        if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Day"].Value), 2) != Math.Round(PL_Day, 2))
+                            dg_in[j].Cells["PL_Day"].Value = PL_Day;
+                        if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Exec"].Value),2) != Math.Round(PL_Exec,2))
+                            dg_in[j].Cells["PL_Exec"].Value = PL_Exec;
+                        //SetValueRG(dg_in[j], "PL_Day", PL_Day);
+                        //SetValueRG(dg_in[j], "PL_Exec", PL_Exec);
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2432: SetCalc(" + myTicker + ")");
                         if (Fund_Amount != 0)
                         {
-                            SetValueRG(dg_in[j], @"% Fill", Value_Filled / Fund_Amount);
-                            SetValueRG(dg_in[j], @"PL BPS", (PL_Day + PL_Exec) / Fund_Amount * 100m);
-                            SetValueRG(dg_in[j], @"PL_EOD", PL_Day + PL_Exec);
-                            SetValueRG(dg_in[j], @"Qty_EOD", Quantity + Qty_Order);
-                            SetValueRG(dg_in[j], @"Qty_EOD_Fill", Quantity + Qty_Fill);
+                            Decimal Pct_Fill;
+                            Decimal PL_BPS;
+                            Decimal PL_EOD;
+                            Decimal Qty_EOD;
+                            Decimal Qty_EOD_Fill;
+                            Pct_Fill = Value_Filled / Fund_Amount;
+                            PL_BPS = (PL_Day + PL_Exec) / Fund_Amount * 100m;
+                            PL_EOD = PL_Day + PL_Exec;
+                            Qty_EOD = Quantity + Qty_Order;
+                            Qty_EOD_Fill = Quantity + Qty_Fill;
+
+                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% Fill"].Value),4) != Math.Round(Pct_Fill,4))
+                                dg_in[j].Cells[@"% Fill"].Value = Pct_Fill;
+                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL BPS"].Value),2) != Math.Round(PL_BPS,2))
+                                dg_in[j].Cells[@"PL BPS"].Value = PL_BPS;
+                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_EOD"].Value),2) != Math.Round(PL_EOD,2))
+                                dg_in[j].Cells[@"PL_EOD"].Value = PL_EOD;
+                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"Qty_EOD"].Value),2) != Math.Round(Qty_EOD,2))
+                                dg_in[j].Cells[@"Qty_EOD"].Value = Qty_EOD;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"Qty_EOD_Fill"].Value), 2) != Math.Round(Qty_EOD_Fill, 2))
+                                dg_in[j].Cells[@"Qty_EOD_Fill"].Value = Qty_EOD_Fill;
+                            //SetValueRG(dg_in[j], @"% Fill", Value_Filled / Fund_Amount);
+                            //SetValueRG(dg_in[j], @"PL BPS", (PL_Day + PL_Exec) / Fund_Amount * 100m);
+                            //SetValueRG(dg_in[j], @"PL_EOD", PL_Day + PL_Exec);
+                            //SetValueRG(dg_in[j], @"Qty_EOD", Quantity + Qty_Order);
+                            //SetValueRG(dg_in[j], @"Qty_EOD_Fill", Quantity + Qty_Fill);
                         }
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2440: SetCalc(" + myTicker + ")");
 
                         // - Below are P&L's that need diff between this update & last update
                         PL_Diff = PL_Day + PL_Exec - PL_Today_Prev;
-                        SetValueRG(dg_in[j], "PL_TradePeriod", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value));
-                        SetValueRG(dg_in[j], "PL_WRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value));
-                        SetValueRG(dg_in[j], "PL_MRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value));
-                        SetValueRG(dg_in[j], "PL_MTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value));
-                        SetValueRG(dg_in[j], "PL_DeltaMax", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value));
-                        SetValueRG(dg_in[j], "PL_Inception", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value));
-                        SetValueRG(dg_in[j], "PL_YTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value));
-                        SetValueRG(dg_in[j], "PL_YTD_July", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value));
 
+                        Decimal PL_TradePeriod = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value);
+                        Decimal PL_WRoll = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value);
+                        Decimal PL_MRoll = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value);
+                        Decimal PL_MTD = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value);
+                        Decimal PL_DeltaMax = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value);
+                        Decimal PL_Inception = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value);
+                        Decimal PL_YTD = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value);
+                        Decimal PL_YTD_July = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value);
+
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_TradePeriod"].Value),2) != Math.Round(PL_TradePeriod,2))
+                            dg_in[j].Cells[@"PL_TradePeriod"].Value = PL_TradePeriod;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_WRoll"].Value),2) != Math.Round(PL_WRoll, 2))
+                            dg_in[j].Cells[@"PL_WRoll"].Value = PL_WRoll;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_MRoll"].Value),2) != Math.Round(PL_MRoll,2))
+                            dg_in[j].Cells[@"PL_MRoll"].Value = PL_MRoll;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_MTD"].Value),2) != Math.Round(PL_MTD,2))
+                            dg_in[j].Cells[@"PL_MTD"].Value = PL_MTD;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_DeltaMax"].Value),2) != Math.Round(PL_DeltaMax,2))
+                            dg_in[j].Cells[@"PL_DeltaMax"].Value = PL_DeltaMax;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_Inception"].Value),2) != Math.Round(PL_Inception,2))
+                            dg_in[j].Cells[@"PL_Inception"].Value = PL_Inception;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_YTD"].Value),2) != Math.Round(PL_YTD,2))
+                            dg_in[j].Cells[@"PL_YTD"].Value = PL_YTD;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_YTD_July"].Value),2) != Math.Round(PL_YTD_July,2))
+                            dg_in[j].Cells[@"PL_YTD_July"].Value = PL_YTD_July;
+
+                        
+                        //SetValueRG(dg_in[j], "PL_TradePeriod", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value));
+                        //SetValueRG(dg_in[j], "PL_WRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value));
+                        //SetValueRG(dg_in[j], "PL_MRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value));
+                        //SetValueRG(dg_in[j], "PL_MTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value));
+                        //SetValueRG(dg_in[j], "PL_DeltaMax", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value));
+                        //SetValueRG(dg_in[j], "PL_Inception", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value));
+                        //SetValueRG(dg_in[j], "PL_YTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value));
+                        //SetValueRG(dg_in[j], "PL_YTD_July", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value));
+                        
                         // PCT Change
                         try
                         {
@@ -2628,7 +2717,9 @@ namespace T1MultiAsset
                         {
                             PCT_Change = 0;
                         }
-                        SetValueRG(dg_in[j], @"% Chg", PCT_Change);
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% Chg"].Value), 4) != Math.Round(PCT_Change, 4))
+                            dg_in[j].Cells[@"% Chg"].Value = PCT_Change;
+                        //SetValueRG(dg_in[j], @"% Chg", PCT_Change);
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2466: SetCalc(" + myTicker + ")");
 
                         //if (myTicker.ToUpper() == "XPM2 INDEX")
@@ -2665,12 +2756,22 @@ namespace T1MultiAsset
                                                 // TODO (5) Using Start-of-Day Fund_Amount where could also take into account value change on the day using Price & Prev_Close.
                                                 //          Very little incremental value though. If Portfolio is up 5% on the day, then position would be 5% out, so on a 5% pos, this would be 0.25%.
                                                 Decimal myFund_Amount = Convert.ToDecimal(myFundIDFundAmount[1]);
-
-                                                SetValueRG(dg_tran[k], "LocalValue_" + myFundIDFundAmount[0], SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (SystemLibrary.ToDecimal(dg_tran[k].Cells["Quantity_" + myFundIDFundAmount[0]].Value) + SystemLibrary.ToDecimal(dg_tran[k].Cells["Incr_" + myFundIDFundAmount[0]].Value))));
-                                                Value = SystemLibrary.ToDecimal(dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value) * FXRate;
-                                                SetValueRG(dg_tran[k], "Value_" + myFundIDFundAmount[0], Value);
+                                                LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (SystemLibrary.ToDecimal(dg_tran[k].Cells["Quantity_" + myFundIDFundAmount[0]].Value) + SystemLibrary.ToDecimal(dg_tran[k].Cells["Incr_" + myFundIDFundAmount[0]].Value)));
+                                                if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value), 2) != Math.Round(LocalValue, 2))
+                                                    dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value = LocalValue;
+                                                //SetValueRG(dg_tran[k], "LocalValue_" + myFundIDFundAmount[0], SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (SystemLibrary.ToDecimal(dg_tran[k].Cells["Quantity_" + myFundIDFundAmount[0]].Value) + SystemLibrary.ToDecimal(dg_tran[k].Cells["Incr_" + myFundIDFundAmount[0]].Value))));
+                                                //Value = SystemLibrary.ToDecimal(dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value) * FXRate;
+                                                Value = LocalValue * FXRate;
+                                                if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells["Value_" + myFundIDFundAmount[0]].Value), 2) != Math.Round(Value, 2))
+                                                    dg_tran[k].Cells["Value_" + myFundIDFundAmount[0]].Value = Value;
+                                                //SetValueRG(dg_tran[k], "Value_" + myFundIDFundAmount[0], Value);
                                                 if (myFund_Amount != 0)
-                                                    SetValueRG(dg_tran[k], @"Weight_" + myFundIDFundAmount[0], Value / myFund_Amount);
+                                                {
+                                                    Decimal Weight = Value / myFund_Amount;
+                                                    if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells[@"Weight_" + myFundIDFundAmount[0]].Value),2) != Math.Round(Weight,2))
+                                                        dg_tran[k].Cells[@"Weight_" + myFundIDFundAmount[0]].Value = Weight;
+                                                    //SetValueRG(dg_tran[k], @"Weight_" + myFundIDFundAmount[0], Value / myFund_Amount);
+                                                }
                                             }
                                         }
                                     }
@@ -2910,7 +3011,12 @@ namespace T1MultiAsset
                     {
                         myExposure = SystemLibrary.ToDecimal(dg_Port.Rows[i].Cells["Exposure"].Value);
                         if (Gross_Amount != 0)
-                            SetValueRG(dg_Port.Rows[i], @"% Gross", myExposure / Gross_Amount);
+                        {
+                            Decimal PCT_Gross = myExposure / Gross_Amount;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_Port.Rows[i].Cells[@"% Gross"].Value), 4) != Math.Round(PCT_Gross, 4))
+                                dg_Port.Rows[i].Cells[@"% Gross"].Value = PCT_Gross;
+                            //SetValueRG(dg_Port.Rows[i], @"% Gross", myExposure / Gross_Amount);
+                        }
                     }
                 }
 
@@ -3816,7 +3922,11 @@ namespace T1MultiAsset
             try
             {
                 this.SuspendLayout();
-                ResetHiddenRows();
+                //ResetHiddenRows();
+                SetFormat();
+                //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - pre SetCalc()");
+                //SetCalc();
+                //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - post SetCalc()");
                 /*
                 if (tabControl_Port.SelectedTab.Text == "TRADE")
                 {
@@ -3963,8 +4073,53 @@ namespace T1MultiAsset
 
         private void button4_Click(object sender, EventArgs e)
         {
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Start: SetCalc()");
+            SetCalc();
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - End: SetCalc()");
+            return;
+            String Checks = "Can T1 access directories:\r\n";
 
- 
+            //MessageBox.Show("This will take 30 seconds. Press OK to continue", "FTP Check");
+            // hourglass cursor
+            Cursor.Current = Cursors.WaitCursor;
+
+            SystemLibrary.SetDebugLevel(4);
+            String[] myFiles = SystemLibrary.FTPGetFileList(SystemLibrary.FTPSCOTIAPrimeVars, @"/FPOBELYS");
+            String FTPFileNames = "Scotia Files\r\n";
+
+            if (myFiles != null)
+            {
+                SystemLibrary.DebugLine("myFiles: " + myFiles.Length.ToString());
+                // This block of code is so that I only go to the database once against the SCOTIA_File_FTPList table
+                foreach (String myFileName in myFiles)
+                {
+                    FTPFileNames = FTPFileNames + "'" + myFileName + "'\r\n";
+                }
+            }
+
+            String myPath = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SCOTIAPrime_Path')");
+            if (Directory.Exists(myPath))
+            {
+                Checks = Checks + "Found '" + myPath + "'";
+                if (Directory.Exists(myPath + @"\Archive"))
+                {
+                    Checks = Checks + "\r\nFound '" + myPath + @"\Archive" + "'";
+                }
+                if (Directory.Exists(myPath + @"\OutBound"))
+                {
+                    Checks = Checks + "\r\nFound '" + myPath + @"\OutBound" + "'";
+                }
+            }
+
+            SystemLibrary.SetDebugLevel(0);
+            Cursor.Current = Cursors.Default;
+            Clipboard.SetText(Checks + "\r\n\r\n" + FTPFileNames);
+            MessageBox.Show(Checks + "\r\n\r\n" + FTPFileNames, "FTP TEST: Please Paste from clipboard to Skype.");
+
+
+
+            return;
+
             int screenLeft = SystemInformation.VirtualScreen.Left;
             int screenTop = SystemInformation.VirtualScreen.Top;
             int screenWidth = SystemInformation.VirtualScreen.Width;
@@ -3972,7 +4127,7 @@ namespace T1MultiAsset
 
             this.Size = new System.Drawing.Size(screenWidth, screenHeight);
             this.Location = new System.Drawing.Point(screenLeft, screenTop);
-            
+
             //SavePrices();
             return;
 
@@ -4566,26 +4721,28 @@ namespace T1MultiAsset
         {
             //SystemLibrary.SetDebugLevel(4);
             SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Start(" + cb_Fund.Text + ")");
-            //SystemLibrary.SetDebugLevel(0);
-            FundID = Convert.ToInt16(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[0].ToString());
-            Fund_Name = ((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[1].ToString();
-            Fund_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[2].ToString());
-            Fund_Crncy = ((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[3].ToString();
-            LoadFundAmount();
-            SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Post LoadFundAmount()");
-            /*this.SuspendLayout();*/
-            LoadPortfolio(true);
-            SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Post LoadPortfolio(true)");
-            /*
-            ResetHiddenRows();
-            SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Post ResetHiddenRows()");
-            this.ResumeLayout(true);
-            */
+            if (cb_Fund.Items.Count > 0)
+            {
+                //SystemLibrary.SetDebugLevel(0);
+                FundID = Convert.ToInt16(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[0].ToString());
+                Fund_Name = ((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[1].ToString();
+                Fund_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[2].ToString());
+                Fund_Crncy = ((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[3].ToString();
+                LoadFundAmount();
+                SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Post LoadFundAmount()");
+                /*this.SuspendLayout();*/
+                LoadPortfolio(true);
+                SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Post LoadPortfolio(true)");
+                /*
+                ResetHiddenRows();
+                SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - Post ResetHiddenRows()");
+                this.ResumeLayout(true);
+                */
 
-            // Store the FundID to the Registry
-            Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
-            myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\StartUp", "FundID", FundID);
-
+                // Store the FundID to the Registry
+                Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
+                myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\StartUp", "FundID", FundID);
+            }
             //SystemLibrary.SetDebugLevel(4);
             SystemLibrary.DebugLine("cb_Fund_SelectionChangeCommitted - End");
             //SystemLibrary.SetDebugLevel(0);
@@ -4594,20 +4751,22 @@ namespace T1MultiAsset
         private void cb_Portfolio_SelectionChangeCommitted(object sender, EventArgs e)
         {
             SystemLibrary.DebugLine("cb_Portfolio_SelectionChangeCommitted - Start");
-            PortfolioID = Convert.ToInt16(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[0].ToString());
-            Portfolio_Name = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[1].ToString();
-            Portfolio_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[2].ToString());
-            Portfolio_Crncy = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[3].ToString();
-            LoadFund(PortfolioID);
-            this.SuspendLayout();
-            LoadPortfolio(true);
-            //cfr 20130918 ResetHiddenRows();
-            this.ResumeLayout(true);
+            if (cb_Portfolio.Items.Count > 0)
+            {
+                PortfolioID = Convert.ToInt16(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[0].ToString());
+                Portfolio_Name = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[1].ToString();
+                Portfolio_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[2].ToString());
+                Portfolio_Crncy = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[3].ToString();
+                LoadFund(PortfolioID);
+                this.SuspendLayout();
+                LoadPortfolio(true);
+                //cfr 20130918 ResetHiddenRows();
+                this.ResumeLayout(true);
 
-            // Store the FundID to the Registry
-            Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
-            myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\StartUp", "PortfolioID", PortfolioID);
-
+                // Store the FundID to the Registry
+                Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
+                myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\StartUp", "PortfolioID", PortfolioID);
+            }
             SystemLibrary.DebugLine("cb_Portfolio_SelectionChangeCommitted - End");
         } // cb_Portfolio_SelectionChangeCommitted()
 
@@ -4994,9 +5153,15 @@ namespace T1MultiAsset
 
                         // Add Column that allows for incremental trades
                         if (dg_Port.Columns["Quantity_incr"] == null)
+                        {
                             dg_Port.Columns.Add("Quantity_incr", "Incremental Qty");
+                            dg_Port.Columns["Quantity_incr"].ValueType = typeof(Decimal);
+                        }
                         if (dg_Port.Columns["FUM_incr"] == null)
+                        {
                             dg_Port.Columns.Add("FUM_incr", "Incr FUM %");
+                            dg_Port.Columns["FUM_incr"].ValueType = typeof(Decimal);
+                        }
 
 
 
@@ -5380,291 +5545,299 @@ namespace T1MultiAsset
             bt_Create_Orders.Visible = false;
             bt_EMSX.Visible = false;
 
-            FixDataGridHeight();
-
-            toolStripMenuItem1.Enabled = true;
-            toolStripMenuItem1.Visible = true;
-
-            // UNhide hidden rows
-            // Hide Rows That are for FX balance
-            for (int i = 0; i < dg_Port.Rows.Count; i++)
+            // Deals with lack of database while running
+            try
             {
-                dg_Port.Rows[i].Visible = true;
-            }
-            if (dg_Port.Columns.Count > 0)
-            {
-                SetFormatColumn(dg_Port, "Qty_EOD", Color.Empty, Color.Empty, "N0", "0");
-                SetFormatColumn(dg_Port, @"% Fill", Color.Empty, Color.Empty, "0.00%", "0");
-            }
+                FixDataGridHeight();
 
-            switch (TabName)
-            {
-                case "TRADE":
-                    // Allow user to change
-                    dg_Port.Visible = true;
-                    dg_Action.Visible = false;
-                    dg_PortfolioTranspose.Visible = false;
-                    gb_Align.Visible = false;
-                    dg_Port.AllowUserToAddRows = true;
-                    dg_Port.ReadOnly = false;
-                    dg_Port.AlternatingRowsDefaultCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
-                    bt_Create_Orders.Visible = true;
-                    bt_EMSX.Visible = true;
+                toolStripMenuItem1.Enabled = true;
+                toolStripMenuItem1.Visible = true;
 
-                    // Organise columns
-                    // - Hide All columns
-                    foreach (DataGridViewColumn dc in dg_Port.Columns)
-                        dc.Frozen = false;
+                // UNhide hidden rows
+                // Hide Rows That are for FX balance
+                for (int i = 0; i < dg_Port.Rows.Count; i++)
+                {
+                    dg_Port.Rows[i].Visible = true;
+                }
+                if (dg_Port.Columns.Count > 0)
+                {
+                    SetFormatColumn(dg_Port, "Qty_EOD", Color.Empty, Color.Empty, "N0", "0");
+                    SetFormatColumn(dg_Port, @"% Fill", Color.Empty, Color.Empty, "0.00%", "0");
+                }
 
-                    foreach (DataGridViewColumn dc in dg_Port.Columns)
-                    {
-                        switch (dc.Name)
-                        {
-                            case "Ticker":
-                                dc.ReadOnly = false;
-                                dc.Visible = true;
-                                break;
-                            case "Price":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Security_Name":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Quantity":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Qty_Order":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Qty_Fill":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Qty_EOD":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Quantity_incr":
-                                dc.ReadOnly = false;
-                                dc.Visible = true;
-                                break;
-                            case "FUM_incr":
-                                dc.ReadOnly = false;
-                                dc.Visible = true;
-                                break;
-                            case "Value":
-                                dc.ReadOnly = false;
-                                dc.Visible = true;
-                                break;
-                            case "Exposure":
-                                dc.ReadOnly = false;
-                                dc.Visible = true;
-                                break;
-                            case @"% FUM":
-                                dc.ReadOnly = false;
-                                dc.Visible = true;
-                                break;
-                            case @"% Fill":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "Round_Lot_Size":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            case "FXRate":
-                                dc.ReadOnly = true;
-                                dc.Visible = true;
-                                break;
-                            default:
-                                if (dc.Visible == true)
-                                    dc.Visible = false;
-                                break;
-                        }
-                    }
-                    // Now set the Column Order, followed by Frozen
-                    dg_Port.Columns["Ticker"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Price"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Security_Name"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Quantity"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Qty_Order"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Qty_Fill"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Qty_EOD"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Quantity_incr"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["FUM_incr"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Value"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Exposure"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns[@"% FUM"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns[@"% Fill"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Round_Lot_Size"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["FXRate"].DisplayIndex = ColOrder++;
-                    dg_Port.Columns["Ticker"].Frozen = true;
-                    if (dg_Port.Columns.Count > 0)
-                    {
-                        SetFormatColumn(dg_Port, "Qty_EOD", Color.Empty, Color.Gainsboro, "N0", "0");
-                        SetFormatColumn(dg_Port, @"% Fill", Color.Empty, Color.Gainsboro, "0.00%", "0");
-                    }
-                    // Hide Rows That are for FX balance
-                    // CFR 20120327 UnHideRows();
-                    // CFR 20120327 HideAggregateRows("Y");
-                    // CFR 20120327 HideFXbalanceRows();
-                    myDataView.RowFilter = "IsAggregate <> 'Y' AND " +
-                                           "ISNULL(Industry_Group,'') Not In ('Equity Equiv','Cash Equiv')";
-
-                    // Deal with Currency display
-                    for(int i=0; i<dg_Port.Rows.Count; i++)
-                    {
-                        if (SystemLibrary.ToString(dg_Port.Rows[i].Cells["Sector"].Value) == "Currency")
-                        {
-                            dg_Port.Rows[i].Cells["Quantity"].Style.Format = "N2";
-                            dg_Port.Rows[i].Cells["Qty_Order"].Style.Format = "N2";
-                            dg_Port.Rows[i].Cells["Qty_Fill"].Style.Format = "N2";
-                            dg_Port.Rows[i].Cells["Qty_EOD"].Style.Format = "N2";
-                            dg_Port.Rows[i].Cells["Quantity_incr"].Style.Format = "N2";
-                            dg_Port.Rows[i].Cells["Value"].Style.Format = "N2";
-                            dg_Port.Rows[i].Cells["Exposure"].Style.Format = "N2";
-                        }
-                    }
-
-                    break;
-                case @"ColinFullList":
-                    // Allow user to change
-                    dg_Port.Visible = true;
-                    dg_Action.Visible = false;
-                    dg_PortfolioTranspose.Visible = false;
-                    gb_Align.Visible = false;
-                    dg_Port.AllowUserToAddRows = false;
-                    dg_Port.ReadOnly = true;
-                    dg_Port.AlternatingRowsDefaultCellStyle = dg_Port_AltStyle;
-                    // Reset background column on the Modelling columns
-                    TidyTRADEColumns();
-
-                    // Organise columns
-                    foreach (DataGridViewColumn dc in dg_Port.Columns)
-                    {
-                        dc.Visible = true;
-                    }
-                    // unHide Rows
-                    // CFR 20120327 UnHideRows();
-                    myDataView.RowFilter = "";
-                    break;
-                default:
-                    dg_Port.Visible = true;
-                    dg_Action.Visible = false;
-                    dg_PortfolioTranspose.Visible = false;
-                    gb_Align.Visible = false;
-                    // See if this is the ACTION Tab
-                    if (tc_Port.SelectedTab.Text.StartsWith("ACTION"))
-                    {
-                        if (tc_Port.SelectedTab.Tag != null)
-                        {
-                            if (tc_Port.SelectedTab.Tag.ToString() == "SYSTEM")
-                            {
-                                LoadActionTab(true);
-                                dg_Action.Visible = true;
-                                dg_Port.Visible = false;
-                                dg_PortfolioTranspose.Visible = false;
-                                gb_Align.Visible = false;
-                            }
-                        }
-                    }
-                    // See if this is the Portfolio Transpose Tab
-                    if (tc_Port.SelectedTab.Text.StartsWith("ALIGN"))
-                    {
-                        if (tc_Port.SelectedTab.Tag != null)
-                        {
-                            if (tc_Port.SelectedTab.Tag.ToString() == "SYSTEM")
-                            {
-                                if (!isAlive_PortfolioTranspose)
-                                    LoadPortfolioTranspose(true);
-                                dg_PortfolioTranspose.Visible = true;
-                                gb_Align.Visible = true;
-                                dg_Port.Visible = false;
-                                dg_Action.Visible = false;
-                                bt_Create_Orders.Visible = true;
-                                bt_EMSX.Visible = true;
-                            }
-                        }
-                    }
-                    if (dg_Port.Visible == true)
-                    {
+                switch (TabName)
+                {
+                    case "TRADE":
                         // Allow user to change
+                        dg_Port.Visible = true;
+                        dg_Action.Visible = false;
+                        dg_PortfolioTranspose.Visible = false;
+                        gb_Align.Visible = false;
+                        dg_Port.AllowUserToAddRows = true;
+                        dg_Port.ReadOnly = false;
+                        dg_Port.AlternatingRowsDefaultCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
+                        bt_Create_Orders.Visible = true;
+                        bt_EMSX.Visible = true;
+
+                        // Organise columns
+                        // - Hide All columns
+                        foreach (DataGridViewColumn dc in dg_Port.Columns)
+                            dc.Frozen = false;
+
+                        foreach (DataGridViewColumn dc in dg_Port.Columns)
+                        {
+                            switch (dc.Name)
+                            {
+                                case "Ticker":
+                                    dc.ReadOnly = false;
+                                    dc.Visible = true;
+                                    break;
+                                case "Price":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Security_Name":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Quantity":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Qty_Order":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Qty_Fill":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Qty_EOD":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Quantity_incr":
+                                    dc.ReadOnly = false;
+                                    dc.Visible = true;
+                                    break;
+                                case "FUM_incr":
+                                    dc.ReadOnly = false;
+                                    dc.Visible = true;
+                                    break;
+                                case "Value":
+                                    dc.ReadOnly = false;
+                                    dc.Visible = true;
+                                    break;
+                                case "Exposure":
+                                    dc.ReadOnly = false;
+                                    dc.Visible = true;
+                                    break;
+                                case @"% FUM":
+                                    dc.ReadOnly = false;
+                                    dc.Visible = true;
+                                    break;
+                                case @"% Fill":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "Round_Lot_Size":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                case "FXRate":
+                                    dc.ReadOnly = true;
+                                    dc.Visible = true;
+                                    break;
+                                default:
+                                    if (dc.Visible == true)
+                                        dc.Visible = false;
+                                    break;
+                            }
+                        }
+                        // Now set the Column Order, followed by Frozen
+                        dg_Port.Columns["Ticker"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Price"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Security_Name"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Quantity"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Qty_Order"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Qty_Fill"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Qty_EOD"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Quantity_incr"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["FUM_incr"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Value"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Exposure"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns[@"% FUM"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns[@"% Fill"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Round_Lot_Size"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["FXRate"].DisplayIndex = ColOrder++;
+                        dg_Port.Columns["Ticker"].Frozen = true;
+                        if (dg_Port.Columns.Count > 0)
+                        {
+                            SetFormatColumn(dg_Port, "Qty_EOD", Color.Empty, Color.Gainsboro, "N0", "0");
+                            SetFormatColumn(dg_Port, @"% Fill", Color.Empty, Color.Gainsboro, "0.00%", "0");
+                        }
+                        // Hide Rows That are for FX balance
+                        // CFR 20120327 UnHideRows();
+                        // CFR 20120327 HideAggregateRows("Y");
+                        // CFR 20120327 HideFXbalanceRows();
+                        myDataView.RowFilter = "IsAggregate <> 'Y' AND " +
+                                               "ISNULL(Industry_Group,'') Not In ('Equity Equiv','Cash Equiv')";
+
+                        // Deal with Currency display
+                        for (int i = 0; i < dg_Port.Rows.Count; i++)
+                        {
+                            if (SystemLibrary.ToString(dg_Port.Rows[i].Cells["Sector"].Value) == "Currency")
+                            {
+                                dg_Port.Rows[i].Cells["Quantity"].Style.Format = "N2";
+                                dg_Port.Rows[i].Cells["Qty_Order"].Style.Format = "N2";
+                                dg_Port.Rows[i].Cells["Qty_Fill"].Style.Format = "N2";
+                                dg_Port.Rows[i].Cells["Qty_EOD"].Style.Format = "N2";
+                                dg_Port.Rows[i].Cells["Quantity_incr"].Style.Format = "N2";
+                                dg_Port.Rows[i].Cells["Value"].Style.Format = "N2";
+                                dg_Port.Rows[i].Cells["Exposure"].Style.Format = "N2";
+                            }
+                        }
+
+                        break;
+                    case @"ColinFullList":
+                        // Allow user to change
+                        dg_Port.Visible = true;
+                        dg_Action.Visible = false;
+                        dg_PortfolioTranspose.Visible = false;
+                        gb_Align.Visible = false;
                         dg_Port.AllowUserToAddRows = false;
                         dg_Port.ReadOnly = true;
                         dg_Port.AlternatingRowsDefaultCellStyle = dg_Port_AltStyle;
                         // Reset background column on the Modelling columns
                         TidyTRADEColumns();
 
-                        // See if any columns for this Tab - Only occurs on a fresh database.
-                        if (dg_Port.Columns.Count < 1)
-                            return;
-
                         // Organise columns
                         foreach (DataGridViewColumn dc in dg_Port.Columns)
                         {
-                            DataRow[] dr = dt_Port_Tab_Detail.Select("TabName='" + TabName + "' and ColName='" + dc.Name + "'");
-                            if (dr.Length == 0)
-                                dc.Visible = false;
-                            else
-                            {
-                                dc.Frozen = false;
-                                dc.Visible = true;
-                            }
-                            if (dc.Name == "Ticker")
-                                dc.DefaultCellStyle.ForeColor = Color.DarkBlue;
-                            //dc.Visible = true;
-                            //SystemLibrary.DebugLine(dc.Name);
+                            dc.Visible = true;
                         }
-                        // I found I needed to set the Sort Order in its own loop
-                        SystemLibrary.DebugLine("StartLoop:" + TabName);
-                        // Sort on ColOrder Descending otherwise can still have wrong order columns
-                        foreach (DataRow dr_TD in dt_Port_Tab_Detail.Select("TabName='" + TabName + "'", "ColOrder desc"))
+                        // unHide Rows
+                        // CFR 20120327 UnHideRows();
+                        myDataView.RowFilter = "";
+                        break;
+                    default:
+                        dg_Port.Visible = true;
+                        dg_Action.Visible = false;
+                        dg_PortfolioTranspose.Visible = false;
+                        gb_Align.Visible = false;
+                        // See if this is the ACTION Tab
+                        if (tc_Port.SelectedTab.Text.StartsWith("ACTION"))
                         {
-                            SystemLibrary.DebugLine(TabName + "," + dr_TD["ColName"].ToString() + "," + dr_TD["ColOrder"].ToString());
-                            dg_Port.Columns[dr_TD["ColName"].ToString()].DisplayIndex = Convert.ToInt16(dr_TD["ColOrder"]);
-                        }
-                        SystemLibrary.DebugLine("EndLoop:" + TabName);
-
-                        // Organise the Frozen Column
-                        DataRow[] dr1 = dt_Port_Tabs.Select("TabName='" + TabName + "'");
-                        if (dr1.Length > 0)
-                        {
-                            String FrozenColumn = SystemLibrary.ToString(dr1[0]["FrozenColName"]);
-                            if (FrozenColumn.Length > 0)
+                            if (tc_Port.SelectedTab.Tag != null)
                             {
-                                if (dg_Port.Columns.Contains(FrozenColumn))
+                                if (tc_Port.SelectedTab.Tag.ToString() == "SYSTEM")
                                 {
-                                    try
-                                    {
-                                        dg_Port.Columns[FrozenColumn].Frozen = true;
-                                    }
-                                    catch { }
+                                    LoadActionTab(true);
+                                    dg_Action.Visible = true;
+                                    dg_Port.Visible = false;
+                                    dg_PortfolioTranspose.Visible = false;
+                                    gb_Align.Visible = false;
                                 }
                             }
                         }
-
-                        // Hide Rows where isAggregate ="Y"
-                        String myRowFilter = "";
-                        if (dr1.Length>0)
-                            myRowFilter = dr1[0]["RowFilter"].ToString();
-                        if (myRowFilter.Length > 0)
-                            myDataView.RowFilter = myRowFilter;
-                        else
+                        // See if this is the Portfolio Transpose Tab
+                        if (tc_Port.SelectedTab.Text.StartsWith("ALIGN"))
                         {
-                            // CFR 20120327 UnHideRows();
-                            // CFR 20120327 HideAggregateRows("Y");
-                            myDataView.RowFilter = "IsAggregate <> 'Y' ";
+                            if (tc_Port.SelectedTab.Tag != null)
+                            {
+                                if (tc_Port.SelectedTab.Tag.ToString() == "SYSTEM")
+                                {
+                                    if (!isAlive_PortfolioTranspose)
+                                        LoadPortfolioTranspose(true);
+                                    dg_PortfolioTranspose.Visible = true;
+                                    gb_Align.Visible = true;
+                                    dg_Port.Visible = false;
+                                    dg_Action.Visible = false;
+                                    bt_Create_Orders.Visible = true;
+                                    bt_EMSX.Visible = true;
+                                }
+                            }
                         }
-                        //SetFormat();
-                    }
-                    break;
+                        if (dg_Port.Visible == true)
+                        {
+                            // Allow user to change
+                            dg_Port.AllowUserToAddRows = false;
+                            dg_Port.ReadOnly = true;
+                            dg_Port.AlternatingRowsDefaultCellStyle = dg_Port_AltStyle;
+                            // Reset background column on the Modelling columns
+                            TidyTRADEColumns();
+
+                            // See if any columns for this Tab - Only occurs on a fresh database.
+                            if (dg_Port.Columns.Count < 1)
+                                return;
+
+                            // Organise columns
+                            foreach (DataGridViewColumn dc in dg_Port.Columns)
+                            {
+                                DataRow[] dr = dt_Port_Tab_Detail.Select("TabName='" + TabName + "' and ColName='" + dc.Name + "'");
+                                if (dr.Length == 0)
+                                    dc.Visible = false;
+                                else
+                                {
+                                    dc.Frozen = false;
+                                    dc.Visible = true;
+                                }
+                                if (dc.Name == "Ticker")
+                                    dc.DefaultCellStyle.ForeColor = Color.DarkBlue;
+                                //dc.Visible = true;
+                                //SystemLibrary.DebugLine(dc.Name);
+                            }
+                            // I found I needed to set the Sort Order in its own loop
+                            SystemLibrary.DebugLine("StartLoop:" + TabName);
+                            // Sort on ColOrder Descending otherwise can still have wrong order columns
+                            foreach (DataRow dr_TD in dt_Port_Tab_Detail.Select("TabName='" + TabName + "'", "ColOrder desc"))
+                            {
+                                SystemLibrary.DebugLine(TabName + "," + dr_TD["ColName"].ToString() + "," + dr_TD["ColOrder"].ToString());
+                                dg_Port.Columns[dr_TD["ColName"].ToString()].DisplayIndex = Convert.ToInt16(dr_TD["ColOrder"]);
+                            }
+                            SystemLibrary.DebugLine("EndLoop:" + TabName);
+
+                            // Organise the Frozen Column
+                            DataRow[] dr1 = dt_Port_Tabs.Select("TabName='" + TabName + "'");
+                            if (dr1.Length > 0)
+                            {
+                                String FrozenColumn = SystemLibrary.ToString(dr1[0]["FrozenColName"]);
+                                if (FrozenColumn.Length > 0)
+                                {
+                                    if (dg_Port.Columns.Contains(FrozenColumn))
+                                    {
+                                        try
+                                        {
+                                            dg_Port.Columns[FrozenColumn].Frozen = true;
+                                        }
+                                        catch { }
+                                    }
+                                }
+                            }
+
+                            // Hide Rows where isAggregate ="Y"
+                            String myRowFilter = "";
+                            if (dr1.Length > 0)
+                                myRowFilter = dr1[0]["RowFilter"].ToString();
+                            if (myRowFilter.Length > 0)
+                                myDataView.RowFilter = myRowFilter;
+                            else
+                            {
+                                // CFR 20120327 UnHideRows();
+                                // CFR 20120327 HideAggregateRows("Y");
+                                myDataView.RowFilter = "IsAggregate <> 'Y' ";
+                            }
+                            //SetFormat();
+                        }
+                        break;
+                }
+                SetFormat();
+                SetCalc();
             }
-            SetFormat();
-            SetCalc();
+            catch (Exception ex)
+            {
+                Console.WriteLine("tabControl_Port_SelectedIndexChanged(): " + SystemLibrary.GetFullErrorMessage(ex));
+            }
 
         } //tabControl_Port_SelectedIndexChanged()
 
@@ -7470,35 +7643,42 @@ namespace T1MultiAsset
             // Reduce the number of calls to reload the portfolio
             inStartUp = true;
 
-            // Force a Position refresh
-            SystemLibrary.SQLExecute("Exec sp_Update_Positions 'Y' ");
-
-            // Force a Full Action Tab Refresh
-            if (tabControl_Port.SelectedTab.Text.StartsWith("ACTION"))
+            try
             {
-                SystemLibrary.SQLExecute("Exec sp_ActionsNeeded 200, 'N'");
-                LoadActionTab(false);
+                // Force a Position refresh
+                SystemLibrary.SQLExecute("Exec sp_Update_Positions 'Y' ");
+
+                // Force a Full Action Tab Refresh
+                if (tabControl_Port.SelectedTab.Text.StartsWith("ACTION"))
+                {
+                    SystemLibrary.SQLExecute("Exec sp_ActionsNeeded 200, 'N'");
+                    LoadActionTab(false);
+                }
+
+                // Reload all the securities to be updated back to the Securities table
+                SetUpLast_Price_DataTable();
+
+                // Reload dt_Securities
+                SetUpSecurities_DataTable();
+
+                // Get the latest fund sizes.
+                LoadPortfolioGroup();
+
+                // Need to find FundID in cb_Fund && PortfolioID in cb_Portfo
+                DataRow[] dr_FindP = dt_Portfolio.Select("PortfolioId=" + myPortfolioID);
+                if (dr_FindP.Length > 0)
+                    cb_Portfolio.SelectedValue = PortfolioID;
+                // Now do Fund
+                LoadFund(PortfolioID);
+                DataRow[] dr_Find = dt_Fund.Select("FundID=" + myFundID);
+                if (dr_Find.Length > 0)
+                    cb_Fund.SelectedValue = FundID;
+                cb_Portfolio_SelectionChangeCommitted(null, null);
             }
-
-            // Reload all the securities to be updated back to the Securities table
-            SetUpLast_Price_DataTable();
-
-            // Reload dt_Securities
-            SetUpSecurities_DataTable();
-
-            // Get the latest fund sizes.
-            LoadPortfolioGroup();
-
-            // Need to find FundID in cb_Fund && PortfolioID in cb_Portfo
-            DataRow[] dr_FindP = dt_Portfolio.Select("PortfolioId=" + myPortfolioID);
-            if (dr_FindP.Length > 0)
-                cb_Portfolio.SelectedValue = PortfolioID;
-            // Now do Fund
-            LoadFund(PortfolioID);
-            DataRow[] dr_Find = dt_Fund.Select("FundID=" + myFundID);
-            if (dr_Find.Length > 0)
-                cb_Fund.SelectedValue = FundID;
-            cb_Portfolio_SelectionChangeCommitted(null, null);
+            catch (Exception ex)
+            {
+                Console.WriteLine("pb_Refresh_Click(): " + SystemLibrary.GetFullErrorMessage(ex));
+            }
 
             // Reduce the number of calls to reload the portfolio
             inStartUp = false;
@@ -7723,6 +7903,82 @@ namespace T1MultiAsset
             inDragMode = false;
 
         } //dg_PortfolioTranspose_MouseUp()
+
+        private void dg_Port_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+
+        } //dg_Port_CellPainting()
+
+        private void dg_Port_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].Name != "Price")
+                Generic_CellFormatting(sender, e);
+        } // dg_Port_CellFormatting()
+
+        private void dg_Header_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            Generic_CellFormatting(sender, e);
+        } // dg_Header_CellFormatting()
+
+        private void dg_PortfolioTranspose_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].Name != "Price")
+                Generic_CellFormatting(sender, e);
+        } // dg_PortfolioTranspose_CellFormatting()
+
+        private void Generic_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.ColumnIndex > -1 && e.RowIndex > -1)
+            {
+                try
+                {
+                    /*
+                     * NOTE to Programmer:
+                     * If you want the colours to work on columns not attached to a datatable then
+                     * make sure you set program the dg_XXX.Columns[<ColName>].ValueType = typeof(Decimal);
+                     */
+                    String DataTypeName = "";
+                    if (((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].ValueType == null)
+                        DataTypeName = "System.String"; 
+                    else
+                        DataTypeName = SystemLibrary.ToString(((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].ValueType.FullName);
+                    switch (DataTypeName)
+                    {
+                        case "System.DateTime":
+                        case "System.String":
+                        case "System.Char":
+                            break;
+                        default:
+                            object myTestValue = ((System.Windows.Forms.DataGridView)(sender)).Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                            if (!(myTestValue == null || myTestValue == DBNull.Value))
+                            {
+                                Decimal myValue = Convert.ToDecimal(myTestValue);
+                                if ((Decimal)myValue < Decimal.Zero)
+                                {
+                                    if (e.CellStyle.ForeColor != Color.Red)
+                                        e.CellStyle.ForeColor = Color.Red;
+                                }
+                                else if ((Decimal)myValue > Decimal.Zero)
+                                {
+                                    if (e.CellStyle.ForeColor != Color.Green)
+                                        e.CellStyle.ForeColor = Color.Green;
+                                }
+                                else
+                                {
+                                    if (e.CellStyle.ForeColor != Color.Black)
+                                        e.CellStyle.ForeColor = Color.Black;
+                                }
+                            }
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("For Programmer: Generic_CellFormatting(" + ((System.Windows.Forms.DataGridView)(sender)).Name + "," + ((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].Name + "):"+SystemLibrary.GetFullErrorMessage(ex));
+                }
+            }
+
+        } //Generic_CellFormatting()
 
    
     }

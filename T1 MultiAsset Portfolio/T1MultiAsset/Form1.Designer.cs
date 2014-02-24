@@ -93,6 +93,7 @@
             this.forwardDividendsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.brokerMaintenanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.maintainFundstoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.maintainCommissiontoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.EMSXMultiMappingStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.mLPrimeBrokerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -175,7 +176,6 @@
             this.bt_Print = new System.Windows.Forms.Button();
             this.pb_Refresh = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.maintainCommissiontoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dg_Port)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dg_Header)).BeginInit();
@@ -233,6 +233,7 @@
             this.dg_Port.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dg_Port_CellBeginEdit);
             this.dg_Port.Sorted += new System.EventHandler(this.dg_Port_Sorted);
             this.dg_Port.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dg_Port_MouseClick);
+            this.dg_Port.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dg_Port_CellFormatting);
             this.dg_Port.MouseUp += new System.Windows.Forms.MouseEventHandler(this.dg_Port_MouseUp);
             this.dg_Port.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg_Port_CellEndEdit);
             this.dg_Port.DragEnter += new System.Windows.Forms.DragEventHandler(this.dg_Port_DragEnter);
@@ -339,7 +340,7 @@
             this.toolStripMenuItem5,
             this.importDataToolStripMenuItem});
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-            this.setupToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setupToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.setupToolStripMenuItem.Text = "Setup...";
             // 
             // databaseConnectionToolStripMenuItem
@@ -431,7 +432,7 @@
             this.layoutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.designPortfolioTabsToolStripMenuItem});
             this.layoutToolStripMenuItem.Name = "layoutToolStripMenuItem";
-            this.layoutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.layoutToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.layoutToolStripMenuItem.Text = "Layout";
             // 
             // designPortfolioTabsToolStripMenuItem
@@ -468,7 +469,7 @@
             this.toolStripMenuItem6,
             this.defineInterestAccualsToolStripMenuItem});
             this.processingToolStripMenuItem.Name = "processingToolStripMenuItem";
-            this.processingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.processingToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.processingToolStripMenuItem.Text = "Processing";
             // 
             // processOrdersToolStripMenuItem
@@ -538,6 +539,13 @@
             this.maintainFundstoolStripMenuItem.Size = new System.Drawing.Size(203, 22);
             this.maintainFundstoolStripMenuItem.Text = "Maintain Funds";
             this.maintainFundstoolStripMenuItem.Click += new System.EventHandler(this.maintainFundstoolStripMenuItem_Click);
+            // 
+            // maintainCommissiontoolStripMenuItem
+            // 
+            this.maintainCommissiontoolStripMenuItem.Name = "maintainCommissiontoolStripMenuItem";
+            this.maintainCommissiontoolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this.maintainCommissiontoolStripMenuItem.Text = "Maintain Commission";
+            this.maintainCommissiontoolStripMenuItem.Click += new System.EventHandler(this.maintainCommissiontoolStripMenuItem_Click);
             // 
             // EMSXMultiMappingStripMenuItem
             // 
@@ -621,7 +629,7 @@
             this.tradeReportToolStripMenuItem,
             this.borrowReportToolStripMenuItem});
             this.reportsToolStripMenuItem.Name = "reportsToolStripMenuItem";
-            this.reportsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.reportsToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.reportsToolStripMenuItem.Text = "Reports";
             // 
             // tradeReportToolStripMenuItem
@@ -652,7 +660,7 @@
             this.toolStripSeparator3,
             this.alterMarginRatesToolStripMenuItem});
             this.reconcileToolStripMenuItem.Name = "reconcileToolStripMenuItem";
-            this.reconcileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.reconcileToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.reconcileToolStripMenuItem.Text = "Reconcile";
             // 
             // NAVReconciliationToolStripMenuItem
@@ -727,7 +735,7 @@
             this.toolStripMenuItem8,
             this.journalsToolStripMenuItem});
             this.accountsToolStripMenuItem.Name = "accountsToolStripMenuItem";
-            this.accountsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.accountsToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.accountsToolStripMenuItem.Text = "Accounts";
             // 
             // setupToolStripMenuItem1
@@ -785,7 +793,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -871,6 +879,7 @@
             this.dg_Header.Size = new System.Drawing.Size(790, 173);
             this.dg_Header.TabIndex = 14;
             this.dg_Header.TabStop = false;
+            this.dg_Header.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dg_Header_CellFormatting);
             // 
             // Label
             // 
@@ -1258,6 +1267,7 @@
             this.dg_PortfolioTranspose.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dg_PortfolioTranspose_CellBeginEdit);
             this.dg_PortfolioTranspose.Sorted += new System.EventHandler(this.dg_PortfolioTranspose_Sorted);
             this.dg_PortfolioTranspose.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dg_PortfolioTranspose_MouseClick);
+            this.dg_PortfolioTranspose.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dg_PortfolioTranspose_CellFormatting);
             this.dg_PortfolioTranspose.MouseUp += new System.Windows.Forms.MouseEventHandler(this.dg_PortfolioTranspose_MouseUp);
             this.dg_PortfolioTranspose.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg_PortfolioTranspose_CellEndEdit);
             this.dg_PortfolioTranspose.DragEnter += new System.Windows.Forms.DragEventHandler(this.dg_PortfolioTranspose_DragEnter);
@@ -1480,13 +1490,6 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Tag = "Up";
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
-            // 
-            // maintainCommissiontoolStripMenuItem
-            // 
-            this.maintainCommissiontoolStripMenuItem.Name = "maintainCommissiontoolStripMenuItem";
-            this.maintainCommissiontoolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.maintainCommissiontoolStripMenuItem.Text = "Maintain Commission";
-            this.maintainCommissiontoolStripMenuItem.Click += new System.EventHandler(this.maintainCommissiontoolStripMenuItem_Click);
             // 
             // Form1
             // 

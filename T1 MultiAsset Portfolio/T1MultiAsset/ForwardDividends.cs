@@ -603,6 +603,32 @@ namespace T1MultiAsset
             }
         } //bt_Update_Click()
 
+        private void dg_Transactions_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            // Seems the only way I can get the previous value before CellEndEdit().
+            LastValue = dg_Transactions[e.ColumnIndex, e.RowIndex].Value;
+
+        } //dg_Transactions_CellBeginEdit()
+
+        private void dg_Transactions_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            // Local Variables
+            Decimal Amount = 0;
+
+            if (dg_Transactions.Columns[e.ColumnIndex].Name == "Amount")
+            {
+                // Add all the Qty_Fill and calculate the MissingQuantity
+                foreach (DataGridViewRow dgr in dg_Transactions.Rows)
+                {
+                    Amount = Amount + SystemLibrary.ToDecimal(dgr.Cells["Amount"].Value);
+                }
+                tb_Amount.Text = Amount.ToString("$#,###.00");
+
+            }
+
+        } //dg_Transactions_CellEndEdit()
+
+
         
     }
 }

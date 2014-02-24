@@ -222,14 +222,19 @@ namespace OvernightPrices
                                 Element element = fieldData.GetValueAsElement(j);
                                 DataRow dr = dt_Prices.NewRow();
                                 dr["BBG_Ticker"] = securityData.GetElementAsString("security");
-                                dr["EffectiveDate"] = element.GetElementAsDatetime("date").ToSystemDateTime();
-                                dr["px_last"] = element.GetElementAsFloat64("PX_LAST");
+                                if (element.HasElement("date"))
+                                    dr["EffectiveDate"] = element.GetElementAsDatetime("date").ToSystemDateTime();
+                                else
+                                    continue; // Break from loop
+                                if (element.HasElement("PX_LAST"))
+                                    dr["px_last"] = element.GetElementAsFloat64("PX_LAST");
+                                else
+                                    continue; // Break from loop
                                 if (element.HasElement("EQY_WEIGHTED_AVG_PX"))
                                     dr["eqy_weighted_avg_px"] = element.GetElementAsFloat64("EQY_WEIGHTED_AVG_PX");
                                 dt_Prices.Rows.Add(dr);
                                 //Console.WriteLine(SystemLibrary.ToString(dr["BBG_Ticker"]) + "," + Convert.ToDateTime(dr["EffectiveDate"]).ToString("ddMMyy") + "," +
                                 //                  SystemLibrary.ToString(dr["px_last"]) + "," + SystemLibrary.ToString(dr["eqy_weighted_avg_px"]));
-
                             }
                         }
                     }

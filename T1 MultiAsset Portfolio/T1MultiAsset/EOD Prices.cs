@@ -55,7 +55,7 @@ namespace T1MultiAsset
 
             SystemLibrary.DebugLine("OvernightPrices - Pre Delete");
             lb_Status.Text = "Clean out last 3 days of prices"; Application.DoEvents(); 
-            SystemLibrary.SQLExecute("Delete from EOD_Prices where EffectiveDate >= dbo.f_Today() - 3 ");
+            SystemLibrary.SQLExecute("Delete from EOD_Prices where EffectiveDate >= dbo.f_Today() - 3 and isNull(Locked,'N') = 'N' ");
 
             SystemLibrary.DebugLine("OvernightPrices - Pre sp_EOD_Prices_Required");
             lb_Status.Text = "Obtain list of End of Day Prices Required"; Application.DoEvents(); 
@@ -169,6 +169,9 @@ namespace T1MultiAsset
                 SystemLibrary.SQLExecute("Exec sp_Calc_Profit_RebuildFrom null");
             else
                 SystemLibrary.SQLExecute("Exec sp_Calc_Profit_RebuildFrom '" + StartDate.ToString("dd-MMM-yyyy") + "' ");
+
+            // Create Interest Accruals
+            SystemLibrary.SQLExecute("Exec sp_ApplyInterestAccrualAll");
 
             SystemLibrary.DebugLine("pre-sp_SOD_Positions ");
             lb_Status.Text = "Run Start-Of-Day"; Application.DoEvents(); 

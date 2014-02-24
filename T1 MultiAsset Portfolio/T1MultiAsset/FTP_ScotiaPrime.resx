@@ -117,4 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label8.Text" xml:space="preserve">
+    <value>SCOTIA Parameters
+
+These parameters are used for Scotia Prime file movements.
+They dictate who to email, how the body of the email is formed, and where to find files.
+
+These should only be altered by the experienced.</value>
+  </data>
 </root>
