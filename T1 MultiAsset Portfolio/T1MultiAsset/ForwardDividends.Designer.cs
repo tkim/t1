@@ -47,23 +47,23 @@
             this.lb_MissingDivs = new System.Windows.Forms.Label();
             this.bt_Reconcile = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.sc_Reconcile = new System.Windows.Forms.SplitContainer();
+            this.lb_TotalAmount = new System.Windows.Forms.Label();
+            this.tb_TotalAmount = new System.Windows.Forms.TextBox();
+            this.lb_Amount = new System.Windows.Forms.Label();
+            this.tb_Amount = new System.Windows.Forms.TextBox();
             this.bt_Update = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.dg_Transactions = new System.Windows.Forms.DataGridView();
-            this.sc_Reconcile = new System.Windows.Forms.SplitContainer();
-            this.lb_Amount = new System.Windows.Forms.Label();
-            this.tb_Amount = new System.Windows.Forms.TextBox();
-            this.lb_TotalAmount = new System.Windows.Forms.Label();
-            this.tb_TotalAmount = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dg_Dividends)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dg_MissingDivs)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dg_Transactions)).BeginInit();
             this.sc_Reconcile.Panel1.SuspendLayout();
             this.sc_Reconcile.Panel2.SuspendLayout();
             this.sc_Reconcile.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dg_Transactions)).BeginInit();
             this.SuspendLayout();
             // 
             // richTextBox1
@@ -242,6 +242,76 @@
             this.splitContainer1.SplitterDistance = 231;
             this.splitContainer1.TabIndex = 12;
             // 
+            // sc_Reconcile
+            // 
+            this.sc_Reconcile.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sc_Reconcile.Location = new System.Drawing.Point(0, 0);
+            this.sc_Reconcile.Name = "sc_Reconcile";
+            this.sc_Reconcile.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // sc_Reconcile.Panel1
+            // 
+            this.sc_Reconcile.Panel1.Controls.Add(this.lb_TotalAmount);
+            this.sc_Reconcile.Panel1.Controls.Add(this.tb_TotalAmount);
+            this.sc_Reconcile.Panel1.Controls.Add(this.dg_MissingDivs);
+            this.sc_Reconcile.Panel1.Controls.Add(this.lb_MissingDivs);
+            this.sc_Reconcile.Panel1.Controls.Add(this.bt_Reconcile);
+            // 
+            // sc_Reconcile.Panel2
+            // 
+            this.sc_Reconcile.Panel2.Controls.Add(this.lb_Amount);
+            this.sc_Reconcile.Panel2.Controls.Add(this.tb_Amount);
+            this.sc_Reconcile.Panel2.Controls.Add(this.bt_Update);
+            this.sc_Reconcile.Panel2.Controls.Add(this.label2);
+            this.sc_Reconcile.Panel2.Controls.Add(this.dg_Transactions);
+            this.sc_Reconcile.Size = new System.Drawing.Size(1232, 300);
+            this.sc_Reconcile.SplitterDistance = 150;
+            this.sc_Reconcile.TabIndex = 15;
+            // 
+            // lb_TotalAmount
+            // 
+            this.lb_TotalAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lb_TotalAmount.AutoSize = true;
+            this.lb_TotalAmount.ForeColor = System.Drawing.Color.DarkGreen;
+            this.lb_TotalAmount.Location = new System.Drawing.Point(967, 9);
+            this.lb_TotalAmount.Name = "lb_TotalAmount";
+            this.lb_TotalAmount.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.lb_TotalAmount.Size = new System.Drawing.Size(70, 13);
+            this.lb_TotalAmount.TabIndex = 36;
+            this.lb_TotalAmount.Text = "Total Amount";
+            // 
+            // tb_TotalAmount
+            // 
+            this.tb_TotalAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tb_TotalAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_TotalAmount.ForeColor = System.Drawing.Color.DarkGreen;
+            this.tb_TotalAmount.Location = new System.Drawing.Point(1047, 6);
+            this.tb_TotalAmount.Name = "tb_TotalAmount";
+            this.tb_TotalAmount.Size = new System.Drawing.Size(94, 20);
+            this.tb_TotalAmount.TabIndex = 35;
+            // 
+            // lb_Amount
+            // 
+            this.lb_Amount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lb_Amount.AutoSize = true;
+            this.lb_Amount.ForeColor = System.Drawing.Color.DarkGreen;
+            this.lb_Amount.Location = new System.Drawing.Point(967, 7);
+            this.lb_Amount.Name = "lb_Amount";
+            this.lb_Amount.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.lb_Amount.Size = new System.Drawing.Size(70, 13);
+            this.lb_Amount.TabIndex = 34;
+            this.lb_Amount.Text = "Total Amount";
+            // 
+            // tb_Amount
+            // 
+            this.tb_Amount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tb_Amount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tb_Amount.ForeColor = System.Drawing.Color.DarkGreen;
+            this.tb_Amount.Location = new System.Drawing.Point(1047, 4);
+            this.tb_Amount.Name = "tb_Amount";
+            this.tb_Amount.Size = new System.Drawing.Size(94, 20);
+            this.tb_Amount.TabIndex = 33;
+            // 
             // bt_Update
             // 
             this.bt_Update.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -303,76 +373,8 @@
             this.dg_Transactions.RowHeadersVisible = false;
             this.dg_Transactions.Size = new System.Drawing.Size(1226, 112);
             this.dg_Transactions.TabIndex = 12;
-            // 
-            // sc_Reconcile
-            // 
-            this.sc_Reconcile.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sc_Reconcile.Location = new System.Drawing.Point(0, 0);
-            this.sc_Reconcile.Name = "sc_Reconcile";
-            this.sc_Reconcile.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // sc_Reconcile.Panel1
-            // 
-            this.sc_Reconcile.Panel1.Controls.Add(this.lb_TotalAmount);
-            this.sc_Reconcile.Panel1.Controls.Add(this.tb_TotalAmount);
-            this.sc_Reconcile.Panel1.Controls.Add(this.dg_MissingDivs);
-            this.sc_Reconcile.Panel1.Controls.Add(this.lb_MissingDivs);
-            this.sc_Reconcile.Panel1.Controls.Add(this.bt_Reconcile);
-            // 
-            // sc_Reconcile.Panel2
-            // 
-            this.sc_Reconcile.Panel2.Controls.Add(this.lb_Amount);
-            this.sc_Reconcile.Panel2.Controls.Add(this.tb_Amount);
-            this.sc_Reconcile.Panel2.Controls.Add(this.bt_Update);
-            this.sc_Reconcile.Panel2.Controls.Add(this.label2);
-            this.sc_Reconcile.Panel2.Controls.Add(this.dg_Transactions);
-            this.sc_Reconcile.Size = new System.Drawing.Size(1232, 300);
-            this.sc_Reconcile.SplitterDistance = 150;
-            this.sc_Reconcile.TabIndex = 15;
-            // 
-            // lb_Amount
-            // 
-            this.lb_Amount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lb_Amount.AutoSize = true;
-            this.lb_Amount.ForeColor = System.Drawing.Color.DarkGreen;
-            this.lb_Amount.Location = new System.Drawing.Point(967, 7);
-            this.lb_Amount.Name = "lb_Amount";
-            this.lb_Amount.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lb_Amount.Size = new System.Drawing.Size(70, 13);
-            this.lb_Amount.TabIndex = 34;
-            this.lb_Amount.Text = "Total Amount";
-            // 
-            // tb_Amount
-            // 
-            this.tb_Amount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tb_Amount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_Amount.ForeColor = System.Drawing.Color.DarkGreen;
-            this.tb_Amount.Location = new System.Drawing.Point(1047, 4);
-            this.tb_Amount.Name = "tb_Amount";
-            this.tb_Amount.Size = new System.Drawing.Size(94, 20);
-            this.tb_Amount.TabIndex = 33;
-            // 
-            // lb_TotalAmount
-            // 
-            this.lb_TotalAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lb_TotalAmount.AutoSize = true;
-            this.lb_TotalAmount.ForeColor = System.Drawing.Color.DarkGreen;
-            this.lb_TotalAmount.Location = new System.Drawing.Point(967, 9);
-            this.lb_TotalAmount.Name = "lb_TotalAmount";
-            this.lb_TotalAmount.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.lb_TotalAmount.Size = new System.Drawing.Size(70, 13);
-            this.lb_TotalAmount.TabIndex = 36;
-            this.lb_TotalAmount.Text = "Total Amount";
-            // 
-            // tb_TotalAmount
-            // 
-            this.tb_TotalAmount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tb_TotalAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tb_TotalAmount.ForeColor = System.Drawing.Color.DarkGreen;
-            this.tb_TotalAmount.Location = new System.Drawing.Point(1047, 6);
-            this.tb_TotalAmount.Name = "tb_TotalAmount";
-            this.tb_TotalAmount.Size = new System.Drawing.Size(94, 20);
-            this.tb_TotalAmount.TabIndex = 35;
+            this.dg_Transactions.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dg_Transactions_CellBeginEdit);
+            this.dg_Transactions.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg_Transactions_CellEndEdit);
             // 
             // ForwardDividends
             // 
@@ -393,12 +395,12 @@
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dg_Transactions)).EndInit();
             this.sc_Reconcile.Panel1.ResumeLayout(false);
             this.sc_Reconcile.Panel1.PerformLayout();
             this.sc_Reconcile.Panel2.ResumeLayout(false);
             this.sc_Reconcile.Panel2.PerformLayout();
             this.sc_Reconcile.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dg_Transactions)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

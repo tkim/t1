@@ -22,6 +22,8 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Net; //Ftp
+using System.Net.Sockets; 
+using System.Net.Mail;
 using System.IO;
 using System.Data.OleDb;
 using System.Data.SqlClient; // 21040206 - I had to include this so I could use DataTable passing techniques
@@ -326,7 +328,21 @@ namespace T1MultiAsset
             StackTrace stack_Current = new StackTrace(true);
             return (stack_Current.ToString());
         }
-  
+
+        public static String GetFullErrorMessage(Exception ex)
+        {
+            // inform the user if the connection failed
+            Exception CheckMessage = ex;
+            String myRetString = CheckMessage.Message;
+
+            while (CheckMessage.InnerException != null)
+            {
+                CheckMessage = CheckMessage.InnerException;
+                myRetString = myRetString + "\r\n" + CheckMessage.Message;
+            }
+
+            return (myRetString);
+        } //GetFullErrorMessage()
 
         #endregion // Console
 
@@ -343,31 +359,47 @@ namespace T1MultiAsset
 
         public static string ProtectEncrypt(String inVal)
         {
-            // Local Variables
-            var Entropy = Encoding.Unicode.GetBytes(ProtectVars.KeyEncrpyt);
+            try
+            {
+                // Local Variables
+                var Entropy = Encoding.Unicode.GetBytes(ProtectVars.KeyEncrpyt);
 
-            //encrypt data
-            var data = Encoding.Unicode.GetBytes(inVal);
-            byte[] encrypted = ProtectedData.Protect(data, Entropy, ProtectVars.KeyScope);
+                //encrypt data
+                var data = Encoding.Unicode.GetBytes(inVal);
+                byte[] encrypted = ProtectedData.Protect(data, Entropy, ProtectVars.KeyScope);
 
 
-            //return as base64 string
-            return (Convert.ToBase64String(encrypted));
+                //return as base64 string
+                return (Convert.ToBase64String(encrypted));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ProtectEncrypt():" + SystemLibrary.GetFullErrorMessage(e));
+                return (inVal);
+            }
 
         } //ProtectEncrypt()
 
         public static string ProtectDecrypt(String inVal)
         {
-            // Local Variables
-            var Entropy = Encoding.Unicode.GetBytes(ProtectVars.KeyEncrpyt);
+            try
+            {
+                // Local Variables
+                var Entropy = Encoding.Unicode.GetBytes(ProtectVars.KeyEncrpyt);
 
 
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(inVal);
+                //parse base64 string
+                byte[] data = Convert.FromBase64String(inVal);
 
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, Entropy, ProtectVars.KeyScope);
-            return (Encoding.Unicode.GetString(decrypted));
+                //decrypt data
+                byte[] decrypted = ProtectedData.Unprotect(data, Entropy, ProtectVars.KeyScope);
+                return (Encoding.Unicode.GetString(decrypted));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ProtectDecrypt():" + SystemLibrary.GetFullErrorMessage(e));
+                return (inVal);
+            }
 
         } //ProtectDecrypt()
 
@@ -394,6 +426,7 @@ namespace T1MultiAsset
                 DBVars.DatabaseName = myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DatabaseName").ToString();
                 DBVars.ServerName = myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "ServerName").ToString();
                 DBVars.DBUser = myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DBUser").ToString();
+                //DBVars.DBPwd = myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DBPwd").ToString();
                 DBVars.DBPwd = ProtectDecrypt(myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DBPwd").ToString());
                 try
                 {
@@ -428,6 +461,7 @@ namespace T1MultiAsset
             myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DatabaseName", DBVars.DatabaseName);
             myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "ServerName", DBVars.ServerName);
             myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DBUser", DBVars.DBUser);
+            //myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DBPwd", DBVars.DBPwd);
             myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "DBPwd", ProtectEncrypt(DBVars.DBPwd));
             myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset\Database", "IntegratedSecurity", DBVars.IntegratedSecurity.ToString());
 
@@ -605,6 +639,38 @@ namespace T1MultiAsset
             return (RetVal);
 
         } //SQLSelectString()
+
+        public static Boolean SQLSelectYN_To_Bool(String mySelect)
+        {
+            //
+            // Procedure:   SQLSelectYN_To_Bool
+            //
+            // Purpose:     Used when getting 1 Datapoint from the database
+            //
+
+            // Local Variables
+            Boolean RetVal;
+            DataTable dt_1 = (DataTable)SQLSelectToObject(mySelect, "DataTable");
+
+            try
+            {
+                if (dt_1.Rows.Count > 0)
+                {
+                    RetVal = SystemLibrary.YN_To_Bool(SystemLibrary.ToString(dt_1.Rows[0][0]));
+                }
+                else
+                    RetVal = false;
+            }
+            catch (Exception e)
+            {
+                // Write Failure to console
+                SystemLibrary.DebugLine("SQLSelectYN_To_Bool:(" + mySelect + ")\r\nError:" + e.Message);
+                RetVal = false;
+            }
+            return (RetVal);
+
+        } //SQLSelectYN_To_Bool()
+
 
         public static DataTable SQLSelectToDataTable(String mySelect)
         {
@@ -862,7 +928,15 @@ namespace T1MultiAsset
                 catch (Exception ex)
                 {
                     // inform the user if the connection failed
-                    myRetString = ex.Message;
+                    Exception CheckMessage = ex;
+                    myRetString = CheckMessage.Message;
+
+                    while (CheckMessage.InnerException != null)
+                    {
+                        CheckMessage = CheckMessage.InnerException;
+                        myRetString = myRetString + "\r\n" + CheckMessage.Message;
+                    }
+
                 }
             }
 
@@ -1285,6 +1359,136 @@ namespace T1MultiAsset
 
         // FTP related calls
         #region FTP Calls
+
+        // Test FTP Handshake (returns an error message or a zero length string)
+        public static String TcpHandshakeTest(String smtpHost, int Port)
+        {
+            // Local Variables
+            String retVal = "";
+
+
+            try
+            {
+                TcpClient tcp = new TcpClient();
+                tcp.Connect(smtpHost, Port);
+            }
+            catch (Exception em)
+            {
+                Exception CheckMessage = em;
+                retVal = "Tcp Handshake Test [" + smtpHost + ":" + Port + "\r\n\r\n" + CheckMessage.Message;
+
+                while (CheckMessage.InnerException != null)
+                {
+                    CheckMessage = CheckMessage.InnerException;
+                    retVal = retVal + "\r\n" + CheckMessage.Message;
+                }
+            }
+
+            return (retVal);
+
+        } //TestFTPHandshake()
+
+        /* 
+         * Sends out the email. If supplied will try the secondary smtp server after the first.
+         * This allows for multiple offices or laptop use
+         */
+        public static Boolean SendEmail(MailMessage mail, ref String myMessage)
+        {
+            // Local Variables
+            Boolean RetVal = true;
+
+            // hourglass cursor
+            Cursor.Current = Cursors.WaitCursor;
+
+            myMessage = "";
+
+            String Mail_SmtpClient = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient')");
+            String Mail_SmtpClient_Port = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_Port')");
+            String Mail_SmtpClient_SSL = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_SSL')");
+            String Mail_SmtpClient_UserName = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_UserName')");
+            String Mail_SmtpClient_Password = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_Password')");
+
+            String Mail_SmtpClient_Secondary = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_Secondary')");
+            String Mail_SmtpClient_Port_Secondary = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_Port_Secondary')");
+            String Mail_SmtpClient_SSL_Secondary = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_SSL_Secondary')");
+            String Mail_SmtpClient_UserName_Secondary = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_UserName_Secondary')");
+            String Mail_SmtpClient_Password_Secondary = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient_Password_Secondary')");
+
+            
+            // TODO (5) When upgrade to .NET 4.0, then can use this
+            // using (SmtpClient SmtpServer = new SmtpClient(MLPrime_SmtpClient))
+            SmtpClient SmtpServer = new SmtpClient(Mail_SmtpClient);
+            {
+                if (Mail_SmtpClient_Port.Trim().Length > 0)
+                    SmtpServer.Port = SystemLibrary.ToInt32(Mail_SmtpClient_Port);
+                else
+                    SmtpServer.Port = 25;
+                if (Mail_SmtpClient_SSL.Trim().Length > 0)
+                    SmtpServer.EnableSsl = SystemLibrary.YN_To_Bool(Mail_SmtpClient_SSL);
+                else
+                    SmtpServer.EnableSsl = false;
+                if(Mail_SmtpClient_UserName.Trim().Length>0 && Mail_SmtpClient_Password.Trim().Length>0)
+                    SmtpServer.Credentials = new System.Net.NetworkCredential(Mail_SmtpClient_UserName, Mail_SmtpClient_Password);
+
+
+                // Try to send the 
+                try
+                {
+                    SmtpServer.Send(mail);
+                }
+                catch (Exception em)
+                {
+                    Console.WriteLine("SendEmail(" + Mail_SmtpClient + ") - " + SystemLibrary.GetFullErrorMessage(em));
+                    myMessage = "SendEmail(" + Mail_SmtpClient + ") Failed:" + SystemLibrary.GetFullErrorMessage(em);
+
+                    /*
+                     * Try the secondary Server.
+                     */
+                    if (Mail_SmtpClient_Secondary.Trim().Length > 0)
+                    {
+                        SmtpClient SmtpServer_Secondary = new SmtpClient(Mail_SmtpClient_Secondary);
+                        {
+                            if (Mail_SmtpClient_Port_Secondary.Trim().Length > 0)
+                                SmtpServer_Secondary.Port = SystemLibrary.ToInt32(Mail_SmtpClient_Port_Secondary);
+                            else
+                                SmtpServer_Secondary.Port = 25;
+                            if (Mail_SmtpClient_SSL_Secondary.Trim().Length > 0)
+                                SmtpServer_Secondary.EnableSsl = SystemLibrary.YN_To_Bool(Mail_SmtpClient_SSL_Secondary);
+                            else
+                                SmtpServer_Secondary.EnableSsl = false;
+                            if (Mail_SmtpClient_UserName_Secondary.Trim().Length > 0 && Mail_SmtpClient_Password_Secondary.Trim().Length > 0)
+                                SmtpServer_Secondary.Credentials = new System.Net.NetworkCredential(Mail_SmtpClient_UserName_Secondary, Mail_SmtpClient_Password_Secondary);
+
+
+                            // Try to send the 
+                            try
+                            {
+                                SmtpServer_Secondary.Send(mail);
+                            }
+                            catch (Exception em_Secondary)
+                            {
+                                Console.WriteLine("SendEmail(" + Mail_SmtpClient_Secondary + ") - " + SystemLibrary.GetFullErrorMessage(em_Secondary));
+                                myMessage = myMessage + "\r\n\r\nSendEmail(" + Mail_SmtpClient_Secondary + ") Failed:" + SystemLibrary.GetFullErrorMessage(em);
+                                RetVal = false;
+                            }
+                        } // SmtpServer_Secondary
+                    }
+                    else
+                    {
+                        RetVal = false;
+                    }
+                }
+
+            }
+
+            Cursor.Current = Cursors.Default;
+
+            if (RetVal)
+                myMessage = "";
+
+            return (RetVal);
+
+        } //SendEmail()
 
         // Bloomberg FTP
         public static Boolean FTPLoadStructure(ref Boolean isConfigured)
@@ -4515,6 +4719,52 @@ namespace T1MultiAsset
 
         } // ToString()
 
+        /*
+         * Deals with null and quotes around strings for Database Strings
+         */
+        public static String ToStringForDatabase(String inType, object inArg)
+        {
+            // Local Variables
+            String RetVal = "";
+
+            if (inArg == DBNull.Value)
+                RetVal = " null ";
+            else
+            {
+                switch (inType.ToLower())
+                {
+                    case "int16":
+                        RetVal = SystemLibrary.ToString(ToInt16(inArg));
+                        break;
+                    case "int32":
+                        RetVal = SystemLibrary.ToString(ToInt32(inArg));
+                        break;
+                    case "decimal":
+                        RetVal = SystemLibrary.ToString(ToDecimal(inArg));
+                        break;
+                    case "date":
+                        RetVal = "'" + Convert.ToDateTime(inArg).ToString("dd-MMM-yyyy") + "'";
+                        break;
+                    case "datetime":
+                        RetVal = "'" + Convert.ToDateTime(inArg).ToString("dd-MMM-yyyy HH:mm:ss") + "'";
+                        break;
+                    default:
+                        try
+                        {
+                            RetVal = "'" + Convert.ToString(inArg) + "'";
+                        }
+                        catch
+                        {
+                            RetVal = "";
+                        }
+                        break;
+                }
+            }
+
+            return (RetVal);
+
+        } // ToStringForDatabase()
+
         public static void PrintScreen(Form inForm)
         {
             String myFileName = "";
@@ -4593,7 +4843,27 @@ namespace T1MultiAsset
 
         public static String GetUserName()
         {
-            return UserPrincipal.Current.GivenName + ' ' + UserPrincipal.Current.Surname;
+            // Local Variables
+            String myUsername = "Unknown User";
+
+            try
+            {
+                myUsername = UserPrincipal.Current.GivenName + ' ' + UserPrincipal.Current.Surname;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error in GetUserName(UserPrincipal.Current)" + GetFullErrorMessage(e));
+                try
+                {
+                    myUsername = SystemLibrary.ToString(Environment.GetEnvironmentVariable("USERNAME"));
+                }
+                catch (Exception e1)
+                {
+                    Console.WriteLine("Error in GetUserName(GetEnvironmentVariable)" + GetFullErrorMessage(e1));
+                }
+            }
+
+            return (myUsername);
         } //GetUserName()
 
         public static void PositionFormOverParent(Form ThisForm, Form ParentForm)

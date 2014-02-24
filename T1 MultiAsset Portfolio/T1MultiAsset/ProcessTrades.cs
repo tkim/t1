@@ -344,6 +344,9 @@ namespace T1MultiAsset
             dg_ForCustodians.DataSource = dt_ForCustodians;
             dg_ForCustodians.Refresh();
 
+            if (dg_ForCustodians.Columns.Count==0)
+                return;
+
             // Hide Reference columns
             dg_ForCustodians.Columns["Account Number"].Visible = false;
             dg_ForCustodians.Columns["TransactionType"].Visible = false;
@@ -1025,9 +1028,11 @@ namespace T1MultiAsset
             int MLClientBatchID;
             Boolean FoundChange = false;
 
-            //EmailToMLPrime(@"C:\Documents and Settings\Administrator\My Documents\XAAM_UPLOAD_2012.01.18.csv");
-            //return;
-
+            /*
+             * Temporary: 22-Feb-2014
+             */
+            int origDebugLevel = SystemLibrary.GetDebugLevel();
+            SystemLibrary.DebugLine(4);
 
             // Saves any Edit changes down to dt_ForCustodians
             dg_ForCustodians.Refresh();
@@ -1091,7 +1096,6 @@ namespace T1MultiAsset
             if (dr_Who.Length > 0)
             {
                 // Create the FileName
-                // "XAMM_UPLOAD_2011.10.17_1.csv"
                 String MLPrime_Path = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Path')");
                 myFileName = "XAAM_UPLOAD_" + SystemLibrary.f_Today().ToString("yyyy.MM.dd");
                 mySql = "Select IsNull(Max(MLClientBatchID),0) + 1 From ML_Out where MLFileName like '" + myFileName + "%' ";
@@ -1647,6 +1651,8 @@ namespace T1MultiAsset
 
             } //.Select("CustodianName='SCOTIA'")
 
+            SystemLibrary.DebugLine(origDebugLevel);
+
             // Refresh
             LoadAll();
             cb_SelectAll.Checked = false;
@@ -1659,8 +1665,17 @@ namespace T1MultiAsset
             // Local Variables
             String htmlBody = "";
             String myPrefix = "";
+            String myMessage = "";
             MailMessage mail = null;
             Boolean RetVal = true;
+
+
+            // hourglass cursor
+            Cursor.Current = Cursors.WaitCursor;
+
+            int origDebugLevel = SystemLibrary.GetDebugLevel();
+            SystemLibrary.SetDebugLevel(4);
+
 
             switch (WhichPrime)
             {
@@ -1678,84 +1693,58 @@ namespace T1MultiAsset
             String Prime_BCCEmail = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('" + myPrefix + "Prime:BCCEmail')");
             String Prime_Title = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('" + myPrefix + "Prime:Title')");
             String Prime_Signature = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('" + myPrefix + "Prime:Signature')");
-            String Prime_SmtpClient = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SmtpClient')");
+           
+            // Put together the email
+            mail = new MailMessage();
 
+            mail.From = new MailAddress(Prime_FromEmail);
 
-            // TODO (5) When upgrade to .NET 4.0, then can use this
-            // using (SmtpClient SmtpServer = new SmtpClient(MLPrime_SmtpClient))
-            SmtpClient SmtpServer = new SmtpClient(Prime_SmtpClient);
+            if (Prime_ToEmail == "")
+                mail.To.Add(Prime_FromEmail);
+            else
             {
-                SmtpServer.Port = 25;
-                //SmtpServer.Credentials = new System.Net.NetworkCredential("username", "pwd");
-                SmtpServer.EnableSsl = false;
-
-
-                // hourglass cursor
-                Cursor.Current = Cursors.WaitCursor;
-
-
-                // Create a new mail header record
-                mail = new MailMessage();
-                
-                mail.From = new MailAddress(Prime_FromEmail);
-
-                if (Prime_ToEmail == "")
-                    mail.To.Add(Prime_FromEmail);
-                else
-                {
-                    //String 
-                    foreach (String myStr in Prime_ToEmail.Split(",;".ToCharArray()))
-                        mail.To.Add(myStr);
-                }
-                if (Prime_CCEmail != "")
-                {
-                    foreach (String myStr in Prime_CCEmail.Split(",;".ToCharArray()))
-                        mail.CC.Add(myStr);
-                }
-                if (Prime_BCCEmail != "")
-                    mail.Bcc.Add(Prime_BCCEmail);
-
-
-                mail.Attachments.Add(new Attachment(myFilePath));
-
-                mail.Subject = Prime_Title + DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
-                mail.IsBodyHtml = true;
-                htmlBody = SystemLibrary.HTMLStart();
-
-                // On change of group, send the Mail
-                htmlBody = SystemLibrary.HTMLLine(Prime_Signature) +
-                           SystemLibrary.HTMLEnd();
-                mail.Body = htmlBody;
-                //mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure | DeliveryNotificationOptions.OnSuccess;
-                try
-                {
-                    SmtpServer.Send(mail);
-                }
-                catch (Exception em)
-                {
-                    Exception CheckMessage = em;
-                    String myMessage = CheckMessage.Message;
-
-                    while (CheckMessage.InnerException != null)
-                    {
-                        CheckMessage = CheckMessage.InnerException;
-                        myMessage = myMessage + "\r\n" + CheckMessage.Message;
-                    }
-                    RetVal = false;
-                    MessageBox.Show(myMessage, "Failed to Send email");
-                }
-
-                // Clean up
-                mail.Dispose();
-                mail = null;
-
+                //String 
+                foreach (String myStr in Prime_ToEmail.Split(",;".ToCharArray()))
+                    mail.To.Add(myStr);
             }
+            if (Prime_CCEmail != "")
+            {
+                foreach (String myStr in Prime_CCEmail.Split(",;".ToCharArray()))
+                    mail.CC.Add(myStr);
+            }
+            if (Prime_BCCEmail != "")
+                mail.Bcc.Add(Prime_BCCEmail);
+
+
+            mail.Attachments.Add(new Attachment(myFilePath));
+
+            mail.Subject = Prime_Title + DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
+            mail.IsBodyHtml = true;
+            htmlBody = SystemLibrary.HTMLStart();
+
+            // On change of group, send the Mail
+            htmlBody = SystemLibrary.HTMLLine(Prime_Signature) +
+                       SystemLibrary.HTMLEnd();
+            mail.Body = htmlBody;
+            //mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure | DeliveryNotificationOptions.OnSuccess;
+
+
+            // Send the email
+            RetVal = SystemLibrary.SendEmail(mail, ref myMessage);
+            if (!RetVal)
+                MessageBox.Show(myMessage, "Failed to Send email");
+
+            // Clean up
+            mail.Dispose();
+            mail = null;
 
             Cursor.Current = Cursors.Default;
+            SystemLibrary.SetDebugLevel(origDebugLevel);
 
             return (RetVal);
             
         } //EmailToPrime()
+
 
         private Boolean FTPToPrime(String WhichPrime, String myFilePath, String myFileName)
         {
@@ -1765,6 +1754,9 @@ namespace T1MultiAsset
             Boolean isMLPrimeConfigured = true;
             Boolean isScotiaPrimeConfigured = true;
             Boolean[] RetFTP;
+
+            int origDebugLevel = SystemLibrary.GetDebugLevel();
+            SystemLibrary.SetDebugLevel(4);
 
             if (ParentForm1 != null)
             {
@@ -1812,6 +1804,7 @@ namespace T1MultiAsset
             ParentForm1.SetFlags(ParentForm1.BloombergEMSXFileConfigured, isScotiaPrimeConfigured, isMLPrimeConfigured, ParentForm1.MLFuturesConfigured);
 
             SystemLibrary.DebugLine("Sent " + WhichPrime + " Prime FTP File: End");
+            SystemLibrary.SetDebugLevel(origDebugLevel);
             return (RetVal);
 
         } //FTPToMLPrime()

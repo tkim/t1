@@ -69,6 +69,7 @@
             this.cb_crncy.Name = "cb_crncy";
             this.cb_crncy.Size = new System.Drawing.Size(69, 21);
             this.cb_crncy.TabIndex = 2;
+            this.cb_crncy.SelectedIndexChanged += new System.EventHandler(this.cb_crncy_SelectedIndexChanged);
             // 
             // dateTimePicker1
             // 
