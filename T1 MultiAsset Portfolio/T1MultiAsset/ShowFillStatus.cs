@@ -77,6 +77,8 @@ namespace T1MultiAsset
         {
             // Local Variables
             String mySql;
+            String QtyFormat = "N0";
+            String PriceFormat = "N2";
 
             if (EMSX_Sequence.Length > 0)
                 mySql = "Exec sp_ShowFills -1, -1, '" + BBG_Ticker + "', " + EMSX_Sequence;
@@ -85,6 +87,19 @@ namespace T1MultiAsset
             
             dt_ShowFills = SystemLibrary.SQLSelectToDataTable(mySql);
             dgv_ShowFills.DataSource = dt_ShowFills;
+
+            if (dgv_ShowFills.Rows.Count > 0)
+            {
+                if (SystemLibrary.ToString(dgv_ShowFills.Rows[0].Cells["Sector"].Value) == "Currency")
+                {
+                    QtyFormat = "N2";
+                    PriceFormat = "N8";
+                    dgv_Summary.Columns["Order_Quantity"].DefaultCellStyle.Format = QtyFormat;
+                    dgv_Summary.Columns["Qty_Routed"].DefaultCellStyle.Format = QtyFormat;
+                    dgv_Summary.Columns["Qty_Working"].DefaultCellStyle.Format = QtyFormat;
+                    dgv_Summary.Columns["Fill_Quantity"].DefaultCellStyle.Format = QtyFormat;
+                }
+            }
 
             try
             {
@@ -109,7 +124,7 @@ namespace T1MultiAsset
                 if (dt_ShowFills.Rows.Count > 0)
                     this.Text = this.Text + " - " + SystemLibrary.ToString(dgv_ShowFills.Rows[0].Cells["Security_Name"].Value);
                 if (Last_Sale != 0)
-                    this.Text = this.Text + " - Price @" + Last_Sale.ToString("N2");
+                    this.Text = this.Text + " - Price @" + Last_Sale.ToString(PriceFormat);
                 dgv_ShowFills.Columns["Security_Name"].Visible = false;
                 dgv_ShowFills.Columns["Order#"].DefaultCellStyle.Format = "#";
                 dgv_ShowFills.Columns["CreatedDate"].DefaultCellStyle.Format = "dd-MMM-yyyy HH:mm:ss";
@@ -118,14 +133,15 @@ namespace T1MultiAsset
                 dgv_ShowFills.Columns["EffectiveDate"].Visible = false;
                 dgv_ShowFills.Columns["Fill_Price"].DefaultCellStyle.Format = "N4";
                 dgv_ShowFills.Columns["Limit_Price"].DefaultCellStyle.Format = "N2";
-                dgv_ShowFills.Columns["Total Order"].DefaultCellStyle.Format = "N0";
-                dgv_ShowFills.Columns["Qty_Order"].DefaultCellStyle.Format = "N0";
-                dgv_ShowFills.Columns["Qty_Routed"].DefaultCellStyle.Format = "N0";
-                dgv_ShowFills.Columns["Qty_Working"].DefaultCellStyle.Format = "N0";
-                dgv_ShowFills.Columns["Fill_Quantity"].DefaultCellStyle.Format = "N0";
+                dgv_ShowFills.Columns["Total Order"].DefaultCellStyle.Format = QtyFormat;
+                dgv_ShowFills.Columns["Qty_Order"].DefaultCellStyle.Format = QtyFormat;
+                dgv_ShowFills.Columns["Qty_Routed"].DefaultCellStyle.Format = QtyFormat;
+                dgv_ShowFills.Columns["Qty_Working"].DefaultCellStyle.Format = QtyFormat;
+                dgv_ShowFills.Columns["Fill_Quantity"].DefaultCellStyle.Format = QtyFormat;
                 dgv_ShowFills.Columns["FillValue"].Visible = false;
                 dgv_ShowFills.Columns["Route"].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                 dgv_ShowFills.Columns["Route"].Width = 45;
+                dgv_ShowFills.Columns["Sector"].Visible = false;
 
                 // Hide the Profit Columns in Last_Sale = 0
                 if (Last_Sale == 0)

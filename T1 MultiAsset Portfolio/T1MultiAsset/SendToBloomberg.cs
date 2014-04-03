@@ -44,7 +44,8 @@ namespace T1MultiAsset
             // Used as at 14-Feb-2011
             dt_SendToBloomberg.Columns.Add("Side"); // B = Buy, S = Sell, SS = Sell Short, BS = Cover Buy, SX = Short Sell Exempt
             // Used as at 14-Feb-2011
-            dt_SendToBloomberg.Columns.Add("OrderQuantity", System.Type.GetType("System.Int32")); // Always positive # of shares
+            // 18-Mar-2014 dt_SendToBloomberg.Columns.Add("OrderQuantity", System.Type.GetType("System.Int32")); // Always positive # of shares
+            dt_SendToBloomberg.Columns.Add("OrderQuantity", System.Type.GetType("System.Decimal")); // Always positive # of shares
             dt_SendToBloomberg.Columns.Add("Limit", System.Type.GetType("System.Decimal"));
             // Used as at 14-Feb-2011
             dt_SendToBloomberg.Columns.Add("TimeinForce"); // DAY, GTC
@@ -428,7 +429,7 @@ namespace T1MultiAsset
                 case "SS":
                     RetVal = "SHRT";
                     break;
-                case "BC":
+                case "BS":
                     RetVal = "COVR";
                     break;
             }
@@ -454,19 +455,19 @@ namespace T1MultiAsset
                     RetVal = "SS";
                     break;
                 case "COVR":
-                    RetVal = "BC";
+                    RetVal = "BS";
                     break;
             }
 
             return (RetVal);
         } //GetEMSXSide()
 
-        public static String EMSXAPI_Modify(String OrderRefID, String inTicker, Int32 NewQuantity)
+        public static String EMSXAPI_Modify(String OrderRefID, String inTicker, Decimal NewQuantity)
         {
             return (EMSXAPI_Modify(OrderRefID, "", inTicker, NewQuantity));
         } //EMSXAPI_Modify()
 
-        public static String EMSXAPI_Modify(String OrderRefID, String EMSX_Sequence, String inTicker, Int32 NewQuantity)
+        public static String EMSXAPI_Modify(String OrderRefID, String EMSX_Sequence, String inTicker, Decimal NewQuantity)
         {
             // 
             // Procedure:   EMSXAPI_Modify
@@ -506,7 +507,8 @@ namespace T1MultiAsset
 
             request.Set("EMSX_SEQUENCE", EMSX_Sequence);
             request.Set("EMSX_TICKER", BBG_Ticker); // It needs a valid ticker, but actually ignore it.
-            request.Set("EMSX_AMOUNT", Convert.ToInt32(Math.Abs(NewQuantity)));
+            // 18-Mar-2014 request.Set("EMSX_AMOUNT", SystemLibrary.ToInt32(Math.Abs(NewQuantity)));
+            request.Set("EMSX_AMOUNT", SystemLibrary.ToDouble(Math.Abs(NewQuantity)));
 
             // Submit the request
             String myMessage = SubmitRequest(request, OrderRefID);

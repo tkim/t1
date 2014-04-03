@@ -32,6 +32,7 @@ namespace T1MultiAsset
         private int CXLocation = 0;
         private int CYLocation = 0;
         private String Last_cb_Portfolio_Text = "";
+        private String StartBBG_Ticker = "";
 
         public struct OrderMenuStruct
         {
@@ -59,7 +60,7 @@ namespace T1MultiAsset
             public String crncy;
             public String Country;
             public DateTime TradeDate;
-            public Int32 Quantity;
+            public Decimal Quantity;
             public Int32 Round_Lot_Size;
             public Boolean ProcessedEOD;
             public Boolean ChangeMade;
@@ -74,13 +75,13 @@ namespace T1MultiAsset
             public String FillNo;
             public String Side;
             public DateTime TradeDate;
-            public Int32 Quantity;
+            public Decimal Quantity;
             public Int32 Round_Lot_Size;
             public Double FillPrice;
             public Boolean ChangeMade;
             public String BBG_Broker;
             public String BBG_StrategyType;
-            public Int32 RoutedAmount;
+            public Decimal RoutedAmount;
         }
 
         public static FillStruct Fills_parent = new FillStruct();
@@ -111,6 +112,12 @@ namespace T1MultiAsset
         } //pb_Refresh_Click()
 
 
+
+        public void FromParent(Form inForm, String inTicker)
+        {
+            FromParent(inForm);
+            StartBBG_Ticker = inTicker;
+        }
 
         public void FromParent(Form inForm)
         {
@@ -170,7 +177,7 @@ namespace T1MultiAsset
 
         } //ProcessOrders_FormClosed()
 
-        private void LoadProcessOrders()
+        public void LoadProcessOrders()
         {
             // Local Variables
             String mySql;
@@ -327,6 +334,13 @@ namespace T1MultiAsset
                 cb_Portfolio.Text = Last_cb_Portfolio_Text;
                 cb_Portfolio_SelectedIndexChanged(null, null);
             }
+
+            if (StartBBG_Ticker.Length>0)
+            {
+                dg_OrdersSelectRowbyTicker(StartBBG_Ticker);
+                StartBBG_Ticker = "";
+            }
+
         } //LoadProcessOrders()
 
         private void SetFormat(Boolean FromLoad)
@@ -342,9 +356,9 @@ namespace T1MultiAsset
             {
                 // Local Variables
                 String Portfolio = SystemLibrary.ToString(dg_Orders.Rows[i].Cells["Portfolio"].Value);
-                int FillAmount = SystemLibrary.ToInt32(dg_Orders.Rows[i].Cells["FillAmount"].Value);
-                int RoutedAmount = SystemLibrary.ToInt32(dg_Orders.Rows[i].Cells["RoutedAmount"].Value);
-                int Quantity = SystemLibrary.ToInt32(dg_Orders.Rows[i].Cells["Quantity"].Value);
+                Decimal FillAmount = SystemLibrary.ToDecimal(dg_Orders.Rows[i].Cells["FillAmount"].Value);
+                Decimal RoutedAmount = SystemLibrary.ToDecimal(dg_Orders.Rows[i].Cells["RoutedAmount"].Value);
+                Decimal Quantity = SystemLibrary.ToDecimal(dg_Orders.Rows[i].Cells["Quantity"].Value);
 
                 ParentForm1.SetColumn(dg_Orders, "Quantity", i);
                 ParentForm1.SetColumn(dg_Orders, "Amount", i);
@@ -354,7 +368,7 @@ namespace T1MultiAsset
                 if (Quantity == 0)
                     dg_Orders.Rows[i].Cells["Order_Filled_PCT"].Value = 0;
                 else
-                    dg_Orders.Rows[i].Cells["Order_Filled_PCT"].Value = Convert.ToDecimal(FillAmount) / Convert.ToDecimal(Quantity);
+                    dg_Orders.Rows[i].Cells["Order_Filled_PCT"].Value = SystemLibrary.ToDecimal(FillAmount) / SystemLibrary.ToDecimal(Quantity);
 
                 if (FillAmount == Quantity)
                 {
@@ -371,7 +385,7 @@ namespace T1MultiAsset
                 else if (RoutedAmount == 0)
                     dg_Orders.Rows[i].Cells["Routed_Filled_PCT"].Value = 0;
                 else
-                    dg_Orders.Rows[i].Cells["Routed_Filled_PCT"].Value = Convert.ToDecimal(FillAmount) / Convert.ToDecimal(RoutedAmount);
+                    dg_Orders.Rows[i].Cells["Routed_Filled_PCT"].Value = SystemLibrary.ToDecimal(FillAmount) / SystemLibrary.ToDecimal(RoutedAmount);
 
                 if (FillAmount != RoutedAmount)
                 {
@@ -383,7 +397,7 @@ namespace T1MultiAsset
 
                 if (SystemLibrary.ToString(dg_Orders.Rows[i].Cells["Order_Filled"].Value) == "Y")
                     dg_Orders.Rows[i].Cells["Order_Filled"].Style.BackColor = Color.Green;
-                else if (FillAmount == SystemLibrary.ToInt32(dg_Orders.Rows[i].Cells["RoutedAmount"].Value))
+                else if (FillAmount == SystemLibrary.ToDecimal(dg_Orders.Rows[i].Cells["RoutedAmount"].Value))
                     dg_Orders.Rows[i].Cells["Order_Filled"].Style.BackColor = Color.GreenYellow;
                 else
                     dg_Orders.Rows[i].Cells["Order_Filled"].Style.BackColor = Color.LightCyan;
@@ -437,8 +451,8 @@ namespace T1MultiAsset
         {
             // Local Variables
             String mySql;
-            Int32 FilledQuantity = 0;
-
+            Decimal FilledQuantity = 0;
+            String QuantityFormat = "N0";
 
             // Make sure its a valid row
             if (inRow < 0)
@@ -448,7 +462,7 @@ namespace T1MultiAsset
             Order.ChangeMadeFill = false;
             Order.OrderRefID = dg_Orders["OrderRefID", inRow].Value.ToString();
             Order.BBG_Ticker = dg_Orders["BBG_Ticker", inRow].Value.ToString();
-            Order.Quantity = Convert.ToInt32(dg_Orders["Quantity", inRow].Value);
+            Order.Quantity = SystemLibrary.ToDecimal(dg_Orders["Quantity", inRow].Value);
             Order.Side = dg_Orders["Side", inRow].Value.ToString();
             Order.Round_Lot_Size = SystemLibrary.ToInt32(dg_Orders["Round_Lot_Size", inRow].Value);
             if (Order.Round_Lot_Size < 1)
@@ -470,6 +484,26 @@ namespace T1MultiAsset
                             "               Fills AS Fills ON BrokerMapping.Broker = Fills.BBG_Broker AND BrokerMapping.StrategyType = Fills.BBG_StrategyType " +
                             "Where  Fills.OrderRefID = '" + Order.OrderRefID + "'";
                     dt_Fills = SystemLibrary.SQLSelectToDataTable(mySql);
+
+                    // Allow for a case where user wants to manually alter side - even of a single filee.
+                    dg_Fills.Columns["f_Side"].Visible = true;
+                    DataGridViewComboBoxColumn dcb_Side = (DataGridViewComboBoxColumn)dg_Fills.Columns["f_Side"];
+                    dcb_Side.Items.Clear();
+                    switch (Order.Side.Substring(0, 1))
+                    {
+                        case "S":
+                            dcb_Side.Items.Add("S");
+                            dcb_Side.Items.Add("SS");
+                            break;
+                        case "B":
+                            dcb_Side.Items.Add("B");
+                            dcb_Side.Items.Add("BS");
+                            break;
+                        default:
+                            dg_Fills.Columns["f_Side"].Visible = false;
+                            break;
+                    }
+
                     DataGridViewComboBoxColumn dcb_Broker = (DataGridViewComboBoxColumn)dg_Fills.Columns["f_BrokerID"];
                     String myFilter = "";
                     if (Order.BBG_Ticker.EndsWith("Index") || Order.BBG_Ticker.EndsWith("Comdty"))
@@ -490,7 +524,7 @@ namespace T1MultiAsset
                         dg_Fills["f_BBG_Ticker", myRow].Value = dr["BBG_Ticker"];
                         dg_Fills["f_BrokerID", myRow].Value = dr["BrokerID"];
                         dg_Fills["f_FillAmount", myRow].Value = dr["FillAmount"];
-                        FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dr["FillAmount"]);
+                        FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dr["FillAmount"]);
                         dg_Fills["f_FillPrice", myRow].Value = dr["FillPrice"];
                         dg_Fills["f_ManualFill", myRow].Value = dr["ManualFill"];
                         dg_Fills["f_Confirmed", myRow].Value = dr["Confirmed"];
@@ -504,17 +538,25 @@ namespace T1MultiAsset
                         ParentForm1.SetColumn(dg_Fills, "f_FillAmount", myRow);
                     }
 
+                    if (SystemLibrary.ToString(dg_Orders["Sector", inRow].Value) == "Currency")
+                    {
+                        QuantityFormat = "N2";
+                        dg_Fills.Columns["f_FillAmount"].DefaultCellStyle.Format = "N2";
+                        dg_Fills.Columns["f_Amount"].DefaultCellStyle.Format = "N2";
+                        dg_Fills.Columns["f_RoutedAmount"].DefaultCellStyle.Format = "N2";
+                    }
+
                     lb_RoundLotSize.Text = "Round Lot Size = " + Order.Round_Lot_Size.ToString("N0");
-                    tb_TotalFillQuality.Text = Order.Quantity.ToString("N0");
+                    tb_TotalFillQuality.Text = Order.Quantity.ToString(QuantityFormat);
                     SystemLibrary.SetTextBoxColour(tb_TotalFillQuality, Order.Quantity);
-                    tb_UnfilledQuantity.Text = (Order.Quantity - FilledQuantity).ToString("N0");
+                    tb_UnfilledQuantity.Text = (Order.Quantity - FilledQuantity).ToString(QuantityFormat);
                     SystemLibrary.SetTextBoxColour(tb_UnfilledQuantity, (Order.Quantity - FilledQuantity));
 
                     // Start with No manual override
                     cb_ManualOverride.Enabled = true;   
                     cb_ManualOverride.Checked = false;
                     cb_ManualOverride_CheckedChanged(null, null);
-                    tb_TotalQuantity.Text = Order.Quantity.ToString("N0");
+                    tb_TotalQuantity.Text = Order.Quantity.ToString(QuantityFormat);
 
                     // Set the Fill_Allocation block
                     dg_Fills_Allocation.Rows.Clear();
@@ -552,6 +594,12 @@ namespace T1MultiAsset
                         dg_OrdersSplit["PortfolioID", myRow].Value = dr["PortfolioID"];
                         dg_OrdersSplit["BBG_Ticker", myRow].Value = Order.BBG_Ticker;
                         dg_OrdersSplit["Order_Quantity", myRow].Value = dr["Quantity"];
+
+                        if (SystemLibrary.ToString(dg_Orders["Sector", inRow].Value) == "Currency")
+                        {
+                            QuantityFormat = "N2";
+                            dg_OrdersSplit.Columns["Order_Quantity"].DefaultCellStyle.Format = "N2";
+                        }
                         dg_OrdersSplit["Round_Lot_Size", myRow].Value = dr["Round_Lot_Size"];
                         ParentForm1.SetColumn(dg_OrdersSplit, "Order_Quantity", myRow);
                     }
@@ -571,7 +619,7 @@ namespace T1MultiAsset
                         bt_SaveSplit.Enabled = true;
                     }
 
-                    tb_TotalQuantity.Text = Order.Quantity.ToString("N0");
+                    tb_TotalQuantity.Text = Order.Quantity.ToString(QuantityFormat);
                     if (Order.Quantity < 0)
                         tb_TotalQuantity.ForeColor = Color.Red;
                     else if (Order.Quantity > 0)
@@ -633,12 +681,12 @@ namespace T1MultiAsset
             SystemLibrary.SQLExecute("Delete from Orders_Split where OrderRefId='"+Order.OrderRefID+"' ");
             foreach (DataGridViewRow dgr in dg_OrdersSplit.Rows)
             {
-                if (SystemLibrary.ToInt32(dgr.Cells["Order_Quantity"].Value) != 0)
+                if (SystemLibrary.ToDecimal(dgr.Cells["Order_Quantity"].Value) != 0)
                 {
                     String mySql = "Insert into Orders_Split (OrderRefId, FundID, PortfolioID, Quantity, Round_Lot_Size) " +
                                    "Values ('" + Order.OrderRefID + "'," + dgr.Cells["FundID"].Value.ToString() + "," + 
                                             dgr.Cells["PortfolioID"].Value.ToString() + "," +
-                                            SystemLibrary.ToInt32(dgr.Cells["Order_Quantity"].Value.ToString()).ToString() + "," + SystemLibrary.ToInt32(dgr.Cells["Round_Lot_Size"].Value.ToString()).ToString() + ")";
+                                            SystemLibrary.ToDecimal(dgr.Cells["Order_Quantity"].Value.ToString()).ToString() + "," + SystemLibrary.ToInt32(dgr.Cells["Round_Lot_Size"].Value.ToString()).ToString() + ")";
                     SystemLibrary.SQLExecute(mySql);
                 }
             }
@@ -660,15 +708,15 @@ namespace T1MultiAsset
         private void dg_OrdersSplit_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             // Local Variables
-            Int32 Qty_Remain = Order.Quantity;
-            Int32 Qty;
+            Decimal Qty_Remain = Order.Quantity;
+            Decimal Qty;
 
             //if (dg_OrdersSplit.Columns[e.ColumnIndex].Name == "Order_Quantity")
             {
                 // Add all the Qty_Fill and calculate the MissingQuantity
                 foreach (DataGridViewRow dgr in dg_OrdersSplit.Rows)
                 {
-                    Qty = SystemLibrary.ToInt32(dgr.Cells["Order_Quantity"].Value);
+                    Qty = SystemLibrary.ToDecimal(dgr.Cells["Order_Quantity"].Value);
                     if (Math.Sign(Qty) != Math.Sign(Order.Quantity) && Qty != 0)
                     {
                         MessageBox.Show("Wrong Sign on Order Quantity");
@@ -689,7 +737,7 @@ namespace T1MultiAsset
                 tb_MissingQuantity.ForeColor = Color.Green;
             else
                 tb_MissingQuantity.ForeColor = Color.Black;
-            if (SystemLibrary.ToInt32(dg_OrdersSplit[e.ColumnIndex, e.RowIndex].Value) < 0)
+            if (SystemLibrary.ToDecimal(dg_OrdersSplit[e.ColumnIndex, e.RowIndex].Value) < 0)
                 dg_OrdersSplit[e.ColumnIndex, e.RowIndex].Style.ForeColor = Color.Red;
             else
                 dg_OrdersSplit[e.ColumnIndex, e.RowIndex].Style.ForeColor = Color.Green;
@@ -741,11 +789,13 @@ namespace T1MultiAsset
                     String Order_Completed = dgr.Cells["Order_Completed"].Value.ToString();
                     mySql = "Update Orders " +
                             "Set Order_Completed = '" + Order_Completed + "' " +
-                            "Where OrderRefID = '" + OrderRefId + "' ";
+                            "Where OrderRefID = '" + OrderRefId + "' " +
+                            "And   isNull(Order_Completed,'N') != '" + Order_Completed + "' ";
                     SystemLibrary.SQLExecute(mySql);
                     mySql = "Update Fills " +
                             "Set Confirmed = '" + Order_Completed + "' " +
-                            "Where OrderRefID = '" + OrderRefId + "' ";
+                            "Where OrderRefID = '" + OrderRefId + "' " +
+                            "And   isNull(Confirmed,'N') != '" + Order_Completed + "' ";
                     SystemLibrary.SQLExecute(mySql);
                 }
             }
@@ -787,12 +837,12 @@ namespace T1MultiAsset
         private void dg_OrdersSplit_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
         {
             // Local Variables
-            int Qty_Remain = Order.Quantity;
+            Decimal Qty_Remain = Order.Quantity;
 
             // Add all the Qty_Fill and calculate the MissingQuantity
             foreach (DataGridViewRow dgr in dg_OrdersSplit.Rows)
             {
-                int Qty = Convert.ToInt32(dgr.Cells["Order_Quantity"].Value);
+                Decimal Qty = SystemLibrary.ToDecimal(dgr.Cells["Order_Quantity"].Value);
                 Qty_Remain = Qty_Remain - Qty;
             }
 
@@ -814,7 +864,8 @@ namespace T1MultiAsset
         {
             // Open the Process Trades Form and if Available Pass on the Parent Form.
             ProcessTrades frm_po = new ProcessTrades();
-            if(ParentForm1!=null)
+            frm_po = (ProcessTrades)SystemLibrary.FormExists(frm_po, true);
+            if (ParentForm1 != null)
                 frm_po.FromParent(ParentForm1);
             frm_po.Show();
         }
@@ -845,7 +896,7 @@ namespace T1MultiAsset
         private void dg_Fills_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             // Local Variables
-            Int32 FilledQuantity = 0;
+            Decimal FilledQuantity = 0;
 
 
             // What column is changing
@@ -921,10 +972,10 @@ namespace T1MultiAsset
             // Set Unfilled Quantity
             foreach (DataGridViewRow dgr in dg_Fills.Rows)
             {
-                FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dgr.Cells["f_FillAmount"].Value);
+                FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dgr.Cells["f_FillAmount"].Value);
             }
-            //FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dg_Fills.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
-            tb_UnfilledQuantity.Text = (Order.Quantity - FilledQuantity).ToString("N0");
+            //FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dg_Fills.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+            tb_UnfilledQuantity.Text = (Order.Quantity - FilledQuantity).ToString(dg_Fills.Columns["f_FillAmount"].DefaultCellStyle.Format);
             SystemLibrary.SetTextBoxColour(tb_UnfilledQuantity, (Order.Quantity - FilledQuantity));
 
             // Check if can Save
@@ -972,7 +1023,7 @@ namespace T1MultiAsset
         private void dg_Fills_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
         {
             // Local Variables
-            Int32 FilledQuantity = 0;
+            Decimal FilledQuantity = 0;
 
             // Seems to be a bug that allows users to Delete Rows even when Readonly
             if (dg_Fills.ReadOnly)
@@ -981,9 +1032,9 @@ namespace T1MultiAsset
             // Set Unfilled Quantity
             foreach (DataGridViewRow dgr in dg_Fills.Rows)
             {
-                FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dgr.Cells["f_FillAmount"].Value);
+                FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dgr.Cells["f_FillAmount"].Value);
             }
-            //FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dg_Fills.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+            //FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dg_Fills.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
             tb_UnfilledQuantity.Text = (Order.Quantity - FilledQuantity).ToString("N0");
             SystemLibrary.SetTextBoxColour(tb_UnfilledQuantity, (Order.Quantity - FilledQuantity));
 
@@ -1007,7 +1058,7 @@ namespace T1MultiAsset
             int myScrollRow = dg_Orders.FirstDisplayedScrollingRowIndex;
                 //DataGridView.FirstDisplayedScrollingRowIndex
 
-            if (tb_UnfilledQuantity.Text.Trim() != "0")
+            if (SystemLibrary.ToDecimal(tb_UnfilledQuantity.Text.Trim()) != 0.00M)
             {
                 if (MessageBox.Show(this, "I notice there is still and Unfilled Quantity of " + tb_UnfilledQuantity.Text + ".\r\n\r\n" +
                               "Do you want to Abort [Save Fill] so you can correct this?", "Save Fill", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -1051,8 +1102,9 @@ namespace T1MultiAsset
                     return;
                 }
 
-                if (Math.IEEERemainder(SystemLibrary.ToDouble(dgr.Cells["f_FillAmount"].Value), Convert.ToDouble(Order.Round_Lot_Size)) != 0)
-                    okRoundLot = false;
+                if (dg_Fills.Columns["f_FillAmount"].DefaultCellStyle.Format == "NO")
+                    if (Math.IEEERemainder(SystemLibrary.ToDouble(dgr.Cells["f_FillAmount"].Value), Convert.ToDouble(Order.Round_Lot_Size)) != 0)
+                        okRoundLot = false;
                 //SystemLibrary.DebugLine(dgr.Cells["f_FillAmount"].Value + ", " + Order.Round_Lot_Size+", "+Math.IEEERemainder(SystemLibrary.ToDouble(dgr.Cells["f_FillAmount"].Value), Convert.ToDouble(Order.Round_Lot_Size)));
                 if (dgr.Cells["f_BrokerID"].Value == null)
                 {
@@ -1060,7 +1112,7 @@ namespace T1MultiAsset
                     dg_Fills.AllowUserToAddRows = true;
                     return;
                 }
-                if (SystemLibrary.ToInt32(dgr.Cells["f_FillAmount"].Value) == 0)
+                if (SystemLibrary.ToDecimal(dgr.Cells["f_FillAmount"].Value) == 0)
                 {
                     MessageBox.Show("Failed: You must supply a valid Fill Amount.\r\n\r\nOtherwise Delete the unwanted record.", "Save Fill");
                     dg_Fills.AllowUserToAddRows = true;
@@ -1074,6 +1126,12 @@ namespace T1MultiAsset
                         dg_Fills.AllowUserToAddRows = true;
                         return;
                     }
+                }
+                if (SystemLibrary.ToString(dgr.Cells["f_Side"].Value) != Order.Side)
+                {
+                    MessageBox.Show(this, "I notice that you have a side of the Fill (" + SystemLibrary.ToString(dgr.Cells["f_Side"].Value) +") not the same as the Order ("+Order.Side+")\r\n\r\n" +
+                                          "You may want to check this and right-click on the Order to set the Side for all fills.",
+                                          "Save Fill");
                 }
             }
 
@@ -1101,7 +1159,7 @@ namespace T1MultiAsset
                 dg_Fills["f_BBG_Ticker", myRow].Value = dr["BBG_Ticker"];
                 dg_Fills["f_BrokerID", myRow].Value = dr["BrokerID"];
                 dg_Fills["f_FillAmount", myRow].Value = dr["FillAmount"];
-                FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dr["FillAmount"]);
+                FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dr["FillAmount"]);
                 dg_Fills["f_FillPrice", myRow].Value = dr["FillPrice"];
                 dg_Fills["f_ManualFill", myRow].Value = dr["ManualFill"];
                 dg_Fills["f_Confirmed", myRow].Value = dr["Confirmed"];
@@ -1187,6 +1245,23 @@ namespace T1MultiAsset
             }
         } //dg_OrdersSelectRowbyOrderRefID()
 
+        private void dg_OrdersSelectRowbyTicker(String BBG_Ticker)
+        {
+            // Go back the that row in dg_Orders
+            for (int i = 0; i < dg_Orders.Rows.Count; i++)
+            {
+                if (dg_Orders["BBG_Ticker", i].Value.ToString() == BBG_Ticker)
+                {
+                    dg_Orders.Rows[i].Selected = true;
+                    dg_Orders.CurrentCell = dg_Orders["BBG_Ticker", i];
+                    //LoadOrders_Split(i);
+                    break; // Exit the loop
+                }
+                else
+                    dg_Orders.Rows[i].Selected = false;
+            }
+        } //dg_OrdersSelectRowbyOrderRefID()
+
         private void tb_TotalFillQuality_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Tell the Key handler to ignore this key stroke
@@ -1232,7 +1307,7 @@ namespace T1MultiAsset
             Fills_parent.ChangeMade = false;
             Fills_parent.OrderRefID = OrderRefID;
             //Fills_parent.BBG_Ticker = dg_Fills["f_BBG_Ticker", inRow].Value.ToString();
-            Fills_parent.Quantity = Convert.ToInt32(dg_Fills["f_Amount", inRow].Value);
+            Fills_parent.Quantity = SystemLibrary.ToDecimal(dg_Fills["f_Amount", inRow].Value);
             Fills_parent.FillPrice = Convert.ToDouble(dg_Fills["f_FillPrice", inRow].Value);
             Fills_parent.Side = dg_Fills["f_Side", inRow].Value.ToString();
             // Where Does Round_Lot_Size come from?
@@ -1240,7 +1315,7 @@ namespace T1MultiAsset
             //Fills_parent.TradeDate = Convert.ToDateTime(dg_Fills["f_TradeDate", inRow].Value);
             Fills_parent.BBG_Broker = dg_Fills["f_BBG_Broker", inRow].Value.ToString();
             Fills_parent.BBG_StrategyType = dg_Fills["f_BBG_StrategyType", inRow].Value.ToString();
-            Fills_parent.RoutedAmount = Convert.ToInt32(dg_Fills["f_RoutedAmount", inRow].Value);
+            Fills_parent.RoutedAmount = SystemLibrary.ToDecimal(dg_Fills["f_RoutedAmount", inRow].Value);
             Fills_parent.FillNo = dg_Fills["f_FillNo", inRow].Value.ToString();
 
             // BrokerID needs to come when I know BBG_Broker/BBG_StrategyType
@@ -1321,7 +1396,7 @@ namespace T1MultiAsset
         {
             // Local Variable
             String myValue = "";
-            int myQty = Order.Quantity;
+            Decimal myQty = Order.Quantity;
             String  mySql;
             String OrderRefID = Order.OrderRefID;
 
@@ -1333,7 +1408,7 @@ namespace T1MultiAsset
 
             if (SystemLibrary.InputBox("Resize Order from " + tb_TotalQuantity.Text, "Change the Size of the Order OR Cancel", ref myValue, validate_ResizOrder, MessageBoxIcon.Question) == DialogResult.OK)
             {
-                myQty = SystemLibrary.ToInt32(myValue);
+                myQty = SystemLibrary.ToDecimal(myValue);
                 mySql = "Exec sp_ResizeOrder '" + OrderRefID + "', " + myQty.ToString();
                 SystemLibrary.SQLExecute(mySql);
 
@@ -1361,7 +1436,7 @@ namespace T1MultiAsset
             // Rules: Ok to be Zero - this means cancelling the order
             //          Cannot be opposite sign
             //          Look at Order.Side
-            int myIntValue = SystemLibrary.ToInt32(myValue);
+            Decimal myIntValue = SystemLibrary.ToDecimal(myValue);
             if (Math.Sign((decimal)Order.Quantity) != Math.Sign((decimal)myIntValue))
                 return "'" + myValue + "' cannot be opposite sign to original order. Please set to 0 (Zero) if you want to delete this order.";
             else
@@ -1379,91 +1454,131 @@ namespace T1MultiAsset
                     Point myLocation = new Point(this.Location.X + CXLocation, this.Location.Y + CYLocation);
                     // Select the Order as needed in code later on.
                     LoadOrders_Split(e.RowIndex);
-                    String OrderRefID = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["OrderRefId"].Value);
-                    String EMSX_Sequence = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["Order#"].Value);
-                    String ProcessedEOD = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["ProcessedEOD"].Value);
-                    String BBG_Ticker = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["BBG_Ticker"].Value);
-                    String FormattedQuantity = dg_Orders.Rows[e.RowIndex].Cells["Quantity"].FormattedValue.ToString();
-                    String FormattedFillAmount = dg_Orders.Rows[e.RowIndex].Cells["FillAmount"].FormattedValue.ToString();
-                    String FormattedRoutedAmount = dg_Orders.Rows[e.RowIndex].Cells["RoutedAmount"].FormattedValue.ToString();
-                    Decimal Quantity = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["Quantity"].Value);
-                    Decimal FillAmount = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["FillAmount"].Value);
-                    Decimal FillPrice = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["FillPrice"].Value);
-                    Decimal RoutedAmount = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["RoutedAmount"].Value);
-                    String Side = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["Side"].Value);
-                    if (OrderRefID.Length == 0)
-                        return;
-                    if (ProcessedEOD != "N")
+
+                    if (dg_Orders.Rows[e.RowIndex].Cells[e.ColumnIndex].OwningColumn.Name.ToString() == "BBG_Ticker")
                     {
-                        MessageBox.Show("Must Delete the Trades associated with this Order first");
-                        return;
+                        String Ticker = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                        String PortfolioName = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["Portfolio"].Value);
+                        SystemLibrary.BBGShowMenu(-1, -1, Ticker, PortfolioName, SystemLibrary.BBGRelativeTicker(Ticker), myLocation.X, myLocation.Y);
                     }
-                    
-                    ContextMenuStrip myMenu = new ContextMenuStrip();
-                    ToolStripMenuItem mySubMenu = new ToolStripMenuItem();
+                    else
+                    {
+                        String OrderRefID = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["OrderRefId"].Value);
+                        String EMSX_Sequence = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["Order#"].Value);
+                        String ProcessedEOD = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["ProcessedEOD"].Value);
+                        String BBG_Ticker = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["BBG_Ticker"].Value);
+                        String FormattedQuantity = dg_Orders.Rows[e.RowIndex].Cells["Quantity"].FormattedValue.ToString();
+                        String FormattedFillAmount = dg_Orders.Rows[e.RowIndex].Cells["FillAmount"].FormattedValue.ToString();
+                        String FormattedRoutedAmount = dg_Orders.Rows[e.RowIndex].Cells["RoutedAmount"].FormattedValue.ToString();
+                        Decimal Quantity = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["Quantity"].Value);
+                        Decimal FillAmount = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["FillAmount"].Value);
+                        Decimal FillPrice = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["FillPrice"].Value);
+                        Decimal RoutedAmount = SystemLibrary.ToDecimal(dg_Orders.Rows[e.RowIndex].Cells["RoutedAmount"].Value);
+                        String Side = SystemLibrary.ToString(dg_Orders.Rows[e.RowIndex].Cells["Side"].Value);
+                        if (OrderRefID.Length == 0)
+                            return;
+                        if (ProcessedEOD != "N")
+                        {
+                            MessageBox.Show("Must Delete the Trades associated with this Order first");
+                            return;
+                        }
 
-                    OrderMenuStruct myOrderStr = new OrderMenuStruct();
-                    myOrderStr.OrderRefID = OrderRefID;
-                    myOrderStr.EMSX_Sequence = EMSX_Sequence;
-                    myOrderStr.BBG_Ticker = BBG_Ticker;
-                    myOrderStr.FormattedQuantity = FormattedQuantity;
-                    myOrderStr.FormattedFillAmount = FormattedFillAmount;
-                    myOrderStr.FormattedRoutedAmount = FormattedRoutedAmount;
-                    myOrderStr.Quantity = Quantity;
-                    myOrderStr.FillAmount = FillAmount;
-                    myOrderStr.FillPrice = FillPrice;
-                    myOrderStr.RoutedAmount = RoutedAmount;
-                    myOrderStr.Side = Side;
-                    myOrderStr.myParentForm = this;
+                        ContextMenuStrip myMenu = new ContextMenuStrip();
+                        ToolStripMenuItem mySubMenu = new ToolStripMenuItem();
 
-                    // Fill Status Order Menu
-                    mySubMenu = new ToolStripMenuItem("EMSX Details");
-                    myOrderStr.Instruction = "ShowFillStatus";
-                    mySubMenu.Tag = myOrderStr;
-                    mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
-                    myMenu.Items.Add(mySubMenu);
+                        OrderMenuStruct myOrderStr = new OrderMenuStruct();
+                        myOrderStr.OrderRefID = OrderRefID;
+                        myOrderStr.EMSX_Sequence = EMSX_Sequence;
+                        myOrderStr.BBG_Ticker = BBG_Ticker;
+                        myOrderStr.FormattedQuantity = FormattedQuantity;
+                        myOrderStr.FormattedFillAmount = FormattedFillAmount;
+                        myOrderStr.FormattedRoutedAmount = FormattedRoutedAmount;
+                        myOrderStr.Quantity = Quantity;
+                        myOrderStr.FillAmount = FillAmount;
+                        myOrderStr.FillPrice = FillPrice;
+                        myOrderStr.RoutedAmount = RoutedAmount;
+                        myOrderStr.Side = Side;
+                        myOrderStr.myParentForm = this;
 
-                    // Resize to Fill Menu
-                    myMenu.Items.Add("-");
-                    mySubMenu = new ToolStripMenuItem("Resize Order to the Fill Amount");
-                    myOrderStr.Instruction = "ResizeToFill";
-                    mySubMenu.Tag = myOrderStr;
-                    mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
-                    myMenu.Items.Add(mySubMenu);
+                        // Fill Status Order Menu
+                        mySubMenu = new ToolStripMenuItem("EMSX Details");
+                        myOrderStr.Instruction = "ShowFillStatus";
+                        mySubMenu.Tag = myOrderStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
 
-                    // Resize to Fill Menu
-                    mySubMenu = new ToolStripMenuItem("Resize Order to the Routed Amount");
-                    myOrderStr.Instruction = "ResizeToRouted";
-                    mySubMenu.Tag = myOrderStr;
-                    mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
-                    myMenu.Items.Add(mySubMenu);
+                        // Resize to Fill Menu
+                        myMenu.Items.Add("-");
+                        mySubMenu = new ToolStripMenuItem("Resize Order to the Fill Amount");
+                        myOrderStr.Instruction = "ResizeToFill";
+                        mySubMenu.Tag = myOrderStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
 
-                    // Double Order Menu
-                    mySubMenu = new ToolStripMenuItem("Double Order Size");
-                    myOrderStr.Instruction = "ResizeToDouble";
-                    mySubMenu.Tag = myOrderStr;
-                    mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
-                    myMenu.Items.Add(mySubMenu);
+                        // Resize to Fill Menu
+                        mySubMenu = new ToolStripMenuItem("Resize Order to the Routed Amount");
+                        myOrderStr.Instruction = "ResizeToRouted";
+                        mySubMenu.Tag = myOrderStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
 
-                    // Resize Order Menu
-                    myMenu.Items.Add("-");
-                    mySubMenu = new ToolStripMenuItem("Resize Order");
-                    myOrderStr.Instruction = "ResizeOrder";
-                    mySubMenu.Tag = myOrderStr;
-                    mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
-                    myMenu.Items.Add(mySubMenu);
+                        // Double Order Menu
+                        mySubMenu = new ToolStripMenuItem("Double Order Size");
+                        myOrderStr.Instruction = "ResizeToDouble";
+                        mySubMenu.Tag = myOrderStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
 
-                    // Delete Order Menu
-                    myMenu.Items.Add("-");
-                    mySubMenu = new ToolStripMenuItem("Delete Order");
-                    myOrderStr.Instruction = "Delete";
-                    mySubMenu.Tag = myOrderStr;
-                    mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
-                    myMenu.Items.Add(mySubMenu);
+                        // Resize Order Menu
+                        myMenu.Items.Add("-");
+                        mySubMenu = new ToolStripMenuItem("Resize Order");
+                        myOrderStr.Instruction = "ResizeOrder";
+                        mySubMenu.Tag = myOrderStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
 
-                    // Show the Menu
-                    myMenu.Show(myLocation);
+                        // Delete Order Menu
+                        myMenu.Items.Add("-");
+                        mySubMenu = new ToolStripMenuItem("Delete Order");
+                        myOrderStr.Instruction = "Delete";
+                        mySubMenu.Tag = myOrderStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
 
+                        // Swap between Short & Long Order Menu
+                        myMenu.Items.Add("-");
+                        String MenuText = "";
+                        switch (Side)
+                        {
+                            case "B":
+                                MenuText = "Swap from 'Buy' to 'Buy to Cover'";
+                                break;
+                            case "BS":
+                                MenuText = "Swap from 'Buy to Cover' to 'Buy'";
+                                break;
+                            case "S":
+                                MenuText = "Swap from 'Sell' to 'Sell Short'";
+                                break;
+                            case "SS":
+                                MenuText = "Swap from 'Sell Short' to 'Sell'";
+                                break;
+                            default:
+                                Console.WriteLine("Programmer issue: dg_Orders_CellMouseClick(Unknown Side='" + Side + "'");
+                                MenuText = "";
+                                break;
+                        }
+                        if (MenuText.Length > 0)
+                        {
+                            mySubMenu = new ToolStripMenuItem(MenuText);
+                            myOrderStr.Instruction = "Swap Order";
+                            mySubMenu.Tag = myOrderStr;
+                            mySubMenu.MouseUp += new MouseEventHandler(dg_OrdersSystemMenuItem_Click);
+                            myMenu.Items.Add(mySubMenu);
+                        }
+
+                        // Show the Menu
+                        myMenu.Show(myLocation);
+                    }
                 }
             }
             catch { }
@@ -1481,6 +1596,9 @@ namespace T1MultiAsset
             OrderMenuStruct myOrderStr = (OrderMenuStruct)ts_From.Tag;
             String myQuestion = "";
             String myMessage = "";
+            String Side = myOrderStr.Side;
+            String NewSide = "";
+            String mySql;
             String OrderRefID = myOrderStr.OrderRefID;
             Decimal Quantity = myOrderStr.Quantity;
             Decimal FillAmount = myOrderStr.FillAmount;
@@ -1493,6 +1611,40 @@ namespace T1MultiAsset
             {
                 switch (myOrderStr.Instruction)
                 {
+                    case "Swap Order":
+                        switch (Side)
+                        {
+                            case "B":
+                                myQuestion = "Swap from 'Buy' to 'Buy to Cover'";
+                                NewSide = "BS";
+                                break;
+                            case "BS":
+                                myQuestion = "Swap from 'Buy to Cover' to 'Buy'";
+                                NewSide = "B";
+                                break;
+                            case "S":
+                                myQuestion = "Swap from 'Sell' to 'Sell Short'";
+                                NewSide = "SS";
+                                break;
+                            case "SS":
+                                myQuestion = "Swap from 'Sell Short' to 'Sell'";
+                                NewSide = "S";
+                                break;
+                        }
+                        myQuestion = "You are about to " + myQuestion + "\r\n\r\nDo you wish to continue?";
+                        if (MessageBox.Show(myQuestion, "Swap Order Side", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            mySql = "Update Orders Set Side = '" + NewSide + "' Where OrderRefID = '" + OrderRefID + "' ";
+                            SystemLibrary.SQLExecute(mySql);
+                            mySql = "Update Fills Set Side = '" + NewSide + "' Where OrderRefID = '" + OrderRefID + "' ";
+                            SystemLibrary.SQLExecute(mySql);
+                            myForm.LoadProcessOrders();
+
+                            // Update The Positions Table
+                            myForm.NeedUpdate = true;
+                            myForm.NeedFullUpdate = true;
+                        }
+                        break;
                     case "ShowFillStatus":
                         ShowFillStatus fs = new ShowFillStatus();
                         SystemLibrary.FormExists(fs, true);
@@ -1568,7 +1720,7 @@ namespace T1MultiAsset
                         else if (MessageBox.Show(myQuestion, "Resize Order", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
                             if (myForm.ParentForm1.isBloombergUser)
-                                myMessage = SendToBloomberg.EMSXAPI_Modify(OrderRefID, myOrderStr.BBG_Ticker, Convert.ToInt32(myOrderStr.FillAmount));
+                                myMessage = SendToBloomberg.EMSXAPI_Modify(OrderRefID, myOrderStr.BBG_Ticker, SystemLibrary.ToDecimal(myOrderStr.FillAmount));
                             else
                                 myMessage = "";
 
@@ -1599,7 +1751,7 @@ namespace T1MultiAsset
                                            "Is this Ok?", "Resize Order", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
                             if (myForm.ParentForm1.isBloombergUser)
-                                myMessage = SendToBloomberg.EMSXAPI_Modify(OrderRefID, myOrderStr.BBG_Ticker, Convert.ToInt32(myOrderStr.RoutedAmount));
+                                myMessage = SendToBloomberg.EMSXAPI_Modify(OrderRefID, myOrderStr.BBG_Ticker, SystemLibrary.ToDecimal(myOrderStr.RoutedAmount));
                             else
                                 myMessage = "";
                             
@@ -1627,7 +1779,7 @@ namespace T1MultiAsset
                                            "Is this Ok?", "Resize Order", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
                             if (myForm.ParentForm1.isBloombergUser)
-                                myMessage = SendToBloomberg.EMSXAPI_Modify(OrderRefID, myOrderStr.BBG_Ticker, Convert.ToInt32(DoubleQuantity));
+                                myMessage = SendToBloomberg.EMSXAPI_Modify(OrderRefID, myOrderStr.BBG_Ticker, SystemLibrary.ToDecimal(DoubleQuantity));
                             else
                                 myMessage = "";
 
@@ -1649,12 +1801,11 @@ namespace T1MultiAsset
                         break;
                     case "ResizeOrder":
                         String myValue = myOrderStr.FormattedQuantity;
-                        long myQty;
-                        String mySql;
+                        Decimal myQty;
 
                         if (SystemLibrary.InputBox("Resize Order for " + myOrderStr.BBG_Ticker + " from " + myOrderStr.FormattedQuantity, "Change the Size of the Order OR Cancel", ref myValue, myForm.validate_ResizOrder, MessageBoxIcon.Question) == DialogResult.OK)
                         {
-                            myQty = SystemLibrary.ToInt32(myValue);
+                            myQty = SystemLibrary.ToDecimal(myValue);
                             if (Math.Sign(myQty) != Math.Sign(myOrderStr.Quantity))
                             {
                                 MessageBox.Show(@"Cannot swap between Buy & Sell.", "Resize aborted");
@@ -1883,12 +2034,12 @@ namespace T1MultiAsset
                 dg_Fills.Refresh();
 
                 // Set Unfilled Quantity
-                Int32 FilledQuantity = 0;
+                Decimal FilledQuantity = 0;
                 foreach (DataGridViewRow dgr in dg_Fills.Rows)
                 {
-                    FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dgr.Cells["f_FillAmount"].Value);
+                    FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dgr.Cells["f_FillAmount"].Value);
                 }
-                //FilledQuantity = FilledQuantity + SystemLibrary.ToInt32(dg_Fills.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                //FilledQuantity = FilledQuantity + SystemLibrary.ToDecimal(dg_Fills.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                 tb_UnfilledQuantity.Text = (Order.Quantity - FilledQuantity).ToString("N0");
                 SystemLibrary.SetTextBoxColour(tb_UnfilledQuantity, (Order.Quantity - FilledQuantity));
 

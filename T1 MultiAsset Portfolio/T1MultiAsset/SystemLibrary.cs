@@ -41,6 +41,7 @@ using System.Drawing.Printing;
 using System.DirectoryServices.AccountManagement;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using Tamir.SharpSsh.jsch;
 
 
 namespace T1MultiAsset
@@ -205,6 +206,44 @@ namespace T1MultiAsset
         public static String SCOTIAPrimeFilePath;
         public static String SCOTIAPrime_FilePart;
 
+        // EMSX/EMSI
+        public static String EMSI_Crypt_Key;
+        public static String EMSI_Path;
+
+        // Decrpyt / Encrypt
+        public static String _bindirectory;
+
+
+        // Send Data
+        [DllImport("User32.dll")]
+        public static extern int FindWindow(string strClassName, string strWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, ref CopyDataStruct lParam);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr LocalAlloc(int flag, int size);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr LocalFree(IntPtr p);
+
+        public const int WM_COPYDATA = 0x004A;
+
+        public struct CopyDataStruct : IDisposable
+        {
+            public IntPtr dwData;
+            public int cbData;
+            public IntPtr lpData;
+
+            public void Dispose()
+            {
+                if (this.lpData != IntPtr.Zero)
+                {
+                    LocalFree(this.lpData);
+                    this.lpData = IntPtr.Zero;
+                }
+            }
+        }
 
 
         // Console redirection
@@ -707,7 +746,7 @@ namespace T1MultiAsset
             OleDbDataAdapter myAdapter;
             DataTable dt_SqlResult = new DataTable();
             DataSet ds_SqlResult = new DataSet();
-            int old_debugLevel = debugLevel;
+            //CFR 20140224int old_debugLevel = debugLevel;
             DateTime myStartTime = DateTime.Now;
 
             using (OleDbConnection conn = new OleDbConnection(DBVars.ConnString))
@@ -729,12 +768,12 @@ namespace T1MultiAsset
                 }
 
                 // Colin DEBUG SQL SLOW
-                debugLevel = 4;
+                //CFR 20140224debugLevel = 4;
                 if (myFill == "DataTable")
                     SystemLibrary.DebugLine(myStartTime, "SQLSelectToObject: {" + dt_SqlResult.Rows.Count.ToString() + "} ({" + mySelect + "},{" + myFill + "})");
                 else
                     SystemLibrary.DebugLine(myStartTime, "SQLSelectToObject: {" + ds_SqlResult.Tables[0].Rows.Count.ToString() + "} ({" + mySelect + "},{" + myFill + "})");
-                debugLevel = old_debugLevel;
+                //CFR 20140224debugLevel = old_debugLevel;
 
                 if (myFill=="DataTable")
                     return (dt_SqlResult);
@@ -815,10 +854,10 @@ namespace T1MultiAsset
             }
 
             // Colin DEBUG SQL SLOW
-            int old_debugLevel = debugLevel;
-            debugLevel = 4;
+            //CFR 20140224int old_debugLevel = debugLevel;
+            //CFR 20140224debugLevel = 4;
             SystemLibrary.DebugLine(myStartTime, "SQLBulkUpdate: {" + myRows.ToString() + "} {" + mySelect + "}");
-            debugLevel = old_debugLevel;
+            //CFR 20140224debugLevel = old_debugLevel;
 
             return (myRows);
 
@@ -875,7 +914,7 @@ namespace T1MultiAsset
             // Local Variables
             OleDbCommand myCommand;
             Int32 myRows = -1;
-            int old_debugLevel = debugLevel;
+            //CFR 20140224int old_debugLevel = debugLevel;
             DateTime myStartTime = DateTime.Now;
 
             using (OleDbConnection conn = new OleDbConnection(DBVars.ConnString))
@@ -895,9 +934,9 @@ namespace T1MultiAsset
                 //Console.WriteLine("SQLExecute: - "+myRows.ToString() + " (" + mySql + ")");
 
                 // Colin DEBUG SQL SLOW
-                debugLevel = 4;
+                //CFR 20140224debugLevel = 4;
                 SystemLibrary.DebugLine(myStartTime, "SQLExecute: {" + myRows.ToString() + "} {" + mySql + "}");
-                debugLevel = old_debugLevel;
+                //CFR 20140224debugLevel = old_debugLevel;
 
                 return (myRows);
             }
@@ -1230,7 +1269,7 @@ namespace T1MultiAsset
             // Local Variable
             SqlCommand myCommand;
             Int32 myRows = -1;
-            int old_debugLevel = debugLevel;
+            //CFR 20140224int old_debugLevel = debugLevel;
             DateTime myStartTime = DateTime.Now;
 
 
@@ -1257,9 +1296,9 @@ namespace T1MultiAsset
             }
 
             // Colin DEBUG SQL SLOW
-            debugLevel = 4;
+            //CFR 20140224debugLevel = 4;
             SystemLibrary.DebugLine(myStartTime, "SQLExecute: {" + dt_in.Rows.Count.ToString() + "} {" + myStoredProcedureName + "}");
-            debugLevel = old_debugLevel;
+            //CFR 20140224debugLevel = old_debugLevel;
 
             return (myRows);
 
@@ -1733,29 +1772,446 @@ namespace T1MultiAsset
 
         } // FTPSCOTIAPrimeSaveStructure()
 
+        public static String SFTPTestStructure(String ServerIP, String UserID, String Password)
+        {
+            /*
+             * ServerIP = "sftp://<Host>:<Port>/<Path>"
+             */
+            // Local Variables
+            JSch jsch = new JSch();
+            String[] mySplit = ServerIP.Split(':');
+            String myHost = "";
+            String myPath = "";
+            String retVal = "";
+            int myPort = 22;
+
+
+            switch(mySplit.Length)
+            {
+                case 0:
+                case 1:
+                    retVal = "Need to supply Server details";
+                    break;
+                case 2:
+                    myHost = mySplit[1].Substring(2); ;
+                    break;
+                default:
+                    myHost = mySplit[1].Substring(2);
+                    // See if a Path
+                    int myPos = mySplit[2].IndexOf(@"/");
+                    if (myPos<0)
+                        myPos = mySplit[2].IndexOf(@"\");
+                    if (myPos > -1)
+                    {
+                        myPort = SystemLibrary.ToInt32(mySplit[2].Substring(0,myPos-1));
+                        myPath = mySplit[2].Substring(myPos + 1);
+                    }
+                    else
+                        myPort = SystemLibrary.ToInt32(mySplit[2]);
+                    break;
+            }
+            if (retVal.Length > 0)
+                return (retVal);
+
+            Session session = jsch.getSession(UserID,myHost,myPort);
+            session.setPassword(Password);
+
+            // Turn off checking for HostKey, which otherwise need the RSA key put in the host_key file
+            Hashtable foo = new Hashtable();
+            foo.Add("StrictHostKeyChecking", "no");
+            session.setConfig(foo);
+
+            try
+            {
+                session.connect();
+
+                Channel channel = session.openChannel("sftp");
+                channel.connect();
+                ChannelSftp c = (ChannelSftp)channel;
+
+                if (myPath.Length > 0)
+                    c.cd(myPath);
+                else
+                    myPath = ".";
+
+                // List files
+                try
+                {
+                    ArrayList vv = c.ls(myPath);
+                    if (vv != null)
+                    {
+                        for (int ii = 0; ii < vv.Count; ii++)
+                        {
+                            object obj = vv[ii];
+                            if (obj is ChannelSftp.LsEntry)
+                                Console.WriteLine(vv[ii]);
+                        }
+                    }
+                }
+                catch (SftpException e)
+                {
+                    retVal = e.message;
+                }
+
+                // Cleanup
+                c.quit();
+                c.exit();
+            }
+            catch (Exception e)
+            {
+                retVal = SystemLibrary.GetFullErrorMessage(e);
+            }
+
+            return (retVal);
+
+        } //SFTPTestStructure()
+
+        public static void SFTPDeleteFile(FTPStruct inVars, String RemotePath, string fileName)
+        {
+            // Local Variables
+            JSch jsch = new JSch();
+            String[] mySplit = inVars.ServerIP.Split(':');
+            String myHost = "";
+            String myPath = RemotePath;
+            String retVal = "";
+            int myPort = 22;
+
+
+            switch (mySplit.Length)
+            {
+                case 0:
+                case 1:
+                    retVal = "Need to supply Server details";
+                    break;
+                case 2:
+                    myHost = mySplit[1].Substring(2); ;
+                    break;
+                default:
+                    myHost = mySplit[1].Substring(2);
+                    // See if a Path
+                    int myPos = mySplit[2].IndexOf(@"/");
+                    if (myPos < 0)
+                        myPos = mySplit[2].IndexOf(@"\");
+                    if (myPos > -1)
+                    {
+                        myPort = SystemLibrary.ToInt32(mySplit[2].Substring(0, myPos - 1));
+                        //myPath = mySplit[2].Substring(myPos + 1);
+                    }
+                    else
+                        myPort = SystemLibrary.ToInt32(mySplit[2]);
+                    break;
+            }
+            if (retVal.Length > 0)
+            {
+                SystemLibrary.DebugLine("SFTPDeleteFile:" + retVal);
+                return;
+            }
+
+            Session session = jsch.getSession(inVars.UserID, myHost, myPort);
+            session.setPassword(inVars.Password);
+
+            // Turn off checking for HostKey, which otherwise need the RSA key put in the host_key file
+            Hashtable foo = new Hashtable();
+            foo.Add("StrictHostKeyChecking", "no");
+            session.setConfig(foo);
+
+            try
+            {
+                session.connect();
+
+                Channel channel = session.openChannel("sftp");
+                channel.connect();
+                ChannelSftp c = (ChannelSftp)channel;
+
+                if (myPath.Length > 0)
+                    c.cd(myPath);
+                else
+                    myPath = ".";
+
+                // Remove the file
+                try
+                {
+                    c.rm(myPath + @"\" + fileName);
+                }
+                catch (SftpException e)
+                {
+                    retVal = e.message;
+                    SystemLibrary.DebugLine("SFTPDeleteFile:" + e.message);
+                }
+
+                // Cleanup
+                c.quit();
+                c.exit();
+            }
+            catch (Exception e)
+            {
+                SystemLibrary.DebugLine("SFTPDeleteFile:" + e.Message);
+            }
+
+            return;
+
+        } //SFTPDeleteFile()
+
+        public static Boolean SFTPDownloadFile(FTPStruct inVars, string filePath, string RemotePath, string fileName)
+        {
+            // Local Variables
+            //SftpProgressMonitor monitor = new MyProgressMonitor();
+            int mode = ChannelSftp.OVERWRITE;
+            JSch jsch = new JSch();
+            Boolean retValue = true;
+            String[] mySplit = inVars.ServerIP.Split(':');
+            String myHost = "";
+            String myPath = RemotePath;
+            String SourcePath;
+            String DestinationPath = filePath + @"\" + fileName;
+            String retVal = "";
+            int myPort = 22;
+
+
+            switch (mySplit.Length)
+            {
+                case 0:
+                case 1:
+                    retVal = "Need to supply Server details";
+                    break;
+                case 2:
+                    myHost = mySplit[1].Substring(2); ;
+                    break;
+                default:
+                    myHost = mySplit[1].Substring(2);
+                    // See if a Path
+                    int myPos = mySplit[2].IndexOf(@"/");
+                    if (myPos < 0)
+                        myPos = mySplit[2].IndexOf(@"\");
+                    if (myPos > -1)
+                    {
+                        myPort = SystemLibrary.ToInt32(mySplit[2].Substring(0, myPos - 1));
+                        //myPath = mySplit[2].Substring(myPos + 1);
+                    }
+                    else
+                        myPort = SystemLibrary.ToInt32(mySplit[2]);
+                    break;
+            }
+            if (retVal.Length > 0)
+            {
+                SystemLibrary.DebugLine("SFTPDeleteFile:" + retVal);
+                return (false);
+            }
+
+            Session session = jsch.getSession(inVars.UserID, myHost, myPort);
+            session.setPassword(inVars.Password);
+
+            // Turn off checking for HostKey, which otherwise need the RSA key put in the host_key file
+            Hashtable foo = new Hashtable();
+            foo.Add("StrictHostKeyChecking", "no");
+            session.setConfig(foo);
+
+            try
+            {
+                session.connect();
+
+                Channel channel = session.openChannel("sftp");
+                channel.connect();
+                ChannelSftp c = (ChannelSftp)channel;
+
+                if (myPath.Length > 0)
+                    c.cd(myPath);
+                else
+                    myPath = ".";
+                //SourcePath = myPath + @"\" + fileName;
+                SourcePath = fileName;
+
+                // Download the file
+                try
+                {
+                    c.get(SourcePath, DestinationPath); //, monitor, mode);
+                }
+                catch (SftpException e)
+                {
+                    retValue = false;
+                    SystemLibrary.DebugLine("SFTPDeleteFile:" + e.message);
+                }
+
+                // Now set the file creation time to same as FTP file
+                if (retValue)
+                {
+                    try
+                    {
+                        ArrayList vv = c.ls(SourcePath);
+                        if (vv != null)
+                        {
+                            object obj = vv[0];
+                            if (obj is ChannelSftp.LsEntry)
+                            {
+                                SftpATTRS myAttrs = ((ChannelSftp.LsEntry)vv[0]).getAttrs();
+
+                                File.SetCreationTime(filePath + "\\" + fileName, Util.Time_T2DateTime((uint)myAttrs.getMTime()));
+                                File.SetLastWriteTime(filePath + "\\" + fileName, Util.Time_T2DateTime((uint)myAttrs.getMTime()));
+                                File.SetLastAccessTime(filePath + "\\" + fileName, Util.Time_T2DateTime((uint)myAttrs.getATime()));
+                            }
+                        }
+                    }
+                    catch (SftpException e)
+                    {
+                        // Not important enough to fail if cannot get attributes, but report
+                        SystemLibrary.DebugLine("SFTPDeleteFile.getAttrs():" + e.message);
+                    }
+                }
+
+                // Cleanup
+                c.quit();
+                c.exit();
+            }
+            catch (Exception e)
+            {
+                retValue = false;
+                SystemLibrary.DebugLine("SFTPDeleteFile:" + e.Message);
+            }
+
+            return (retValue);
+        } //SFTPDownloadFile()
+
+        public static String[] SFTPGetFileList(FTPStruct inVars, String RemotePath)
+        {
+            // Local Variables
+            JSch jsch = new JSch();
+            StringBuilder result = new StringBuilder();
+            String[] downloadFiles;
+            String[] mySplit = inVars.ServerIP.Split(':');
+            String myHost = "";
+            String myPath = RemotePath;
+            String retVal = "";
+            int myPort = 22;
+
+
+            switch (mySplit.Length)
+            {
+                case 0:
+                case 1:
+                    retVal = "Need to supply Server details";
+                    break;
+                case 2:
+                    myHost = mySplit[1].Substring(2); ;
+                    break;
+                default:
+                    myHost = mySplit[1].Substring(2);
+                    // See if a Path
+                    int myPos = mySplit[2].IndexOf(@"/");
+                    if (myPos < 0)
+                        myPos = mySplit[2].IndexOf(@"\");
+                    if (myPos > -1)
+                    {
+                        myPort = SystemLibrary.ToInt32(mySplit[2].Substring(0, myPos - 1));
+                        //myPath = mySplit[2].Substring(myPos + 1);
+                    }
+                    else
+                        myPort = SystemLibrary.ToInt32(mySplit[2]);
+                    break;
+            }
+            if (retVal.Length > 0)
+            {
+                SystemLibrary.DebugLine("SFTPGetFileList:" + retVal);
+                downloadFiles = null;
+                return downloadFiles;
+            }
+
+            Session session = jsch.getSession(inVars.UserID, myHost, myPort);
+            session.setPassword(inVars.Password);
+
+            // Turn off checking for HostKey, which otherwise need the RSA key put in the host_key file
+            Hashtable foo = new Hashtable();
+            foo.Add("StrictHostKeyChecking", "no");
+            session.setConfig(foo);
+
+            try
+            {
+                session.connect();
+
+                Channel channel = session.openChannel("sftp");
+                channel.connect();
+                ChannelSftp c = (ChannelSftp)channel;
+
+                if (myPath.Length > 0)
+                    c.cd(myPath);
+                else
+                    myPath = ".";
+
+                // List files
+                try
+                {
+                    ArrayList vv = c.ls(myPath);
+                    if (vv != null)
+                    {
+                        for (int ii = 0; ii < vv.Count; ii++)
+                        {
+                            object obj = vv[ii];
+                            if (obj is ChannelSftp.LsEntry)
+                            {
+                                String Filename = ((ChannelSftp.LsEntry)vv[ii]).getFilename();
+                                if (Filename.StartsWith(inVars.EMSXFileNameStartsWith))
+                                {
+                                    result.Append(Filename);
+                                    result.Append("\n");
+                                }
+                                Console.WriteLine(vv[ii]);
+                            }
+                        }
+                    }
+                    if (result.Length > 0)
+                        result.Remove(result.ToString().LastIndexOf('\n'), 1);
+                    downloadFiles = result.ToString().Split('\n');
+                }
+                catch (SftpException e)
+                {
+                    retVal = e.message;
+                    SystemLibrary.DebugLine("SFTPGetFileList:" + retVal);
+                    downloadFiles = null;
+                }
+
+                // Cleanup
+                c.quit();
+                c.exit();
+            }
+            catch (Exception e)
+            {
+                SystemLibrary.DebugLine("SFTPGetFileList:" + e.Message);
+                downloadFiles = null;
+            }
+
+            return downloadFiles;
+
+        } //SFTPGetFileList()
+
+
         public static String FTPTestStructure(String ServerIP, String UserID, String Password)
         {
             // Local Variables
             String retVal = "";
 
-            // Test Connect to the Server
-            FtpWebRequest reqFTP;
-            try
+            if (ServerIP.ToLower().StartsWith("sftp"))
+                retVal = SFTPTestStructure(ServerIP, UserID, Password);
+            else
             {
-                reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + ServerIP + "/"));
-                reqFTP.UseBinary = true;
-                reqFTP.KeepAlive = false;
-                reqFTP.Credentials = new NetworkCredential(UserID, Password);
-                reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
-                WebResponse response = reqFTP.GetResponse();
-                response.Close();
-                retVal = "";
-                reqFTP.Abort();
-                reqFTP = null;
-            }
-            catch (Exception ex)
-            {
-                retVal = ex.Message;
+                // Test Connect to the Server
+                FtpWebRequest reqFTP;
+                try
+                {
+                    reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + ServerIP + "/"));
+                    reqFTP.UseBinary = true;
+                    //20140228 reqFTP.KeepAlive = false;
+                    reqFTP.KeepAlive = true;
+                    reqFTP.Credentials = new NetworkCredential(UserID, Password);
+                    reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
+                    WebResponse response = reqFTP.GetResponse();
+                    response.Close();
+                    retVal = "";
+                    reqFTP.Abort();
+                    reqFTP = null;
+                }
+                catch (Exception ex)
+                {
+                    retVal = ex.Message;
+                }
             }
 
             return (retVal);
@@ -1765,149 +2221,163 @@ namespace T1MultiAsset
         public static String[] FTPGetFileList(FTPStruct inVars, String RemotePath)
         {
             // Connect to the Server and return a list of files that are appropriate
-            String[] downloadFiles;
-            StringBuilder result = new StringBuilder();
-            FtpWebRequest reqFTP;
-            try
+            if (inVars.ServerIP.ToLower().StartsWith("sftp"))
+                return (SFTPGetFileList(inVars, RemotePath));
+            else
             {
-                reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/"));
-                reqFTP.UseBinary = true;
-                reqFTP.KeepAlive = false;
-                reqFTP.UsePassive = true;
-                reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
-                reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
-                WebResponse response = reqFTP.GetResponse();
-                StreamReader reader = new StreamReader(response.GetResponseStream());
-                //MessageBox.Show(reader.ReadToEnd());
-                String line = reader.ReadLine();
-                while (line != null)
+                String[] downloadFiles;
+                StringBuilder result = new StringBuilder();
+                FtpWebRequest reqFTP;
+                try
                 {
-                    if (line.StartsWith(inVars.EMSXFileNameStartsWith))
+                    reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/"));
+                    reqFTP.UseBinary = true;
+                    reqFTP.KeepAlive = false;
+                    reqFTP.UsePassive = true;
+                    reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
+                    reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
+                    WebResponse response = reqFTP.GetResponse();
+                    StreamReader reader = new StreamReader(response.GetResponseStream());
+                    //MessageBox.Show(reader.ReadToEnd());
+                    String line = reader.ReadLine();
+                    while (line != null)
                     {
-                        result.Append(line);
-                        result.Append("\n");
+                        if (line.StartsWith(inVars.EMSXFileNameStartsWith))
+                        {
+                            result.Append(line);
+                            result.Append("\n");
+                        }
+                        line = reader.ReadLine();
                     }
-                    line = reader.ReadLine();
+                    if (result.Length > 0)
+                        result.Remove(result.ToString().LastIndexOf('\n'), 1);
+                    reader.Close();
+                    response.Close();
+                    //MessageBox.Show(response.StatusDescription);
+                    reqFTP.Abort();
+                    reqFTP = null;
+                    return result.ToString().Split('\n');
                 }
-                if(result.Length>0)
-                    result.Remove(result.ToString().LastIndexOf('\n'), 1);
-                reader.Close();
-                response.Close();
-                //MessageBox.Show(response.StatusDescription);
-                reqFTP.Abort();
-                reqFTP = null;
-                return result.ToString().Split('\n');
-            }
-            catch (Exception ex)
-            {
-                SystemLibrary.DebugLine("FTPGetFileList:"+ ex.Message);
-                downloadFiles = null;
-                return downloadFiles;
+                catch (Exception ex)
+                {
+                    SystemLibrary.DebugLine("FTPGetFileList:" + ex.Message);
+                    downloadFiles = null;
+                    return downloadFiles;
+                }
             }
         } // FTPGetFileList
 
         public static Boolean FTPDownloadFile(FTPStruct inVars, string filePath, string RemotePath, string fileName)
         {
-            // Local Variables
-            Boolean retVal = true;
-            FtpWebRequest reqFTP;
-
-            SystemLibrary.DebugLine("FTPDownloadFile(START): " + fileName);
-            try
+            if (inVars.ServerIP.ToLower().StartsWith("sftp"))
+                return (SFTPDownloadFile(inVars, filePath, RemotePath, fileName));
+            else
             {
-                //filePath = <<The full path where the file is to be created.>>, 
-                //fileName = <<Name of the file to be created(Need not be the name of the file on FTP server).>>
-                FileStream outputStream = new FileStream(filePath + "\\" + fileName, FileMode.Create);
+                // Local Variables
+                Boolean retVal = true;
+                FtpWebRequest reqFTP;
 
-                reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/" + fileName));
-                reqFTP.UsePassive = true;
-                reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
-                reqFTP.UseBinary = true;
-                reqFTP.KeepAlive = false;
-                reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
-                FtpWebResponse response = (FtpWebResponse)reqFTP.GetResponse();
-                Stream ftpStream = response.GetResponseStream();
-                long cl = response.ContentLength;
-                int bufferSize = 2048;
-                int readCount;
-                byte[] buffer = new byte[bufferSize];
-
-                readCount = ftpStream.Read(buffer, 0, bufferSize);
-                while (readCount > 0)
-                {
-                    outputStream.Write(buffer, 0, readCount);
-                    readCount = ftpStream.Read(buffer, 0, bufferSize);
-                }
-
-                ftpStream.Close();
-                outputStream.Close();
-                response.Close();
-            }
-            catch (Exception ex)
-            {
-                SystemLibrary.DebugLine("FTPDownloadFile.DownloadFile(" + fileName + "):" + ex.Message);
-                retVal = false;
-            }
-
-            if (retVal)
-            {
+                SystemLibrary.DebugLine("FTPDownloadFile(START): " + fileName);
                 try
                 {
-                    // Now set the file creation time to same as FTP file
+                    //filePath = <<The full path where the file is to be created.>>, 
+                    //fileName = <<Name of the file to be created(Need not be the name of the file on FTP server).>>
+                    FileStream outputStream = new FileStream(filePath + "\\" + fileName, FileMode.Create);
+
                     reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/" + fileName));
                     reqFTP.UsePassive = true;
-                    reqFTP.Method = WebRequestMethods.Ftp.GetDateTimestamp;
+                    reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
                     reqFTP.UseBinary = true;
                     reqFTP.KeepAlive = false;
                     reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
-                    FtpWebResponse response1 = (FtpWebResponse)reqFTP.GetResponse();
+                    FtpWebResponse response = (FtpWebResponse)reqFTP.GetResponse();
+                    Stream ftpStream = response.GetResponseStream();
+                    long cl = response.ContentLength;
+                    int bufferSize = 2048;
+                    int readCount;
+                    byte[] buffer = new byte[bufferSize];
 
-                    File.SetCreationTime(filePath + "\\" + fileName, response1.LastModified);
-                    File.SetLastWriteTime(filePath + "\\" + fileName, response1.LastModified);
-                    File.SetLastAccessTime(filePath + "\\" + fileName, response1.LastModified);
-                    reqFTP.Abort();
-                    reqFTP = null;
+                    readCount = ftpStream.Read(buffer, 0, bufferSize);
+                    while (readCount > 0)
+                    {
+                        outputStream.Write(buffer, 0, readCount);
+                        readCount = ftpStream.Read(buffer, 0, bufferSize);
+                    }
+
+                    ftpStream.Close();
+                    outputStream.Close();
+                    response.Close();
                 }
-                catch (Exception ex1)
+                catch (Exception ex)
                 {
-                    SystemLibrary.DebugLine("FTPDownloadFile.GetDateTimestamp(" + fileName + "):" + ex1.Message);
-                    // Even if we can't get the timestamp, just keep going
-                    //retVal = false;
+                    SystemLibrary.DebugLine("FTPDownloadFile.DownloadFile(" + fileName + "):" + ex.Message);
+                    retVal = false;
                 }
+
+                if (retVal)
+                {
+                    try
+                    {
+                        // Now set the file creation time to same as FTP file
+                        reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/" + fileName));
+                        reqFTP.UsePassive = true;
+                        reqFTP.Method = WebRequestMethods.Ftp.GetDateTimestamp;
+                        reqFTP.UseBinary = true;
+                        reqFTP.KeepAlive = false;
+                        reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
+                        FtpWebResponse response1 = (FtpWebResponse)reqFTP.GetResponse();
+
+                        File.SetCreationTime(filePath + "\\" + fileName, response1.LastModified);
+                        File.SetLastWriteTime(filePath + "\\" + fileName, response1.LastModified);
+                        File.SetLastAccessTime(filePath + "\\" + fileName, response1.LastModified);
+                        reqFTP.Abort();
+                        reqFTP = null;
+                    }
+                    catch (Exception ex1)
+                    {
+                        SystemLibrary.DebugLine("FTPDownloadFile.GetDateTimestamp(" + fileName + "):" + ex1.Message);
+                        // Even if we can't get the timestamp, just keep going
+                        //retVal = false;
+                    }
+                }
+
+                SystemLibrary.DebugLine("FTPDownloadFile(END): " + retVal.ToString());
+                return (retVal);
             }
-
-            SystemLibrary.DebugLine("FTPDownloadFile(END): " + retVal.ToString());
-            return (retVal);
-
         } //FTPDownloadFile()
 
         public static void FTPDeleteFile(FTPStruct inVars, String RemotePath, string fileName)
         {
-            try
+            if (inVars.ServerIP.ToLower().StartsWith("sftp"))
+                SFTPGetFileList(inVars, RemotePath);
+            else
             {
-                string uri = "ftp://" + RemotePath + inVars.ServerIP + "/" + fileName;
-                FtpWebRequest reqFTP;
-                reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/" + fileName));
+                try
+                {
+                    string uri = "ftp://" + RemotePath + inVars.ServerIP + "/" + fileName;
+                    FtpWebRequest reqFTP;
+                    reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + inVars.ServerIP + RemotePath + "/" + fileName));
 
-                reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
-                reqFTP.KeepAlive = false;
-                reqFTP.Method = WebRequestMethods.Ftp.DeleteFile;
+                    reqFTP.Credentials = new NetworkCredential(inVars.UserID, inVars.Password);
+                    reqFTP.KeepAlive = false;
+                    reqFTP.Method = WebRequestMethods.Ftp.DeleteFile;
 
-                string result = String.Empty;
-                FtpWebResponse response = (FtpWebResponse)reqFTP.GetResponse();
-                long size = response.ContentLength;
-                Stream datastream = response.GetResponseStream();
-                StreamReader sr = new StreamReader(datastream);
-                result = sr.ReadToEnd();
-                sr.Close();
-                datastream.Close();
-                response.Close();
-                reqFTP.Abort();
-                reqFTP = null;
-            }
-            catch (Exception ex)
-            {
-                SystemLibrary.DebugLine("FTPDeleteFile(" + fileName + "):" + ex.Message);
+                    string result = String.Empty;
+                    FtpWebResponse response = (FtpWebResponse)reqFTP.GetResponse();
+                    long size = response.ContentLength;
+                    Stream datastream = response.GetResponseStream();
+                    StreamReader sr = new StreamReader(datastream);
+                    result = sr.ReadToEnd();
+                    sr.Close();
+                    datastream.Close();
+                    response.Close();
+                    reqFTP.Abort();
+                    reqFTP = null;
+                }
+                catch (Exception ex)
+                {
+                    SystemLibrary.DebugLine("FTPDeleteFile(" + fileName + "):" + ex.Message);
+                }
             }
         } //FTPDeleteFile()
 
@@ -3016,6 +3486,9 @@ namespace T1MultiAsset
             Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
             List<string> result = new List<string>();
 
+            // For some reason this looses a field if the string starts with "," so add a space to counter that
+            if (input.StartsWith(","))
+                input = " " + input;
             foreach (Match match in csvSplit.Matches(input))
                 result.Add(match.Value.TrimStart(',').TrimStart('"').TrimEnd('"'));
 
@@ -3043,7 +3516,7 @@ namespace T1MultiAsset
 
             isConfigured = true;
 
-            try
+            //try
             {
                 if (SCOTIAPrimeFilePath == null)
                     SCOTIAPrimeFilePath = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('SCOTIAPrime_Path')");
@@ -3079,22 +3552,23 @@ namespace T1MultiAsset
                     SCOTIAPrimeSaveData(SCOTIAPrimeFilePath, myFileName);
                 }
 
-                /*
-                // Check for confirm and error files
-                rgFiles = di.GetFiles("*.txt.*");
+                // Check for StockBorrowFees
+                rgFiles = di.GetFiles("*StockBorrowFees*.csv");
 
                 TotFiles = TotFiles + rgFiles.Length;
                 for (int i = 0; i < rgFiles.Length; i++)
                 {
                     myFileName = rgFiles[i].Name;
-                    SCOTIAPrimeSaveDataConfirm(SCOTIAPrimeFilePath, myFileName);
+                    SCOTIAPrimeSaveData(SCOTIAPrimeFilePath, myFileName);
                 }
-                */
+                
             }
+            /*
             catch (Exception e)
             {
                 SystemLibrary.DebugLine("SCOTIAPrimeGetFiles (" + SystemLibrary.ToString(SCOTIAPrimeFilePath) + ") " + e.Message);
             }
+             */
             // Return the number of files 
             return (TotFiles);
 
@@ -3142,13 +3616,24 @@ namespace T1MultiAsset
                     myRows = SQLBulkUpdate(dt_Header, "", "SCOTIA_File_header");
                     if (myRows == 1)
                     {
+                        String TableName = "";
+                        DateTime fileDate = DateTime.MinValue;
                         // Now load the detail.
-                        int Pos1 = fileName.IndexOf('_');
-                        if (Pos1 < 0)
-                            return (false);
-                        String TableName = "SCOTIA_" + fileName.Substring(0, Pos1);
-                        DateTime fileDate = YYYYMMDD_ToDate(fileName.Substring(fileName.Length - 12, 8));
+                        if (fileName.Contains("StockBorrowFees"))
+                        {
+                            TableName = "SCOTIA_StockBorrowFees";
+                        }
+                        else
+                        {
+                            int Pos1 = fileName.IndexOf('_');
+                            if (Pos1 < 0)
+                                return (false);
+                            TableName = "SCOTIA_" + fileName.Substring(0, Pos1);
+                            fileDate = YYYYMMDD_ToDate(fileName.Substring(fileName.Length - 12, 8));
+                        }
                         DataTable dt_Detail = SystemLibrary.SQLSelectToDataTable("Select * from " + TableName + " where 1=2");
+                        if (dt_Detail.Columns.Count == 0)
+                            return (false);
                         String[] SCOTIAData = File.ReadAllLines(filePath + "\\" + fileName);
                         if (SCOTIAData.Length > 0)
                         {
@@ -3168,8 +3653,10 @@ namespace T1MultiAsset
                                     Header[j] = "ID1";
                                 else if ((TableName == "SCOTIA_POSITIONS" || TableName == "SCOTIA_CASHSTMNT") && Header[j] == "Security")
                                     Header[j] = "Security_Name";
-                                else if (TableName == "SCOTIA_POSITIONS" && Header[j] == "Date")
+                                else if ((TableName == "SCOTIA_POSITIONS" || TableName == "SCOTIA_StockBorrowFees") && Header[j] == "Date")
                                     Header[j] = "EffectiveDate";
+                                else if (TableName == "SCOTIA_StockBorrowFees" && (Header[j] == "Group" || Header[j] == "Event"))
+                                    Header[j] = Header[j] + "_";
                             }
                             for (Int32 i = 1; i < SCOTIAData.Length; i++)
                             {
@@ -3184,7 +3671,7 @@ namespace T1MultiAsset
                                
                                 for (Int32 j = 0; j < Header.Length; j++) // NB: Some of the SCOTIA files have trailing
                                 {
-                                    if (dt_Detail.Columns.Contains(Header[j]) && Detail.Length == HeaderCount)
+                                    if (dt_Detail.Columns.Contains(Header[j]) && Detail.Length >= HeaderCount)
                                     {
                                         if (dt_Detail.Columns[Header[j]].DataType.Name == "DateTime")
                                         {
@@ -3209,7 +3696,7 @@ namespace T1MultiAsset
                                         }
                                     }
                                 }
-                                if (Detail.Length == HeaderCount)
+                                if (Detail.Length >= HeaderCount)
                                     dt_Detail.Rows.Add(dr_D);
                             }
                             myRows = SQLBulkUpdate(dt_Detail, "", TableName);
@@ -3636,6 +4123,87 @@ namespace T1MultiAsset
                         cs.Show(); // (myTag.applyForm);
                     break;
 
+                case "MaintainPrices":
+                    MaintainPrices mp = new MaintainPrices();
+                    // See if already open
+                    if (e.Button.ToString() == "Left")
+                        foreach (Form frm in Application.OpenForms)
+                            if (frm is MaintainPrices)
+                            {
+                                isOpen = true;
+                                mp.Dispose();
+                                mp = (MaintainPrices)frm;
+                                break; // Leave loop
+                            }
+
+                    mp.FromParent(myTag.applyForm, BBGMenu.Ticker);
+                    if (isOpen)
+                    {
+                        mp.LoadPrices();
+                        mp.WindowState = FormWindowState.Normal;
+                        mp.BringToFront();
+                    }
+                    else
+                    {
+                        mp.LoadPrices();
+                        mp.Show(); // (myTag.applyForm);
+                    }
+                    break;
+
+                case "MaintainSecurities":
+                    MaintainSecurities ms = new MaintainSecurities();
+                    // See if already open
+                    if (e.Button.ToString() == "Left")
+                        foreach (Form frm in Application.OpenForms)
+                            if (frm is MaintainSecurities)
+                            {
+                                isOpen = true;
+                                ms.Dispose();
+                                ms = (MaintainSecurities)frm;
+                                break; // Leave loop
+                            }
+
+                    ms.FromParent(myTag.applyForm, BBGMenu.Ticker);
+                    if (isOpen)
+                    {
+                        ms.LoadSecurities();
+                        ms.WindowState = FormWindowState.Normal;
+                        ms.BringToFront();
+                    }
+                    else
+                    {
+                        //ms.LoadSecurities();
+                        ms.Show(); // (myTag.applyForm);
+                    }
+                    break;
+
+                case "ProcessOrders":
+                    ProcessOrders po = new ProcessOrders();
+                    // See if already open
+                    if (e.Button.ToString() == "Left")
+                        foreach (Form frm in Application.OpenForms)
+                            if (frm is ProcessOrders)
+                            {
+                                isOpen = true;
+                                po.Dispose();
+                                po = (ProcessOrders)frm;
+                                break; // Leave loop
+                            }
+
+                    po.FromParent(myTag.applyForm, BBGMenu.Ticker);
+                    if (isOpen)
+                    {
+                        po.LoadProcessOrders();
+                        po.WindowState = FormWindowState.Normal;
+                        po.BringToFront();
+                    }
+                    else
+                    {
+                        //po.LoadProcessOrders();
+                        po.Show(); // (myTag.applyForm);
+                    }
+                    break;
+
             }
 
         } //BBGBloombergSystemMenuItem_Click()
@@ -3650,6 +4218,7 @@ namespace T1MultiAsset
             IntPtr[] smallIcon = new IntPtr[numIcons];
             int myRet = ExtractIconEx("shell32.dll", 0, largeIcon, smallIcon, numIcons);
             ToolStripMenuItem mySubMenu = new ToolStripMenuItem();
+            ToolStripMenuItem mySubMenu1 = new ToolStripMenuItem();
             int myNextLevel;
             int FaceID;
 
@@ -3691,6 +4260,33 @@ namespace T1MultiAsset
                 ts.MouseUp += new MouseEventHandler(BBGBloombergSystemMenuItem_Click);
                 ts.Owner.ImageList = BBGMenu.il_Menu; // Not sure why I needed this, but did not inherit from parent?
                 //ts.ImageIndex = 80;
+
+                mySubMenu.DropDownItems.Add("-");
+
+                ts = mySubMenu.DropDownItems.Add("Process Orders");
+                ts.Tag = new BloombergMenuTag(inForm, "Process Orders", "ProcessOrders", "");
+                ts.MouseUp += new MouseEventHandler(BBGBloombergSystemMenuItem_Click);
+                ts.Owner.ImageList = BBGMenu.il_Menu; // Not sure why I needed this, but did not inherit from parent?
+                ts.ImageIndex = 176;
+
+                // Nest a lower menu
+                mySubMenu1 = new ToolStripMenuItem("Maintainence");
+                //mySubMenu.ImageIndex = 80;
+                //BBGMenu.myMenu.ImageList = BBGMenu.il_Menu;
+                mySubMenu.DropDown.Items.Add(mySubMenu1);
+                {
+                    ts = mySubMenu1.DropDownItems.Add("Maintain Price History");
+                    ts.Tag = new BloombergMenuTag(inForm, "Maintain Price History", "MaintainPrices", "");
+                    ts.MouseUp += new MouseEventHandler(BBGBloombergSystemMenuItem_Click);
+                    ts.Owner.ImageList = BBGMenu.il_Menu; // Not sure why I needed this, but did not inherit from parent?
+                    //ts.ImageIndex = 80;
+
+                    ts = mySubMenu1.DropDownItems.Add("Maintain Securities");
+                    ts.Tag = new BloombergMenuTag(inForm, "Maintain Securities", "MaintainSecurities", "");
+                    ts.MouseUp += new MouseEventHandler(BBGBloombergSystemMenuItem_Click);
+                    ts.Owner.ImageList = BBGMenu.il_Menu; // Not sure why I needed this, but did not inherit from parent?
+                    //ts.ImageIndex = 80;
+                }
             }
             BBGMenu.myMenu.Items.Add("-");
 
@@ -4344,13 +4940,15 @@ namespace T1MultiAsset
 
             // Local Variables
             Boolean FoundAlteredRow = false;
-
-            for (int i = 0; i < dt_in.Rows.Count; i++)
+            if (dt_in != null)
             {
-                if (dt_in.Rows[i].RowState != DataRowState.Unchanged)
+                for (int i = 0; i < dt_in.Rows.Count; i++)
                 {
-                    FoundAlteredRow = true;
-                    break;
+                    if (dt_in.Rows[i].RowState != DataRowState.Unchanged)
+                    {
+                        FoundAlteredRow = true;
+                        break;
+                    }
                 }
             }
 
@@ -4422,6 +5020,14 @@ namespace T1MultiAsset
                 {
                     // Bust up column name display splitting on Uppercase (eg. "EffectiveDate" to "Effective Date")
                     dg_In.Columns[i].HeaderText = SplitCase(dg_In.Columns[i].HeaderText);
+                    if (dg_In.Columns[i].ValueType == null)
+                    {
+                        String TableName="";
+                        if (dg_In.DataSource != null)
+                            TableName = "'" + ((DataTable)(dg_In.DataSource)).TableName + "'.";
+                        Console.WriteLine("SetDataGridView() - Found a column with a null type:" + TableName +"'" + dg_In.Columns[i].Name + "'");
+                        continue;
+                    }
                     if (dg_In.Columns[i].ValueType.Name.ToLower().StartsWith("int"))
                     {
                         dg_In.Columns[i].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -4598,6 +5204,33 @@ namespace T1MultiAsset
                 return ("N");
         } //Bool_To_YN()
 
+        public static Boolean ToBoolean(object inArg, Boolean isDefault)
+        {
+            // Local Variables
+            Boolean RetVal;
+
+            if (inArg == DBNull.Value)
+                RetVal = isDefault;
+            else if (inArg == null)
+                RetVal = isDefault;
+            else if (inArg.ToString().Length == 0)
+                RetVal = isDefault;
+            else
+            {
+                try
+                {
+                    RetVal = Convert.ToBoolean(inArg);
+                }
+                catch
+                {
+                    RetVal = isDefault;
+                }
+            }
+
+            return (RetVal);
+
+        } // ToDecimal()
+
         public static Decimal ToDecimal(object inArg)
         {
             // Local Variables
@@ -4682,8 +5315,15 @@ namespace T1MultiAsset
             {
                 try
                 {
-                    if (!Int32.TryParse(inArg.ToString(),System.Globalization.NumberStyles.Any, null, out RetVal))
-                        RetVal = 0;
+                    if (!Int32.TryParse(inArg.ToString(), System.Globalization.NumberStyles.Any, null, out RetVal))
+                    {
+                        // See if it is a decimal that can be truncated
+                        Decimal myVal = SystemLibrary.ToDecimal(inArg);
+                        if (myVal != 0)
+                            RetVal = Convert.ToInt32(myVal);
+                        else
+                            RetVal = 0;
+                    }
                 }
                 catch
                 {
@@ -4849,6 +5489,14 @@ namespace T1MultiAsset
             try
             {
                 myUsername = UserPrincipal.Current.GivenName + ' ' + UserPrincipal.Current.Surname;
+                if (myUsername.Trim().Length == 0)
+                {
+                    myUsername = UserPrincipal.Current.Name;
+                    if (myUsername.Trim().Length == 0)
+                    {
+                        myUsername = SystemLibrary.ToString(Environment.GetEnvironmentVariable("USERNAME"));
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -4919,132 +5567,140 @@ namespace T1MultiAsset
         {
             // Local Variables
             // TODO (5) I need to get these from the Registry I think.
-            String _bindirectory = @"C:\gnupg";
+            //String _bindirectory = @"C:\gnupg";
             int ProcessTimeOutMilliseconds = 10000; // 10 seconds
             int _exitcode = 0;
 
-            if (MLPrime_Crypt_Key == null)
-                MLPrime_Crypt_Key = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Crypt_Key')");
-
-            if (MLPrime_Crypt_User == null)
-                MLPrime_Crypt_User = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Crypt_User')");
-
-            if (MLPrimeFilePath == null)
-                MLPrimeFilePath = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Path')");
-
-            if (MLPrimeFilePath.Length < 1)
-                return (false);
-
-            String gpgOptions = "";
-            String gpgExecutable = _bindirectory + "\\gpg.exe";
-            DateTime lastWriteTime = File.GetLastWriteTime(myFilePath + @"\" + inFile);
-
-
-            // Get oufilename
-            outFile = inFile + @".asc." + lastWriteTime.ToString("yy.MM.dd_HH.mm");
-            if (File.Exists(myFilePath + @"\" + outFile))
-                File.Delete(myFilePath + @"\" + outFile);
-
-            // Setup the file options
-            gpgOptions = @"--homedir """ + MLPrimeFilePath + @"\keyrings"" " +
-                         @"--output """ + myFilePath + @"\" + outFile + @""" " +
-                         @"--armor --verbose --verbose --batch --yes --local-user " + MLPrime_Crypt_User + " --passphrase-fd --no-tty " +
-                         @"--recipient ""Merrill Lynch CLEAR system DH <clear@ml.com>"" " +
-                         @"--comment """ + outFile + @""" --sign " +
-                         @"--encrypt """ + myFilePath + @"\" + inFile + @""" ";
-
-            // Create startinfo object
-            ProcessStartInfo pInfo = new ProcessStartInfo(gpgExecutable, gpgOptions);
-            pInfo.WorkingDirectory = _bindirectory;
-            pInfo.CreateNoWindow = true;
-            pInfo.UseShellExecute = false;
-            // Redirect everything: 
-            // stdin to send the passphrase, stdout to get encrypted message, stderr in case of errors...
-            pInfo.RedirectStandardInput = true;
-            pInfo.RedirectStandardOutput = true;
-            pInfo.RedirectStandardError = true;
-            _processObject = Process.Start(pInfo);
-
-            // Send input text
-            _processObject.StandardInput.Write(MLPrime_Crypt_Key);
-            _processObject.StandardInput.Flush();
-            _processObject.StandardInput.Close();
-
-            _outputString = "";
-            _errorString = "";
-
-            // Create two threads to read both output/error streams without creating a deadlock
-            ThreadStart outputEntry = new ThreadStart(StandardOutputReader);
-            Thread outputThread = new Thread(outputEntry);
-            outputThread.Start();
-            ThreadStart errorEntry = new ThreadStart(StandardErrorReader);
-            Thread errorThread = new Thread(errorEntry);
-            errorThread.Start();
-
-            if (_processObject.WaitForExit(ProcessTimeOutMilliseconds))
+            try
             {
-                // Process exited before timeout...
-                // Wait for the threads to complete reading output/error (but use a timeout!)
-                if (!outputThread.Join(ProcessTimeOutMilliseconds / 2))
-                {
-                    outputThread.Abort();
-                }
-                if (!errorThread.Join(ProcessTimeOutMilliseconds / 2))
-                {
-                    errorThread.Abort();
-                }
-            }
-            else
-            {
-                // Process timeout: PGP hung somewhere... kill it (as well as the threads!)
+                if (MLPrime_Crypt_Key == null)
+                    MLPrime_Crypt_Key = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Crypt_Key')");
+
+                if (MLPrime_Crypt_User == null)
+                    MLPrime_Crypt_User = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Crypt_User')");
+
+                if (MLPrimeFilePath == null)
+                    MLPrimeFilePath = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Path')");
+
+                if (MLPrimeFilePath.Length < 1)
+                    return (false);
+
+                Set_bindirectory();
+
+                String gpgOptions = "";
+                String gpgExecutable = _bindirectory + "\\gpg.exe";
+                DateTime lastWriteTime = File.GetLastWriteTime(myFilePath + @"\" + inFile);
+
+
+                // Get oufilename
+                outFile = inFile + @".asc." + lastWriteTime.ToString("yy.MM.dd_HH.mm");
+                if (File.Exists(myFilePath + @"\" + outFile))
+                    File.Delete(myFilePath + @"\" + outFile);
+
+                // Setup the file options
+                gpgOptions = @"--homedir """ + MLPrimeFilePath + @"\keyrings"" " +
+                             @"--output """ + myFilePath + @"\" + outFile + @""" " +
+                             @"--armor --verbose --verbose --batch --yes --local-user " + MLPrime_Crypt_User + " --passphrase-fd --no-tty " +
+                             @"--recipient ""Merrill Lynch CLEAR system DH <clear@ml.com>"" " +
+                             @"--comment """ + outFile + @""" --sign " +
+                             @"--encrypt """ + myFilePath + @"\" + inFile + @""" ";
+
+                // Create startinfo object
+                ProcessStartInfo pInfo = new ProcessStartInfo(gpgExecutable, gpgOptions);
+                pInfo.WorkingDirectory = _bindirectory;
+                pInfo.CreateNoWindow = true;
+                pInfo.UseShellExecute = false;
+                // Redirect everything: 
+                // stdin to send the passphrase, stdout to get encrypted message, stderr in case of errors...
+                pInfo.RedirectStandardInput = true;
+                pInfo.RedirectStandardOutput = true;
+                pInfo.RedirectStandardError = true;
+                _processObject = Process.Start(pInfo);
+
+                // Send input text
+                _processObject.StandardInput.Write(MLPrime_Crypt_Key);
+                _processObject.StandardInput.Flush();
+                _processObject.StandardInput.Close();
+
                 _outputString = "";
-                _errorString = "Timed out after " + ProcessTimeOutMilliseconds.ToString() + " milliseconds";
-                _processObject.Kill();
-                if (outputThread.IsAlive)
+                _errorString = "";
+
+                // Create two threads to read both output/error streams without creating a deadlock
+                ThreadStart outputEntry = new ThreadStart(StandardOutputReader);
+                Thread outputThread = new Thread(outputEntry);
+                outputThread.Start();
+                ThreadStart errorEntry = new ThreadStart(StandardErrorReader);
+                Thread errorThread = new Thread(errorEntry);
+                errorThread.Start();
+
+                if (_processObject.WaitForExit(ProcessTimeOutMilliseconds))
                 {
-                    outputThread.Abort();
+                    // Process exited before timeout...
+                    // Wait for the threads to complete reading output/error (but use a timeout!)
+                    if (!outputThread.Join(ProcessTimeOutMilliseconds / 2))
+                    {
+                        outputThread.Abort();
+                    }
+                    if (!errorThread.Join(ProcessTimeOutMilliseconds / 2))
+                    {
+                        errorThread.Abort();
+                    }
                 }
-                if (errorThread.IsAlive)
+                else
                 {
-                    errorThread.Abort();
+                    // Process timeout: PGP hung somewhere... kill it (as well as the threads!)
+                    _outputString = "";
+                    _errorString = "Timed out after " + ProcessTimeOutMilliseconds.ToString() + " milliseconds";
+                    _processObject.Kill();
+                    if (outputThread.IsAlive)
+                    {
+                        outputThread.Abort();
+                    }
+                    if (errorThread.IsAlive)
+                    {
+                        errorThread.Abort();
+                    }
+                }
+
+                // Check results and prepare output
+                _exitcode = _processObject.ExitCode;
+                TextWriter stdoutWriter = Console.Error;
+                stdoutWriter.WriteLine(_outputString);
+                stdoutWriter.Flush();
+                stdoutWriter.Close();
+
+                TextWriter stderrWriter = Console.Error;
+                stderrWriter.WriteLine(_errorString);
+                stderrWriter.Flush();
+                stderrWriter.Close();
+
+                if (_exitcode == 0)
+                    return (true);
+                else
+                {
+                    MessageBox.Show("Encrypt Failed:\r\n\r\n" +
+                                    "Stdout:\r\n" + _outputString + "\r\n\r\n" +
+                                    "Stderr:\r\n" + _errorString + "\r\n\r\n",
+                                    "Encrypt Failed: " + myFilePath + @"\" + inFile
+                                    );
+                    return (false);
                 }
             }
-
-            // Check results and prepare output
-            _exitcode = _processObject.ExitCode;
-            TextWriter stdoutWriter = Console.Error;
-            stdoutWriter.WriteLine(_outputString);
-            stdoutWriter.Flush();
-            stdoutWriter.Close();
-
-            TextWriter stderrWriter = Console.Error;
-            stderrWriter.WriteLine(_errorString);
-            stderrWriter.Flush();
-            stderrWriter.Close();
-
-            if (_exitcode == 0)
-                return (true);
-            else
+            catch (Exception e)
             {
-                MessageBox.Show("Encrypt Failed:\r\n\r\n" +
-                                "Stdout:\r\n" + _outputString + "\r\n\r\n" +
-                                "Stderr:\r\n" + _errorString + "\r\n\r\n",
-                                "Encrypt Failed: " + myFilePath + @"\" + inFile
-                                );
+                Console.WriteLine("Encrypt Exception" + SystemLibrary.GetFullErrorMessage(e) + "\r\n\r\n" + SystemLibrary.GetCallStack());
                 return (false);
             }
+
 
         } //MLPrime_Encrypt()
 
         public static Boolean MLPrime_Decrypt(String myFilePath, String inFile, ref String outFile)
         {
             // Local Variables
-            // TODO (5) I need to get these from the Registry I think.
-            String _bindirectory = @"C:\gnupg";
-            int ProcessTimeOutMilliseconds = 10000; // 10 seconds
-            int _exitcode = 0;
+            Boolean RetVal;
 
-            if(MLPrime_Crypt_Key == null)
+            if (MLPrime_Crypt_Key == null)
                 MLPrime_Crypt_Key = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('MLPrime_Crypt_Key')");
 
             if (MLPrimeFilePath == null)
@@ -5053,118 +5709,200 @@ namespace T1MultiAsset
             if (MLPrimeFilePath.Length < 1)
                 return (false);
 
-            String gpgOptions = "";
-            String gpgExecutable = _bindirectory + "\\gpg.exe";
-            DateTime lastWriteTime = File.GetLastWriteTime(myFilePath + @"\" + inFile);
-
-
             // Get oufilename
             outFile = inFile.Substring(0, inFile.Length - 19); // Last 19 chars are <outFile>.asc.yy.MM.dd_HH.mm
-            if (File.Exists(myFilePath + @"\" + outFile))
-                File.Delete(myFilePath + @"\" + outFile);
 
-            // Setup the file options
-            gpgOptions = @"--homedir """ + MLPrimeFilePath + @"\keyrings"" " +
-                         @"--output """ + myFilePath + @"\" + outFile + @""" " +
-                         @"--verbose --batch --yes --passphrase-fd --no-tty " +
-                         @"--decrypt """ + myFilePath + @"\" + inFile + @""" ";
+            RetVal = GNUPG_Decrypt(myFilePath, inFile, ref outFile, MLPrime_Crypt_Key, MLPrimeFilePath);
 
-            // Create startinfo object
-            ProcessStartInfo pInfo = new ProcessStartInfo(gpgExecutable, gpgOptions);
-            pInfo.WorkingDirectory = _bindirectory;
-            pInfo.CreateNoWindow = true;
-            pInfo.UseShellExecute = false;
-            // Redirect everything: 
-            // stdin to send the passphrase, stdout to get encrypted message, stderr in case of errors...
-            pInfo.RedirectStandardInput = true;
-            pInfo.RedirectStandardOutput = true;
-            pInfo.RedirectStandardError = true;
-            _processObject = Process.Start(pInfo);
-
-            // Send input text
-            _processObject.StandardInput.Write(MLPrime_Crypt_Key);
-            _processObject.StandardInput.Flush();
-            _processObject.StandardInput.Close();
-
-            _outputString = "";
-            _errorString = "";
-
-            // Create two threads to read both output/error streams without creating a deadlock
-            ThreadStart outputEntry = new ThreadStart(StandardOutputReader);
-            Thread outputThread = new Thread(outputEntry);
-            outputThread.Start();
-            ThreadStart errorEntry = new ThreadStart(StandardErrorReader);
-            Thread errorThread = new Thread(errorEntry);
-            errorThread.Start();
-
-            if (_processObject.WaitForExit(ProcessTimeOutMilliseconds))
-            {
-                // Process exited before timeout...
-                // Wait for the threads to complete reading output/error (but use a timeout!)
-                if (!outputThread.Join(ProcessTimeOutMilliseconds / 2))
-                {
-                    outputThread.Abort();
-                }
-                if (!errorThread.Join(ProcessTimeOutMilliseconds / 2))
-                {
-                    errorThread.Abort();
-                }
-            }
-            else
-            {
-                // Process timeout: PGP hung somewhere... kill it (as well as the threads!)
-                _outputString = "";
-                _errorString = "Timed out after " + ProcessTimeOutMilliseconds.ToString() + " milliseconds";
-                _processObject.Kill();
-                if (outputThread.IsAlive)
-                {
-                    outputThread.Abort();
-                }
-                if (errorThread.IsAlive)
-                {
-                    errorThread.Abort();
-                }
-            }
-
-            // Check results and prepare output
-            _exitcode = _processObject.ExitCode;
-            TextWriter stdoutWriter = Console.Error;
-            stdoutWriter.WriteLine(_outputString);
-            stdoutWriter.Flush();
-            stdoutWriter.Close();
-
-            TextWriter stderrWriter = Console.Error;
-            stderrWriter.WriteLine(_errorString);
-            stderrWriter.Flush();
-            stderrWriter.Close();
-
-            if (_exitcode == 0)
+            if (RetVal)
             {
                 // Use the file extension to set the file create time same as on ML Prime server.
                 // inFile.Substring(0, inFile.Length - 19); // Last 19 chars are <inFile>.asc.yy.MM.dd_HH.mm
-                int myYear = SystemLibrary.ToInt16(inFile.Substring(inFile.Length-14,2));
+                int myYear = SystemLibrary.ToInt16(inFile.Substring(inFile.Length - 14, 2));
                 if (myYear < 2000) myYear = myYear + 2000;
-                int myMonth = SystemLibrary.ToInt16(inFile.Substring(inFile.Length-11,2));
-                int myDay = SystemLibrary.ToInt16(inFile.Substring(inFile.Length-8,2));
-                int myHH = SystemLibrary.ToInt16(inFile.Substring(inFile.Length-5,2));
+                int myMonth = SystemLibrary.ToInt16(inFile.Substring(inFile.Length - 11, 2));
+                int myDay = SystemLibrary.ToInt16(inFile.Substring(inFile.Length - 8, 2));
+                int myHH = SystemLibrary.ToInt16(inFile.Substring(inFile.Length - 5, 2));
                 int myMin = SystemLibrary.ToInt16(inFile.Substring(inFile.Length - 2, 2));
                 DateTime ExtractedDate = new DateTime(myYear, myMonth, myDay, myHH, myMin, 0, DateTimeKind.Utc);
                 File.SetCreationTimeUtc(myFilePath + @"\" + outFile, ExtractedDate);
                 File.SetLastWriteTimeUtc(myFilePath + @"\" + outFile, ExtractedDate);
                 File.SetLastAccessTimeUtc(myFilePath + @"\" + outFile, ExtractedDate);
-                return (true);
             }
-            else
+
+            return (RetVal);
+
+        } //MLPrime_Decrypt
+
+        public static Boolean EMSX_Decrypt(String myFilePath, String inFile, ref String outFile)
+        {
+            // Local Variables
+            Boolean RetVal;
+
+            if (EMSI_Crypt_Key == null)
+                EMSI_Crypt_Key = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('EMSI_Crypt_Key')");
+
+            if (EMSI_Path == null)
+                EMSI_Path = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('EMSI_Path')");
+
+            if (EMSI_Path.Length < 1)
+                return (false);
+
+            // Get oufilename
+            outFile = inFile.Substring(0, inFile.Length - 4); // Last 4 chars are <outFile>.enc
+
+            RetVal =  GNUPG_Decrypt(myFilePath, inFile, ref outFile, EMSI_Crypt_Key, EMSI_Path);
+
+            if (RetVal)
             {
-                MessageBox.Show("Decrypt Failed:\r\n\r\n" +
-                                "Stdout:\r\n" + _outputString + "\r\n\r\n" +
-                                "Stderr:\r\n" + _errorString + "\r\n\r\n",
-                                "Decrypt Failed: " + myFilePath + @"\" + inFile
-                                );
+                // Take the Timestamps off the original file
+                File.SetCreationTimeUtc(myFilePath + @"\" + outFile, File.GetCreationTimeUtc(inFile));
+                File.SetLastWriteTimeUtc(myFilePath + @"\" + outFile, File.GetLastWriteTimeUtc(inFile));
+                File.SetLastAccessTimeUtc(myFilePath + @"\" + outFile, File.GetLastAccessTimeUtc(inFile));
+            }
+
+            return (RetVal);
+
+
+        } //EMSX_Decrypt()
+
+        public static Boolean GNUPG_Decrypt(String myFilePath, String inFile, ref String outFile, String Crypt_Key, String CryptFilePath)
+        {
+            try
+            {
+                // Local Variables
+                // TODO (5) I need to get these from the Registry I think.
+                int ProcessTimeOutMilliseconds = 10000; // 10 seconds
+                int _exitcode = 0;
+
+                if (CryptFilePath.Length < 1)
+                    return (false);
+
+                Set_bindirectory();
+
+                String gpgOptions = "";
+                String gpgExecutable = _bindirectory + "\\gpg.exe";
+                DateTime lastWriteTime = File.GetLastWriteTime(myFilePath + @"\" + inFile);
+
+
+                if (File.Exists(myFilePath + @"\" + outFile))
+                    File.Delete(myFilePath + @"\" + outFile);
+
+                // Setup the file options
+                gpgOptions = @"--homedir """ + CryptFilePath + @"\keyrings"" " +
+                             @"--output """ + myFilePath + @"\" + outFile + @""" " +
+                             @"--verbose --batch --yes --passphrase-fd --no-tty " +
+                             @"--decrypt """ + myFilePath + @"\" + inFile + @""" ";
+
+                // Create startinfo object
+                ProcessStartInfo pInfo = new ProcessStartInfo(gpgExecutable, gpgOptions);
+                pInfo.WorkingDirectory = _bindirectory;
+                pInfo.CreateNoWindow = true;
+                pInfo.UseShellExecute = false;
+                // Redirect everything: 
+                // stdin to send the passphrase, stdout to get encrypted message, stderr in case of errors...
+                pInfo.RedirectStandardInput = true;
+                pInfo.RedirectStandardOutput = true;
+                pInfo.RedirectStandardError = true;
+                _processObject = Process.Start(pInfo);
+
+                // Send input text
+                _processObject.StandardInput.Write(Crypt_Key);
+                _processObject.StandardInput.Flush();
+                _processObject.StandardInput.Close();
+
+                _outputString = "";
+                _errorString = "";
+
+                // Create two threads to read both output/error streams without creating a deadlock
+                ThreadStart outputEntry = new ThreadStart(StandardOutputReader);
+                Thread outputThread = new Thread(outputEntry);
+                outputThread.Start();
+                ThreadStart errorEntry = new ThreadStart(StandardErrorReader);
+                Thread errorThread = new Thread(errorEntry);
+                errorThread.Start();
+
+                if (_processObject.WaitForExit(ProcessTimeOutMilliseconds))
+                {
+                    // Process exited before timeout...
+                    // Wait for the threads to complete reading output/error (but use a timeout!)
+                    if (!outputThread.Join(ProcessTimeOutMilliseconds / 2))
+                    {
+                        outputThread.Abort();
+                    }
+                    if (!errorThread.Join(ProcessTimeOutMilliseconds / 2))
+                    {
+                        errorThread.Abort();
+                    }
+                }
+                else
+                {
+                    // Process timeout: PGP hung somewhere... kill it (as well as the threads!)
+                    _outputString = "";
+                    _errorString = "Timed out after " + ProcessTimeOutMilliseconds.ToString() + " milliseconds";
+                    _processObject.Kill();
+                    if (outputThread.IsAlive)
+                    {
+                        outputThread.Abort();
+                    }
+                    if (errorThread.IsAlive)
+                    {
+                        errorThread.Abort();
+                    }
+                }
+
+                // Check results and prepare output
+                _exitcode = _processObject.ExitCode;
+                TextWriter stdoutWriter = Console.Error;
+                stdoutWriter.WriteLine(_outputString);
+                stdoutWriter.Flush();
+                stdoutWriter.Close();
+
+                TextWriter stderrWriter = Console.Error;
+                stderrWriter.WriteLine(_errorString);
+                stderrWriter.Flush();
+                stderrWriter.Close();
+
+                if (_exitcode == 0)
+                {
+                    return (true);
+                }
+                else
+                {
+                    Console.WriteLine("Decrypt Failed:\r\n\r\n" +
+                                      "Stdout:\r\n" + _outputString + "\r\n\r\n" +
+                                      "Stderr:\r\n" + _errorString + "\r\n\r\n",
+                                      "Decrypt Failed: " + myFilePath + @"\" + inFile
+                                     );
+                    return (false);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Decrypt Exception" + SystemLibrary.GetFullErrorMessage(e) + "\r\n\r\n" + SystemLibrary.GetCallStack());
                 return (false);
             }
 
-        } //MLPrime_Decrypt()
+        } //GNUPG_Decrypt()
+
+        private static void Set_bindirectory()
+        {
+            if (_bindirectory == null)
+            {
+                // See if local
+                if (Directory.Exists(@"C:\gnupg"))
+                    _bindirectory = @"C:\gnupg";
+                else
+                {
+                    //see if in registry
+                    Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
+                    _bindirectory = SystemLibrary.ToString(myReg.RegGetValue("HKEY_LOCAL_MACHINE", @"SOFTWARE\GNU\GNUPG", "HomeDir"));
+                    if (!Directory.Exists(_bindirectory))
+                        _bindirectory = SystemLibrary.SQLSelectString("Select dbo.f_GetParamString('gnupg_Path')");
+                }
+            }
+
+        } //SetBindDirectory
 
         /// Reader thread for standard output
         /// 
@@ -5546,11 +6284,43 @@ namespace T1MultiAsset
 
         } // LoadToDataTable()
 
-
-
-
-
         #endregion // ProcessInputToDataTable
 
+        // Send Data to RitchViewer For visualisation
+        #region SendMessage
+
+        public static void TestRitchViewer()
+        {
+            SendData("Ritch Viewer", "This will be a structure that supplies data to RitchViewer for visualisation");
+        }
+
+        public static void SendData(String myWindowName, String myMessage)
+        {
+            // Local Variables
+            IntPtr hwnd;
+
+            hwnd = (IntPtr)FindWindow(null, myWindowName);
+            if (hwnd != (IntPtr)0)
+            {
+                CopyDataStruct cds = new CopyDataStruct();
+                try
+                {
+                    cds.cbData = (myMessage.Length + 1) * 2;
+                    cds.lpData = LocalAlloc(0x40, cds.cbData);
+                    Marshal.Copy(myMessage.ToCharArray(), 0, cds.lpData, myMessage.Length);
+                    cds.dwData = (IntPtr)1;
+                    SendMessage(hwnd, WM_COPYDATA, IntPtr.Zero, ref cds);
+                }
+                finally
+                {
+                    cds.Dispose();
+                }
+            }
+  
+        } //SendData()
+
+
+
+        #endregion //SendMessage()
     }
 }

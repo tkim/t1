@@ -28,17 +28,35 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dg_ML_E238T = new System.Windows.Forms.DataGridView();
+            this.GPB_Transaction_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CustodianName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TradeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TradeDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Client_Transaction_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FundName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.BBG_Ticker = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SettlementDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.NetValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Commission = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Reason = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Source = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Product_Short_Name = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ParentFundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dg_Trade = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -61,24 +79,6 @@
             this.t_Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.t_Commission = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.t_ParentFundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GPB_Transaction_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CustodianName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TradeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TradeDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Client_Transaction_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FundName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.BBG_Ticker = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SettlementDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.NetValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Commission = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Reason = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Source = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Product_Short_Name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ParentFundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dg_ML_E238T)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dg_Trade)).BeginInit();
             this.SuspendLayout();
@@ -120,6 +120,117 @@
             this.dg_ML_E238T.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dg_ML_E238T_MouseDown);
             this.dg_ML_E238T.DragEnter += new System.Windows.Forms.DragEventHandler(this.dg_ML_E238T_DragEnter);
             this.dg_ML_E238T.DragDrop += new System.Windows.Forms.DragEventHandler(this.dg_ML_E238T_DragDrop);
+            // 
+            // GPB_Transaction_ID
+            // 
+            this.GPB_Transaction_ID.HeaderText = "Custodian ID";
+            this.GPB_Transaction_ID.Name = "GPB_Transaction_ID";
+            // 
+            // CustodianName
+            // 
+            this.CustodianName.HeaderText = "Custodian";
+            this.CustodianName.Name = "CustodianName";
+            this.CustodianName.ReadOnly = true;
+            // 
+            // TradeID
+            // 
+            this.TradeID.HeaderText = "Match to TradeID";
+            this.TradeID.Name = "TradeID";
+            this.TradeID.ReadOnly = true;
+            // 
+            // TradeDate
+            // 
+            dataGridViewCellStyle1.Format = "dd-MMM-yyyy";
+            this.TradeDate.DefaultCellStyle = dataGridViewCellStyle1;
+            this.TradeDate.HeaderText = "Trade Date";
+            this.TradeDate.Name = "TradeDate";
+            this.TradeDate.ReadOnly = true;
+            // 
+            // Client_Transaction_ID
+            // 
+            this.Client_Transaction_ID.HeaderText = "Client TranID";
+            this.Client_Transaction_ID.Name = "Client_Transaction_ID";
+            this.Client_Transaction_ID.ReadOnly = true;
+            // 
+            // FundID
+            // 
+            this.FundID.HeaderText = "FundID";
+            this.FundID.Name = "FundID";
+            this.FundID.Visible = false;
+            // 
+            // FundName
+            // 
+            this.FundName.HeaderText = "Fund Name";
+            this.FundName.Name = "FundName";
+            // 
+            // BBG_Ticker
+            // 
+            this.BBG_Ticker.HeaderText = "Ticker";
+            this.BBG_Ticker.Name = "BBG_Ticker";
+            // 
+            // SettlementDate
+            // 
+            dataGridViewCellStyle2.Format = "dd-MMM-yyyy";
+            this.SettlementDate.DefaultCellStyle = dataGridViewCellStyle2;
+            this.SettlementDate.HeaderText = "Settlement Date";
+            this.SettlementDate.Name = "SettlementDate";
+            // 
+            // Quantity
+            // 
+            dataGridViewCellStyle3.Format = "N0";
+            this.Quantity.DefaultCellStyle = dataGridViewCellStyle3;
+            this.Quantity.HeaderText = "Quantity";
+            this.Quantity.Name = "Quantity";
+            // 
+            // Price
+            // 
+            this.Price.HeaderText = "Price";
+            this.Price.Name = "Price";
+            // 
+            // NetValue
+            // 
+            dataGridViewCellStyle4.Format = "N2";
+            this.NetValue.DefaultCellStyle = dataGridViewCellStyle4;
+            this.NetValue.HeaderText = "Net Value";
+            this.NetValue.Name = "NetValue";
+            // 
+            // Commission
+            // 
+            dataGridViewCellStyle5.Format = "N2";
+            this.Commission.DefaultCellStyle = dataGridViewCellStyle5;
+            this.Commission.HeaderText = "Commission";
+            this.Commission.Name = "Commission";
+            // 
+            // Side
+            // 
+            this.Side.HeaderText = "Side";
+            this.Side.Name = "Side";
+            // 
+            // Reason
+            // 
+            this.Reason.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Reason.HeaderText = "Reason";
+            this.Reason.Name = "Reason";
+            this.Reason.Width = 69;
+            // 
+            // Source
+            // 
+            this.Source.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Source.HeaderText = "Source";
+            this.Source.Name = "Source";
+            this.Source.Width = 66;
+            // 
+            // Product_Short_Name
+            // 
+            this.Product_Short_Name.HeaderText = "Product";
+            this.Product_Short_Name.Name = "Product_Short_Name";
+            this.Product_Short_Name.ReadOnly = true;
+            // 
+            // ParentFundID
+            // 
+            this.ParentFundID.HeaderText = "ParentFundID";
+            this.ParentFundID.Name = "ParentFundID";
+            this.ParentFundID.Visible = false;
             // 
             // dg_Trade
             // 
@@ -260,8 +371,8 @@
             // 
             // t_TradeDate
             // 
-            dataGridViewCellStyle21.Format = "dd-MMM-yyyy";
-            this.t_TradeDate.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle6.Format = "dd-MMM-yyyy";
+            this.t_TradeDate.DefaultCellStyle = dataGridViewCellStyle6;
             this.t_TradeDate.HeaderText = "Trade Date";
             this.t_TradeDate.Name = "t_TradeDate";
             this.t_TradeDate.ReadOnly = true;
@@ -284,15 +395,15 @@
             // 
             // t_SettlementDate
             // 
-            dataGridViewCellStyle22.Format = "dd-MMM-yyyy";
-            this.t_SettlementDate.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle7.Format = "dd-MMM-yyyy";
+            this.t_SettlementDate.DefaultCellStyle = dataGridViewCellStyle7;
             this.t_SettlementDate.HeaderText = "Settlement Date";
             this.t_SettlementDate.Name = "t_SettlementDate";
             // 
             // t_Quantity
             // 
-            dataGridViewCellStyle23.Format = "N0";
-            this.t_Quantity.DefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle8.Format = "N0";
+            this.t_Quantity.DefaultCellStyle = dataGridViewCellStyle8;
             this.t_Quantity.HeaderText = "Quantity";
             this.t_Quantity.Name = "t_Quantity";
             // 
@@ -303,8 +414,8 @@
             // 
             // t_NetValue
             // 
-            dataGridViewCellStyle24.Format = "N2";
-            this.t_NetValue.DefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle9.Format = "N2";
+            this.t_NetValue.DefaultCellStyle = dataGridViewCellStyle9;
             this.t_NetValue.HeaderText = "Net Value";
             this.t_NetValue.Name = "t_NetValue";
             // 
@@ -315,127 +426,16 @@
             // 
             // t_Commission
             // 
-            dataGridViewCellStyle25.Format = "N2";
-            this.t_Commission.DefaultCellStyle = dataGridViewCellStyle25;
+            dataGridViewCellStyle10.Format = "N2";
+            this.t_Commission.DefaultCellStyle = dataGridViewCellStyle10;
             this.t_Commission.HeaderText = "Commission";
             this.t_Commission.Name = "t_Commission";
             // 
             // t_ParentFundID
             // 
-            this.t_ParentFundID.HeaderText = "t_ParentFundID";
+            this.t_ParentFundID.HeaderText = "ParentFundID";
             this.t_ParentFundID.Name = "t_ParentFundID";
             this.t_ParentFundID.Visible = false;
-            // 
-            // GPB_Transaction_ID
-            // 
-            this.GPB_Transaction_ID.HeaderText = "Custodian ID";
-            this.GPB_Transaction_ID.Name = "GPB_Transaction_ID";
-            // 
-            // CustodianName
-            // 
-            this.CustodianName.HeaderText = "Custodian";
-            this.CustodianName.Name = "CustodianName";
-            this.CustodianName.ReadOnly = true;
-            // 
-            // TradeID
-            // 
-            this.TradeID.HeaderText = "Match to TradeID";
-            this.TradeID.Name = "TradeID";
-            this.TradeID.ReadOnly = true;
-            // 
-            // TradeDate
-            // 
-            dataGridViewCellStyle26.Format = "dd-MMM-yyyy";
-            this.TradeDate.DefaultCellStyle = dataGridViewCellStyle26;
-            this.TradeDate.HeaderText = "Trade Date";
-            this.TradeDate.Name = "TradeDate";
-            this.TradeDate.ReadOnly = true;
-            // 
-            // Client_Transaction_ID
-            // 
-            this.Client_Transaction_ID.HeaderText = "Client TranID";
-            this.Client_Transaction_ID.Name = "Client_Transaction_ID";
-            this.Client_Transaction_ID.ReadOnly = true;
-            // 
-            // FundID
-            // 
-            this.FundID.HeaderText = "FundID";
-            this.FundID.Name = "FundID";
-            this.FundID.Visible = false;
-            // 
-            // FundName
-            // 
-            this.FundName.HeaderText = "Fund Name";
-            this.FundName.Name = "FundName";
-            // 
-            // BBG_Ticker
-            // 
-            this.BBG_Ticker.HeaderText = "Ticker";
-            this.BBG_Ticker.Name = "BBG_Ticker";
-            // 
-            // SettlementDate
-            // 
-            dataGridViewCellStyle27.Format = "dd-MMM-yyyy";
-            this.SettlementDate.DefaultCellStyle = dataGridViewCellStyle27;
-            this.SettlementDate.HeaderText = "Settlement Date";
-            this.SettlementDate.Name = "SettlementDate";
-            // 
-            // Quantity
-            // 
-            dataGridViewCellStyle28.Format = "N0";
-            this.Quantity.DefaultCellStyle = dataGridViewCellStyle28;
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.Name = "Quantity";
-            // 
-            // Price
-            // 
-            this.Price.HeaderText = "Price";
-            this.Price.Name = "Price";
-            // 
-            // NetValue
-            // 
-            dataGridViewCellStyle29.Format = "N2";
-            this.NetValue.DefaultCellStyle = dataGridViewCellStyle29;
-            this.NetValue.HeaderText = "Net Value";
-            this.NetValue.Name = "NetValue";
-            // 
-            // Commission
-            // 
-            dataGridViewCellStyle30.Format = "N2";
-            this.Commission.DefaultCellStyle = dataGridViewCellStyle30;
-            this.Commission.HeaderText = "Commission";
-            this.Commission.Name = "Commission";
-            // 
-            // Side
-            // 
-            this.Side.HeaderText = "Side";
-            this.Side.Name = "Side";
-            // 
-            // Reason
-            // 
-            this.Reason.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.Reason.HeaderText = "Reason";
-            this.Reason.Name = "Reason";
-            this.Reason.Width = 69;
-            // 
-            // Source
-            // 
-            this.Source.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.Source.HeaderText = "Source";
-            this.Source.Name = "Source";
-            this.Source.Width = 66;
-            // 
-            // Product_Short_Name
-            // 
-            this.Product_Short_Name.HeaderText = "Product";
-            this.Product_Short_Name.Name = "Product_Short_Name";
-            this.Product_Short_Name.ReadOnly = true;
-            // 
-            // ParentFundID
-            // 
-            this.ParentFundID.HeaderText = "ParentFundID";
-            this.ParentFundID.Name = "ParentFundID";
-            this.ParentFundID.Visible = false;
             // 
             // MLPrime_Reconcile
             // 

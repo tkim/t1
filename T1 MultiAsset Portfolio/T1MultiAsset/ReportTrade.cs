@@ -28,6 +28,17 @@ namespace T1MultiAsset
         DateTime FromDate = DateTime.MinValue;
         DateTime ToDate = DateTime.MaxValue;
 
+        public struct TradeMenuStruct
+        {
+            public ReportTrade myParentForm;
+            public String Instruction;
+            public String TradeID;
+            public String NewSide;
+        }
+
+        private int CXLocation = 0;
+        private int CYLocation = 0;
+
 
         public ReportTrade()
         {
@@ -183,7 +194,7 @@ namespace T1MultiAsset
 
             mySql = "Select	FundName, PortfolioName, TradeDate, BBG_Ticker, Side, Quantity, Price, NetValue, " +
                     "       Case When isNull(NAV_SOD + Capital_SOD,0) = 0 Then null Else NetValue / (NAV_SOD + Capital_SOD) End as [% FUM], " +
-                    "       BrokerName, SettlementDate, UpdateDate " +
+                    "       BrokerName, SettlementDate, UpdateDate, TradeID " +
                     "from	Trade, " +
                     "		Fund, " +
                     "		Portfolio, " +
@@ -255,6 +266,8 @@ namespace T1MultiAsset
             ParentForm1.SetFormatColumn(dg_ReportTrade, "TradeDate", Color.DarkBlue, Color.Empty, "dd-MMM-yy", "");
             ParentForm1.SetFormatColumn(dg_ReportTrade, "SettlementDate", Color.DarkBlue, Color.Gainsboro, "dd-MMM-yy", "");
             ParentForm1.SetFormatColumn(dg_ReportTrade, "UpdateDate", Color.Empty, Color.Empty, "dd-MMM-yy HH:mm", "");
+
+            dg_ReportTrade.Columns["TradeID"].Visible = false;
 
             // Loop over the Tickers 
             for (Int32 i = 0; i < dg_ReportTrade.Rows.Count; i++) // Last row in dg_ReportTrade is a blank row
@@ -339,6 +352,110 @@ namespace T1MultiAsset
         {
             SystemLibrary.PositionFormOverParent(this, ParentForm1);
         }
+
+        private void dg_ReportTrade_MouseClick(object sender, MouseEventArgs e)
+        {
+            CXLocation = dg_ReportTrade.Location.X + e.Location.X + 5;
+            CYLocation = dg_ReportTrade.Location.Y + e.Location.Y;
+        } //dg_ReportTrade_MouseClick()
+
+        private void dg_ReportTrade_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+           // Show the popup menu
+            try
+            {
+                /*
+                 * WARNING: This block does not deal with Stock Location rebuild, so have restricted access to the developer.
+                 *          It was temporarily added 26-Feb-2014 to help a new client who was working in EMSX only for Orders,
+                 *          and thus missing whether an order direction was Long or Short.
+                 */
+                if (e.Button == MouseButtons.Right && e.RowIndex > -1 && e.ColumnIndex > -1 && SystemLibrary.GetUserName() == "Colin Ritchie")
+                {
+                    Point myLocation = new Point(this.Location.X + CXLocation, this.Location.Y + CYLocation);
+                    ContextMenuStrip myMenu = new ContextMenuStrip();
+                    ToolStripMenuItem mySubMenu = new ToolStripMenuItem();
+
+                    String TradeID = SystemLibrary.ToString(dg_ReportTrade.Rows[e.RowIndex].Cells["TradeID"].Value);
+                    String Side = SystemLibrary.ToString(dg_ReportTrade.Rows[e.RowIndex].Cells["Side"].Value);
+                    String NewSide = Side;
+
+                    // Swap between Short & Long Order Menu
+                    String MenuText = "";
+                    switch (Side)
+                    {
+                        case "B":
+                            MenuText = "Swap from 'Buy' to 'Buy to Cover'";
+                            NewSide = "BS";
+                            break;
+                        case "BS":
+                            MenuText = "Swap from 'Buy to Cover' to 'Buy'";
+                            NewSide = "B";
+                            break;
+                        case "S":
+                            MenuText = "Swap from 'Sell' to 'Sell Short'";
+                            NewSide = "SS";
+                            break;
+                        case "SS":
+                            MenuText = "Swap from 'Sell Short' to 'Sell'";
+                            NewSide = "S";
+                            break;
+                        default:
+                            Console.WriteLine("Programmer issue: dg_Orders_CellMouseClick(Unknown Side='" + Side + "'");
+                            MenuText = "";
+                            break;
+                    }
+                    if (MenuText.Length > 0)
+                    {
+                        TradeMenuStruct myTradeStr = new TradeMenuStruct();
+                        myTradeStr.TradeID = TradeID;
+                        myTradeStr.NewSide = NewSide;
+                        myTradeStr.myParentForm = this;
+
+                        mySubMenu = new ToolStripMenuItem(MenuText);
+                        myTradeStr.Instruction = "Swap Trade";
+                        mySubMenu.Tag = myTradeStr;
+                        mySubMenu.MouseUp += new MouseEventHandler(dg_ReportTradeMenuItem_Click);
+                        myMenu.Items.Add(mySubMenu);
+                    }
+
+                    // Show the Menu
+                    myMenu.Show(myLocation);
+
+
+                
+                }
+            }
+            catch { }
+
+        } //dg_ReportTrade_CellMouseClick()
+
+        public static void dg_ReportTradeMenuItem_Click(object sender, MouseEventArgs e)
+        {
+            //
+            // Purpose: A generic menu click event for the Order Right-Click
+            //
+
+            // Local Variables
+            ToolStripMenuItem ts_From = (ToolStripMenuItem)sender;
+            TradeMenuStruct myTradeStr = (TradeMenuStruct)ts_From.Tag;
+
+            String Tradeid = myTradeStr.TradeID;
+            String NewSide = myTradeStr.NewSide;
+            ReportTrade myForm = myTradeStr.myParentForm;
+
+            String mySql;
+
+            // Alter the Trade Record
+            mySql = "Update Trade Set Side = '" + NewSide + "' Where TradeID = " + Tradeid;
+            int myRows = SystemLibrary.SQLExecute(mySql);
+            mySql = "Update Fills Set Side = '" + NewSide + "' Where OrderRefID = (Select OrderRefID from Fills_Allocation Where TradeID = " + Tradeid + ") ";
+            myRows = SystemLibrary.SQLExecute(mySql);
+            mySql = "Update Orders Set Side = '" + NewSide + "' Where OrderRefID = (Select OrderRefID from Fills_Allocation Where TradeID = " + Tradeid + ") ";
+            myRows = SystemLibrary.SQLExecute(mySql);
+
+            myForm.LoadTrades();
+
+        } //dg_ReportTradeMenuItem_Click()
 
     }
 }

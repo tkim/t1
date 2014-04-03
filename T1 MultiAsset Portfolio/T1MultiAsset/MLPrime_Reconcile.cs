@@ -89,7 +89,7 @@ namespace T1MultiAsset
                     "       ML_E239.Contractual_Settlement_Date SettlementDate, ML_E239.Quantity, " +
                     "       ML_E239.Price, (-ML_E239.Amount) NetValue, " +
                     "	   Round((-Round(ML_E239.Quantity * ML_E239.Price * Securities.Pos_Mult_Factor,2) - ML_E239.Amount)/(1+ExchangeFees.VATRate),2) Commission, " +
-                    "       dbo.f_MLTranType(ML_E239.Transaction_Type) as Side, ML_E239.Reason, 'ML_E239' as Source, ML_E239.Product_Short_Name, Fund.ParentFundID, 'Merrill Lynch' as CustodianName,  ML_E239.Executing_Broker_Code as Broker" +
+                    "       dbo.f_MLTranType(ML_E239.Transaction_Type) as Side, ML_E239.Reason, 'ML_E239' as Source, ML_E239.Product_Short_Name, Fund.ParentFundID, 'Merrill Lynch' as CustodianName,  ML_E239.Executing_Broker_Code as Broker " +
                     "From	ML_E239, " +
                     "		Fund, " +
                     "		Securities, " +
@@ -110,7 +110,7 @@ namespace T1MultiAsset
                     "Select	SCOTIA_AcctHist.ID1, SCOTIA_AcctHist.ID, SCOTIA_AcctHist.Trad_Date as TradeDate, SCOTIA_AcctHist.FundID, Fund.FundName, SCOTIA_AcctHist.BBG_Ticker, " +
                     "       SCOTIA_AcctHist.Val_Date as SettlementDate, Case When SCOTIA_AcctHist.Amt < 0 Then 1 Else -1 End * SCOTIA_AcctHist.Quantity as Quantity, " +
                     "       SCOTIA_AcctHist.Price_gross as Price, (-SCOTIA_AcctHist.Amt) NetValue, SCOTIA_AcctHist.Commission, " +
-                    "       Case When SCOTIA_AcctHist.Amt < 0 Then 'B' Else 'S' End as Side, SCOTIA_AcctHist.Reason, 'SCOTIA_AcctHist' as Source, SCOTIA_AcctHist.Security as Product_Short_Name, Fund.ParentFundID, 'SCOTIA' as CustodianName,  SCOTIA_AcctHist.Cpty as Broker" +
+                    "       Case When SCOTIA_AcctHist.Amt < 0 Then 'B' Else 'S' End as Side, SCOTIA_AcctHist.Reason, 'SCOTIA_AcctHist' as Source, SCOTIA_AcctHist.Security as Product_Short_Name, Fund.ParentFundID, 'SCOTIA' as CustodianName,  SCOTIA_AcctHist.Cpty as Broker " +
                     "From	SCOTIA_AcctHist, " +
                     "		Fund  " +
                     "Where	isNull(SCOTIA_AcctHist.reconcilled,'N') = 'N' " +
@@ -140,6 +140,7 @@ namespace T1MultiAsset
                 dg_ML_E238T["Reason", myRow].Value = dr["Reason"];
                 dg_ML_E238T["Source", myRow].Value = dr["Source"];
                 dg_ML_E238T["Product_Short_Name", myRow].Value = dr["Product_Short_Name"];
+                dg_ML_E238T["ParentFundID", myRow].Value = dr["ParentFundID"];
                 ParentForm1.SetColumn(dg_ML_E238T, "Quantity", myRow);
                 ParentForm1.SetColumn(dg_ML_E238T, "NetValue", myRow);
                 ParentForm1.SetColumn(dg_ML_E238T, "Commission", myRow);
@@ -212,6 +213,7 @@ namespace T1MultiAsset
                 dg_Trade["t_NetValue", myRow].Value = dr["NetValue"];
                 dg_Trade["t_Commission", myRow].Value = dr["Commission"];
                 dg_Trade["t_Side", myRow].Value = dr["Side"];
+                dg_Trade["t_ParentFundID", myRow].Value = dr["ParentFundID"];
                 ParentForm1.SetColumn(dg_Trade, "t_Quantity", myRow);
                 ParentForm1.SetColumn(dg_Trade, "t_NetValue", myRow);
                 ParentForm1.SetColumn(dg_Trade, "t_Commission", myRow);
@@ -299,14 +301,14 @@ namespace T1MultiAsset
                 String CustodianName = SystemLibrary.ToString(Target.Cells["CustodianName"].Value);
                 String SourceCustodianName = SystemLibrary.ToString(Source.Cells["t_CustodianName"].Value);
                 String TradeID = SystemLibrary.ToString(Target.Cells["TradeID"].Value);
-                String FundName = SystemLibrary.ToString(Target.Cells["FundName"].Value) + " - " +
-                                  SystemLibrary.ToString(Target.Cells["BBG_Ticker"].Value);
-                String SourceFundName = SystemLibrary.ToString(Source.Cells["t_FundName"].Value) + " - " +
-                                        SystemLibrary.ToString(Source.Cells["t_BBG_Ticker"].Value);
-                String FundID = SystemLibrary.ToString(Target.Cells["ParentFundID"].Value) + " - " +
-                                  SystemLibrary.ToString(Target.Cells["BBG_Ticker"].Value);
-                String SourceFundID = SystemLibrary.ToString(Source.Cells["t_ParentFundID"].Value) + " - " +
-                                        SystemLibrary.ToString(Source.Cells["t_BBG_Ticker"].Value);
+                String FundName = SystemLibrary.ToString(Target.Cells["FundName"].Value) + " - Parent FundID =" +
+                                  SystemLibrary.ToString(Target.Cells["ParentFundID"].Value);
+                String SourceFundName = SystemLibrary.ToString(Source.Cells["t_FundName"].Value) + " - Parent FundID =" +
+                                        SystemLibrary.ToString(Source.Cells["t_ParentFundID"].Value);
+                String FundID = SystemLibrary.ToString(Target.Cells["ParentFundID"].Value);
+                String BBG_Ticker = SystemLibrary.ToString(Target.Cells["BBG_Ticker"].Value);
+                String SourceFundID = SystemLibrary.ToString(Source.Cells["t_ParentFundID"].Value);
+                String SourceBBG_Ticker = SystemLibrary.ToString(Source.Cells["t_BBG_Ticker"].Value);
                 String SourceSettlementDate = SystemLibrary.ToString(Source.Cells["t_SettlementDate"].Value);
                 String SettlementDate = SystemLibrary.ToString(Target.Cells["SettlementDate"].Value);
                 String SourceSide = SystemLibrary.ToString(Source.Cells["t_Side"].Value);
@@ -332,8 +334,19 @@ namespace T1MultiAsset
 
                 if (FundID != SourceFundID)
                 {
-                    if (MessageBox.Show(this, "WARNING: You have an mis-matched a Fund or Ticker on this Trade.\r\n\r\n" +
+                    if (MessageBox.Show(this, "WARNING: You have an mis-matched a Fund on this Trade.\r\n\r\n" +
                                         "Matching\r\n\t'" + FundName + "'\r\nwith\r\n\t'" + SourceFundName + "'.\r\n\r\n" +
+                                        "Do you really wish to do this'?",
+                                        "Change Custodian ID for Trade", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+
+                if (BBG_Ticker != SourceBBG_Ticker)
+                {
+                    if (MessageBox.Show(this, "WARNING: You have an mis-matched a Ticker on this Trade.\r\n\r\n" +
+                                        "Matching\r\n\t'" + BBG_Ticker + "'\r\nwith\r\n\t'" + SourceBBG_Ticker + "'.\r\n\r\n" +
                                         "Do you really wish to do this'?",
                                         "Change Custodian ID for Trade", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                     {
@@ -382,10 +395,16 @@ namespace T1MultiAsset
                 String t_GPB_Transaction_ID = SystemLibrary.ToString(Target.Cells["t_GPB_Transaction_ID"].Value);
                 String CustodianName = SystemLibrary.ToString(Target.Cells["t_CustodianName"].Value);
                 String SourceCustodianName = SystemLibrary.ToString(Source.Cells["CustodianName"].Value);
-                String FundName = SystemLibrary.ToString(Target.Cells["t_FundName"].Value) + " - " +
-                                  SystemLibrary.ToString(Target.Cells["t_BBG_Ticker"].Value);
-                String SourceFundName = SystemLibrary.ToString(Source.Cells["FundName"].Value) + " - " +
-                                        SystemLibrary.ToString(Source.Cells["BBG_Ticker"].Value);
+                String FundName = SystemLibrary.ToString(Target.Cells["t_FundName"].Value) + " - Parent FundID =" +
+                                  SystemLibrary.ToString(Target.Cells["t_ParentFundID"].Value);
+                String SourceFundName = SystemLibrary.ToString(Source.Cells["FundName"].Value) + " - Parent FundID =" +
+                                        SystemLibrary.ToString(Source.Cells["ParentFundID"].Value);
+
+                String FundID = SystemLibrary.ToString(Target.Cells["t_ParentFundID"].Value);
+                String BBG_Ticker = SystemLibrary.ToString(Target.Cells["t_BBG_Ticker"].Value);
+                String SourceFundID = SystemLibrary.ToString(Source.Cells["ParentFundID"].Value);
+                String SourceBBG_Ticker = SystemLibrary.ToString(Source.Cells["BBG_Ticker"].Value);
+
                 String SourceSettlementDate = SystemLibrary.ToString(Source.Cells["SettlementDate"].Value);
                 String SettlementDate = SystemLibrary.ToString(Target.Cells["t_SettlementDate"].Value);
                 String SourceSide = SystemLibrary.ToString(Source.Cells["Side"].Value);
@@ -409,12 +428,23 @@ namespace T1MultiAsset
                     return;
                 }
 
-                if (FundName != SourceFundName)
+                if (FundID != SourceFundID)
                 {
-                    if (MessageBox.Show(this, "WARNING: You have an mis-matched a Fund or Ticker on this Trade.\r\n\r\n" +
+                    if (MessageBox.Show(this, "WARNING: You have an mis-matched a Fund on this Trade.\r\n\r\n" +
                                         "Matching\r\n\t'" + FundName + "'\r\nwith\r\n\t'" + SourceFundName + "'.\r\n\r\n" +
                                         "Do you really wish to do this'?",
-                                        "Change E238T ID for Trade", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                                        "Change Custodian ID for Trade", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+
+                if (BBG_Ticker != SourceBBG_Ticker)
+                {
+                    if (MessageBox.Show(this, "WARNING: You have an mis-matched a Ticker on this Trade.\r\n\r\n" +
+                                        "Matching\r\n\t'" + BBG_Ticker + "'\r\nwith\r\n\t'" + SourceBBG_Ticker + "'.\r\n\r\n" +
+                                        "Do you really wish to do this'?",
+                                        "Change Custodian ID for Trade", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                     {
                         return;
                     }

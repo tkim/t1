@@ -54,7 +54,7 @@ namespace T1MultiAsset
             // SmtpClient
             mySql = "Update System_Parameters Set p_string = '" + tb_SmtpClient.Text + "' Where Parameter_Name = 'SmtpClient'";
             myRows = SystemLibrary.SQLExecute(mySql);
-            if (myRows == -1)
+            if (myRows < 1)
             {
                 mySql = "Insert Into System_Parameters (Parameter_Name, p_string) Select 'SmtpClient','" + tb_SmtpClient.Text + "' Where Not Exists (Select 'x' From System_Parameters Where Parameter_Name = 'SmtpClient')";
                 myRows = SystemLibrary.SQLExecute(mySql);
@@ -147,16 +147,16 @@ namespace T1MultiAsset
 
         private void bt_Test_Click(object sender, EventArgs e)
         {
-            TestSMTP(tb_email.Text, tb_SmtpClient.Text, cb_SSL.Checked, tb_Port.Text, tb_UserName.Text, tb_Password.Text);
+            TestSMTP(tb_email.Text, tb_SmtpClient.Text, cb_SSL.Checked, tb_Port.Text, tb_UserName.Text, tb_Password.Text, cb_DomainAutheticate.Checked);
         } //bt_Test_Click()
 
         private void bt_Test_Secondary_Click(object sender, EventArgs e)
         {
-            TestSMTP(tb_email.Text, tb_SmtpClient_Secondary.Text, cb_SSL_Secondary.Checked, tb_Port_Secondary.Text, tb_UserName_Secondary.Text, tb_Password_Secondary.Text);
+            TestSMTP(tb_email.Text, tb_SmtpClient_Secondary.Text, cb_SSL_Secondary.Checked, tb_Port_Secondary.Text, tb_UserName_Secondary.Text, tb_Password_Secondary.Text, cb_DomainAutheticate_Secondary.Checked);
         } //bt_Test_Click()
 
 
-        private void TestSMTP(String inEmail, String inSMTP, Boolean inSSL, String inPort, String inUsername, String inPassword)
+        private void TestSMTP(String inEmail, String inSMTP, Boolean inSSL, String inPort, String inUsername, String inPassword, Boolean inDomainAutheticate)
         {
             // Local Variables
             MailMessage mail = null;
@@ -182,6 +182,17 @@ namespace T1MultiAsset
                     SmtpServer.Port = SystemLibrary.ToInt32(inPort);
                 else
                     SmtpServer.Port = 25;
+                /*
+                 * 27-Feb-2014
+                 * I was not able to get Domain Authentification working.
+                 * Documentation of solutions online did not match available options for credentials.
+                 */
+                if (inDomainAutheticate)
+                {
+                    //SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    SmtpServer.UseDefaultCredentials = true;
+                    SmtpServer.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+                }
                 if (inUsername.Trim().Length > 0 && inPassword.Trim().Length > 0)
                     SmtpServer.Credentials = new System.Net.NetworkCredential(inUsername, inPassword);
 

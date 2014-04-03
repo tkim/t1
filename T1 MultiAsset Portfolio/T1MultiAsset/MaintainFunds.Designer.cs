@@ -30,9 +30,6 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -49,6 +46,9 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lb_ActionNeeded = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -59,17 +59,6 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.cb_Active = new System.Windows.Forms.CheckBox();
             this.dg_Fund = new System.Windows.Forms.DataGridView();
-            this.FundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._ExtID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FundName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ShortName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FundAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.crncy = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CreatedDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ClosedDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Active = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.AllowTrade = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.ParentFundID = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.bt_SaveFund = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.cb_FundCapital = new System.Windows.Forms.CheckBox();
@@ -108,6 +97,19 @@
             this.pg_StartDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pg_EndDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bt_SavePortfolioGroup = new System.Windows.Forms.Button();
+            this.FundID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._ExtID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._ExtID2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._ExtID3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FundName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ShortName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FundAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.crncy = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CreatedDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ClosedDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Active = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.AllowTrade = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ParentFundID = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dg_MissingFunds)).BeginInit();
             this.groupBox3.SuspendLayout();
@@ -134,7 +136,7 @@
             this.groupBox1.ForeColor = System.Drawing.Color.MediumBlue;
             this.groupBox1.Location = new System.Drawing.Point(0, 544);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1032, 155);
+            this.groupBox1.Size = new System.Drawing.Size(1117, 155);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Map \'External Fund\' to Internal Fund";
@@ -216,7 +218,7 @@
             this.groupBox3.ForeColor = System.Drawing.Color.DarkGreen;
             this.groupBox3.Location = new System.Drawing.Point(0, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1032, 185);
+            this.groupBox3.Size = new System.Drawing.Size(1117, 185);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Maintain Funds";
@@ -249,6 +251,8 @@
             this.dg_Fund.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FundID,
             this._ExtID,
+            this._ExtID2,
+            this._ExtID3,
             this.FundName,
             this.ShortName,
             this.FundAmount,
@@ -260,126 +264,17 @@
             this.ParentFundID});
             this.dg_Fund.Location = new System.Drawing.Point(6, 35);
             this.dg_Fund.Name = "dg_Fund";
-            this.dg_Fund.Size = new System.Drawing.Size(1019, 144);
+            this.dg_Fund.Size = new System.Drawing.Size(1104, 144);
             this.dg_Fund.TabIndex = 1;
             this.dg_Fund.DragEnter += new System.Windows.Forms.DragEventHandler(this.dg_Fund_DragEnter);
             this.dg_Fund.DragDrop += new System.Windows.Forms.DragEventHandler(this.dg_Fund_DragDrop);
-            // 
-            // FundID
-            // 
-            this.FundID.Frozen = true;
-            this.FundID.HeaderText = "FundID";
-            this.FundID.Name = "FundID";
-            this.FundID.Visible = false;
-            this.FundID.Width = 67;
-            // 
-            // _ExtID
-            // 
-            this._ExtID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this._ExtID.Frozen = true;
-            this._ExtID.HeaderText = "ExtID";
-            this._ExtID.MaxInputLength = 256;
-            this._ExtID.MinimumWidth = 75;
-            this._ExtID.Name = "_ExtID";
-            this._ExtID.ToolTipText = "Enter the Prime Broker\'s FundID for reporting & matching";
-            this._ExtID.Width = 75;
-            // 
-            // FundName
-            // 
-            this.FundName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.FundName.Frozen = true;
-            this.FundName.HeaderText = "Fund Name";
-            this.FundName.MinimumWidth = 125;
-            this.FundName.Name = "FundName";
-            this.FundName.ToolTipText = "Enter the Name you want to show for this Fund";
-            this.FundName.Width = 125;
-            // 
-            // ShortName
-            // 
-            this.ShortName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ShortName.HeaderText = "Short Name";
-            this.ShortName.MinimumWidth = 50;
-            this.ShortName.Name = "ShortName";
-            this.ShortName.ToolTipText = "Enter the Short Name you want to show for this Fund";
-            this.ShortName.Width = 88;
-            // 
-            // FundAmount
-            // 
-            this.FundAmount.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle3.Format = "C2";
-            this.FundAmount.DefaultCellStyle = dataGridViewCellStyle3;
-            this.FundAmount.HeaderText = "Fund Size";
-            this.FundAmount.Name = "FundAmount";
-            this.FundAmount.ReadOnly = true;
-            this.FundAmount.ToolTipText = "Read-only:  Size of the Fund at Start-of-Day";
-            this.FundAmount.Width = 79;
-            // 
-            // crncy
-            // 
-            this.crncy.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.crncy.HeaderText = "Currency";
-            this.crncy.Name = "crncy";
-            this.crncy.ToolTipText = "Base Currency of The Fund";
-            this.crncy.Width = 74;
-            // 
-            // CreatedDate
-            // 
-            this.CreatedDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle4.Format = "dd-MMM-yyyy";
-            dataGridViewCellStyle4.NullValue = null;
-            this.CreatedDate.DefaultCellStyle = dataGridViewCellStyle4;
-            this.CreatedDate.HeaderText = "Created Date";
-            this.CreatedDate.Name = "CreatedDate";
-            this.CreatedDate.Width = 95;
-            // 
-            // ClosedDate
-            // 
-            this.ClosedDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            dataGridViewCellStyle5.Format = "dd-MMM-yyyy";
-            dataGridViewCellStyle5.NullValue = null;
-            this.ClosedDate.DefaultCellStyle = dataGridViewCellStyle5;
-            this.ClosedDate.HeaderText = "Closed Date";
-            this.ClosedDate.Name = "ClosedDate";
-            this.ClosedDate.Width = 90;
-            // 
-            // Active
-            // 
-            this.Active.FalseValue = "N";
-            this.Active.HeaderText = "Active";
-            this.Active.Name = "Active";
-            this.Active.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Active.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.Active.ToolTipText = "Use Internal Brokers for x-ing between Portfolios within a Fund/changing Strategi" +
-                "es for attribution.";
-            this.Active.TrueValue = "Y";
-            this.Active.Width = 62;
-            // 
-            // AllowTrade
-            // 
-            this.AllowTrade.FalseValue = "N";
-            this.AllowTrade.HeaderText = "Trading Fund";
-            this.AllowTrade.Name = "AllowTrade";
-            this.AllowTrade.ToolTipText = "For ParentFunds, This is typically \'N\' as Trading in Sub-Funds and Settle in Pare" +
-                "ntFund";
-            this.AllowTrade.TrueValue = "Y";
-            this.AllowTrade.Width = 76;
-            // 
-            // ParentFundID
-            // 
-            this.ParentFundID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ParentFundID.HeaderText = "Parent Fund";
-            this.ParentFundID.MinimumWidth = 125;
-            this.ParentFundID.Name = "ParentFundID";
-            this.ParentFundID.ToolTipText = "Choose a Settlement Fund or Leave Blank if this is a Settlement Fund itself";
-            this.ParentFundID.Width = 125;
             // 
             // bt_SaveFund
             // 
             this.bt_SaveFund.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bt_SaveFund.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bt_SaveFund.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.bt_SaveFund.Location = new System.Drawing.Point(965, 9);
+            this.bt_SaveFund.Location = new System.Drawing.Point(1050, 9);
             this.bt_SaveFund.Name = "bt_SaveFund";
             this.bt_SaveFund.Size = new System.Drawing.Size(60, 20);
             this.bt_SaveFund.TabIndex = 0;
@@ -397,7 +292,7 @@
             this.groupBox2.ForeColor = System.Drawing.Color.DarkGreen;
             this.groupBox2.Location = new System.Drawing.Point(6, 6);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(965, 295);
+            this.groupBox2.Size = new System.Drawing.Size(1050, 295);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Fund Capital inflows / outflows";
@@ -406,7 +301,7 @@
             // 
             this.cb_FundCapital.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cb_FundCapital.AutoSize = true;
-            this.cb_FundCapital.Location = new System.Drawing.Point(767, 12);
+            this.cb_FundCapital.Location = new System.Drawing.Point(852, 12);
             this.cb_FundCapital.Name = "cb_FundCapital";
             this.cb_FundCapital.Size = new System.Drawing.Size(125, 17);
             this.cb_FundCapital.TabIndex = 2;
@@ -444,7 +339,7 @@
             this.dg_FundCapital.Location = new System.Drawing.Point(6, 35);
             this.dg_FundCapital.Name = "dg_FundCapital";
             this.dg_FundCapital.ReadOnly = true;
-            this.dg_FundCapital.Size = new System.Drawing.Size(952, 254);
+            this.dg_FundCapital.Size = new System.Drawing.Size(1037, 254);
             this.dg_FundCapital.TabIndex = 1;
             this.dg_FundCapital.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dg_FundCapital_CellBeginEdit);
             this.dg_FundCapital.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg_FundCapital_CellEndEdit);
@@ -557,7 +452,7 @@
             this.bt_SaveFundCapital.Enabled = false;
             this.bt_SaveFundCapital.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bt_SaveFundCapital.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.bt_SaveFundCapital.Location = new System.Drawing.Point(898, 9);
+            this.bt_SaveFundCapital.Location = new System.Drawing.Point(983, 9);
             this.bt_SaveFundCapital.Name = "bt_SaveFundCapital";
             this.bt_SaveFundCapital.Size = new System.Drawing.Size(60, 20);
             this.bt_SaveFundCapital.TabIndex = 0;
@@ -575,7 +470,7 @@
             this.tabControl1.Location = new System.Drawing.Point(6, 205);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(985, 333);
+            this.tabControl1.Size = new System.Drawing.Size(1070, 333);
             this.tabControl1.TabIndex = 8;
             // 
             // tabPage_Capital
@@ -584,7 +479,7 @@
             this.tabPage_Capital.Location = new System.Drawing.Point(4, 22);
             this.tabPage_Capital.Name = "tabPage_Capital";
             this.tabPage_Capital.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_Capital.Size = new System.Drawing.Size(977, 307);
+            this.tabPage_Capital.Size = new System.Drawing.Size(1062, 307);
             this.tabPage_Capital.TabIndex = 0;
             this.tabPage_Capital.Text = "Fund Capital inflows / outflows";
             this.tabPage_Capital.UseVisualStyleBackColor = true;
@@ -855,11 +750,140 @@
             this.bt_SavePortfolioGroup.UseVisualStyleBackColor = true;
             this.bt_SavePortfolioGroup.Click += new System.EventHandler(this.bt_SavePortfolioGroup_Click);
             // 
+            // FundID
+            // 
+            this.FundID.Frozen = true;
+            this.FundID.HeaderText = "FundID";
+            this.FundID.Name = "FundID";
+            this.FundID.Visible = false;
+            this.FundID.Width = 67;
+            // 
+            // _ExtID
+            // 
+            this._ExtID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this._ExtID.Frozen = true;
+            this._ExtID.HeaderText = "ExtID";
+            this._ExtID.MaxInputLength = 256;
+            this._ExtID.MinimumWidth = 75;
+            this._ExtID.Name = "_ExtID";
+            this._ExtID.ToolTipText = "Enter the Prime Broker\'s FundID for reporting & matching";
+            this._ExtID.Width = 75;
+            // 
+            // _ExtID2
+            // 
+            this._ExtID2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this._ExtID2.Frozen = true;
+            this._ExtID2.HeaderText = "ExtID2";
+            this._ExtID2.MinimumWidth = 75;
+            this._ExtID2.Name = "_ExtID2";
+            this._ExtID2.ToolTipText = "Enter if the Prime Broker has a Secondary FundID for reporting & matching";
+            this._ExtID2.Width = 75;
+            // 
+            // _ExtID3
+            // 
+            this._ExtID3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this._ExtID3.Frozen = true;
+            this._ExtID3.HeaderText = "ExtID3";
+            this._ExtID3.MinimumWidth = 75;
+            this._ExtID3.Name = "_ExtID3";
+            this._ExtID3.ToolTipText = "Enter if the Prime Broker has a Tertiary FundID for reporting & matching";
+            this._ExtID3.Width = 75;
+            // 
+            // FundName
+            // 
+            this.FundName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.FundName.Frozen = true;
+            this.FundName.HeaderText = "Fund Name";
+            this.FundName.MinimumWidth = 125;
+            this.FundName.Name = "FundName";
+            this.FundName.ToolTipText = "Enter the Name you want to show for this Fund";
+            this.FundName.Width = 125;
+            // 
+            // ShortName
+            // 
+            this.ShortName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.ShortName.HeaderText = "Short Name";
+            this.ShortName.MinimumWidth = 50;
+            this.ShortName.Name = "ShortName";
+            this.ShortName.ToolTipText = "Enter the Short Name you want to show for this Fund";
+            this.ShortName.Width = 88;
+            // 
+            // FundAmount
+            // 
+            this.FundAmount.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.Format = "C2";
+            this.FundAmount.DefaultCellStyle = dataGridViewCellStyle3;
+            this.FundAmount.HeaderText = "Fund Size";
+            this.FundAmount.Name = "FundAmount";
+            this.FundAmount.ReadOnly = true;
+            this.FundAmount.ToolTipText = "Read-only:  Size of the Fund at Start-of-Day";
+            this.FundAmount.Width = 79;
+            // 
+            // crncy
+            // 
+            this.crncy.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.crncy.HeaderText = "Currency";
+            this.crncy.Name = "crncy";
+            this.crncy.ToolTipText = "Base Currency of The Fund";
+            this.crncy.Width = 74;
+            // 
+            // CreatedDate
+            // 
+            this.CreatedDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            dataGridViewCellStyle4.Format = "dd-MMM-yyyy";
+            dataGridViewCellStyle4.NullValue = null;
+            this.CreatedDate.DefaultCellStyle = dataGridViewCellStyle4;
+            this.CreatedDate.HeaderText = "Created Date";
+            this.CreatedDate.Name = "CreatedDate";
+            this.CreatedDate.Width = 95;
+            // 
+            // ClosedDate
+            // 
+            this.ClosedDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            dataGridViewCellStyle5.Format = "dd-MMM-yyyy";
+            dataGridViewCellStyle5.NullValue = null;
+            this.ClosedDate.DefaultCellStyle = dataGridViewCellStyle5;
+            this.ClosedDate.HeaderText = "Closed Date";
+            this.ClosedDate.Name = "ClosedDate";
+            this.ClosedDate.Width = 90;
+            // 
+            // Active
+            // 
+            this.Active.FalseValue = "N";
+            this.Active.HeaderText = "Active";
+            this.Active.Name = "Active";
+            this.Active.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Active.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.Active.ToolTipText = "Use Internal Brokers for x-ing between Portfolios within a Fund/changing Strategi" +
+                "es for attribution.";
+            this.Active.TrueValue = "Y";
+            this.Active.Width = 62;
+            // 
+            // AllowTrade
+            // 
+            this.AllowTrade.FalseValue = "N";
+            this.AllowTrade.HeaderText = "Trading Fund";
+            this.AllowTrade.Name = "AllowTrade";
+            this.AllowTrade.ToolTipText = "For ParentFunds, This is typically \'N\' as Trading in Sub-Funds and Settle in Pare" +
+                "ntFund";
+            this.AllowTrade.TrueValue = "Y";
+            this.AllowTrade.Width = 76;
+            // 
+            // ParentFundID
+            // 
+            this.ParentFundID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.ParentFundID.HeaderText = "Parent Fund";
+            this.ParentFundID.MinimumWidth = 125;
+            this.ParentFundID.Name = "ParentFundID";
+            this.ParentFundID.ToolTipText = "Choose a Settlement Fund or Leave Blank if this is a Settlement Fund itself";
+            this.ParentFundID.Width = 125;
+            // 
             // MaintainFunds
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1032, 711);
+            this.ClientSize = new System.Drawing.Size(1117, 711);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
@@ -928,17 +952,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn pg_StartDate;
         private System.Windows.Forms.DataGridViewTextBoxColumn pg_EndDate;
         private System.Windows.Forms.CheckBox cb_Active;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FundID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn _ExtID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FundName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ShortName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FundAmount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn crncy;
-        private System.Windows.Forms.DataGridViewTextBoxColumn CreatedDate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ClosedDate;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn Active;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn AllowTrade;
-        private System.Windows.Forms.DataGridViewComboBoxColumn ParentFundID;
         private System.Windows.Forms.DataGridViewComboBoxColumn fc_FundID;
         private System.Windows.Forms.DataGridViewComboBoxColumn fc_AccountID;
         private System.Windows.Forms.DataGridViewTextBoxColumn fc_EffectiveDate;
@@ -949,6 +962,19 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn fc_CapitalID;
         private System.Windows.Forms.DataGridViewTextBoxColumn fc_ShowRow;
         private System.Windows.Forms.DataGridViewTextBoxColumn fc_Active;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FundID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _ExtID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _ExtID2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _ExtID3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FundName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ShortName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FundAmount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn crncy;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CreatedDate;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ClosedDate;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Active;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn AllowTrade;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ParentFundID;
 
     }
 }

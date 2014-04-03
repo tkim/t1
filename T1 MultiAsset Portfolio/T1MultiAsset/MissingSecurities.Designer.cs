@@ -33,6 +33,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.dg_MissingSecurities = new System.Windows.Forms.DataGridView();
             this.bt_Refresh = new System.Windows.Forms.Button();
+            this.bt_Manual = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dg_MissingSecurities)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,7 +45,7 @@
             this.label1.ForeColor = System.Drawing.Color.DarkBlue;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(1065, 143);
+            this.label1.Size = new System.Drawing.Size(1065, 151);
             this.label1.TabIndex = 0;
             this.label1.Text = resources.GetString("label1.Text");
             // 
@@ -75,7 +76,7 @@
             // 
             this.bt_Refresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bt_Refresh.ForeColor = System.Drawing.Color.DarkGreen;
-            this.bt_Refresh.Location = new System.Drawing.Point(12, 163);
+            this.bt_Refresh.Location = new System.Drawing.Point(12, 165);
             this.bt_Refresh.Name = "bt_Refresh";
             this.bt_Refresh.Size = new System.Drawing.Size(117, 20);
             this.bt_Refresh.TabIndex = 25;
@@ -83,11 +84,24 @@
             this.bt_Refresh.UseVisualStyleBackColor = true;
             this.bt_Refresh.Click += new System.EventHandler(this.bt_SendToBrokers_Click);
             // 
+            // bt_Manual
+            // 
+            this.bt_Manual.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bt_Manual.ForeColor = System.Drawing.Color.DarkBlue;
+            this.bt_Manual.Location = new System.Drawing.Point(166, 165);
+            this.bt_Manual.Name = "bt_Manual";
+            this.bt_Manual.Size = new System.Drawing.Size(117, 20);
+            this.bt_Manual.TabIndex = 26;
+            this.bt_Manual.Text = "Manually Create the Ticker";
+            this.bt_Manual.UseVisualStyleBackColor = true;
+            this.bt_Manual.Click += new System.EventHandler(this.bt_Manual_Click);
+            // 
             // MissingSecurities
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1089, 558);
+            this.Controls.Add(this.bt_Manual);
             this.Controls.Add(this.bt_Refresh);
             this.Controls.Add(this.dg_MissingSecurities);
             this.Controls.Add(this.label1);
@@ -105,5 +119,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView dg_MissingSecurities;
         private System.Windows.Forms.Button bt_Refresh;
+        private System.Windows.Forms.Button bt_Manual;
     }
 }

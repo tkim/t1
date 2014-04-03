@@ -40,6 +40,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
             this.label1 = new System.Windows.Forms.Label();
             this.dg_Orders = new System.Windows.Forms.DataGridView();
             this.cb_ShowProcessed = new System.Windows.Forms.CheckBox();
@@ -59,21 +60,6 @@
             this.cb_SelectAll = new System.Windows.Forms.CheckBox();
             this.bt_Save = new System.Windows.Forms.Button();
             this.dg_Fills = new System.Windows.Forms.DataGridView();
-            this.f_OrderRefID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_FillNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_BBG_Ticker = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_BrokerID = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.f_FillAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_FillPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_ManualFill = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.f_Confirmed = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.f_TradeDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_SettlementDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_RoutedAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_BBG_Broker = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.f_BBG_StrategyType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dg_Fills_Allocation = new System.Windows.Forms.DataGridView();
             this.fa_OrderRefID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.fa_FundID = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -105,6 +91,21 @@
             this.bt_EMSX = new System.Windows.Forms.Button();
             this.cb_Portfolio = new System.Windows.Forms.ComboBox();
             this.cb_PartFilled = new System.Windows.Forms.CheckBox();
+            this.f_OrderRefID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_FillNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_BBG_Ticker = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_BrokerID = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.f_FillAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_FillPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_ManualFill = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.f_Confirmed = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.f_TradeDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_SettlementDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_RoutedAmount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_Side = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.f_BBG_Broker = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.f_BBG_StrategyType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dg_Orders)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dg_OrdersSplit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dg_Fills)).BeginInit();
@@ -377,145 +378,6 @@
             this.dg_Fills.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dg_Fills_CellClick);
             this.dg_Fills.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dg_Fills_DataError);
             this.dg_Fills.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dg_Fills_KeyUp);
-            // 
-            // f_OrderRefID
-            // 
-            this.f_OrderRefID.HeaderText = "OrderRefID";
-            this.f_OrderRefID.Name = "f_OrderRefID";
-            this.f_OrderRefID.ReadOnly = true;
-            this.f_OrderRefID.Visible = false;
-            // 
-            // f_FillNo
-            // 
-            this.f_FillNo.HeaderText = "FillNo";
-            this.f_FillNo.Name = "f_FillNo";
-            this.f_FillNo.ReadOnly = true;
-            this.f_FillNo.Visible = false;
-            // 
-            // f_BBG_Ticker
-            // 
-            this.f_BBG_Ticker.HeaderText = "BBG_Ticker";
-            this.f_BBG_Ticker.Name = "f_BBG_Ticker";
-            this.f_BBG_Ticker.ReadOnly = true;
-            this.f_BBG_Ticker.Visible = false;
-            // 
-            // f_BrokerID
-            // 
-            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.MediumBlue;
-            this.f_BrokerID.DefaultCellStyle = dataGridViewCellStyle8;
-            this.f_BrokerID.HeaderText = "Broker Name";
-            this.f_BrokerID.MinimumWidth = 150;
-            this.f_BrokerID.Name = "f_BrokerID";
-            this.f_BrokerID.ReadOnly = true;
-            this.f_BrokerID.Width = 150;
-            // 
-            // f_FillAmount
-            // 
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            dataGridViewCellStyle9.Format = "N0";
-            this.f_FillAmount.DefaultCellStyle = dataGridViewCellStyle9;
-            this.f_FillAmount.HeaderText = "Fill Amount";
-            this.f_FillAmount.Name = "f_FillAmount";
-            this.f_FillAmount.ReadOnly = true;
-            this.f_FillAmount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_FillAmount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // f_FillPrice
-            // 
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            dataGridViewCellStyle10.Format = "N6";
-            dataGridViewCellStyle10.NullValue = null;
-            this.f_FillPrice.DefaultCellStyle = dataGridViewCellStyle10;
-            this.f_FillPrice.HeaderText = "Fill Price";
-            this.f_FillPrice.Name = "f_FillPrice";
-            this.f_FillPrice.ReadOnly = true;
-            this.f_FillPrice.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_FillPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // f_ManualFill
-            // 
-            this.f_ManualFill.FalseValue = "N";
-            this.f_ManualFill.HeaderText = "Manual";
-            this.f_ManualFill.Name = "f_ManualFill";
-            this.f_ManualFill.ReadOnly = true;
-            this.f_ManualFill.TrueValue = "Y";
-            // 
-            // f_Confirmed
-            // 
-            this.f_Confirmed.FalseValue = "N";
-            this.f_Confirmed.HeaderText = "Confirmed";
-            this.f_Confirmed.Name = "f_Confirmed";
-            this.f_Confirmed.ReadOnly = true;
-            this.f_Confirmed.TrueValue = "Y";
-            this.f_Confirmed.Visible = false;
-            // 
-            // f_TradeDate
-            // 
-            dataGridViewCellStyle11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            dataGridViewCellStyle11.Format = "dd-MMM-yyyy";
-            this.f_TradeDate.DefaultCellStyle = dataGridViewCellStyle11;
-            this.f_TradeDate.HeaderText = "Trade Date";
-            this.f_TradeDate.Name = "f_TradeDate";
-            this.f_TradeDate.ReadOnly = true;
-            this.f_TradeDate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_TradeDate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // f_SettlementDate
-            // 
-            dataGridViewCellStyle12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            dataGridViewCellStyle12.Format = "dd-MMM-yyyy";
-            this.f_SettlementDate.DefaultCellStyle = dataGridViewCellStyle12;
-            this.f_SettlementDate.HeaderText = "Settlement Date";
-            this.f_SettlementDate.Name = "f_SettlementDate";
-            this.f_SettlementDate.ReadOnly = true;
-            this.f_SettlementDate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // f_Amount
-            // 
-            this.f_Amount.HeaderText = "Amount";
-            this.f_Amount.Name = "f_Amount";
-            this.f_Amount.ReadOnly = true;
-            this.f_Amount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_Amount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.f_Amount.Visible = false;
-            // 
-            // f_RoutedAmount
-            // 
-            this.f_RoutedAmount.HeaderText = "Routed Amount";
-            this.f_RoutedAmount.Name = "f_RoutedAmount";
-            this.f_RoutedAmount.ReadOnly = true;
-            this.f_RoutedAmount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_RoutedAmount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.f_RoutedAmount.Visible = false;
-            // 
-            // f_Side
-            // 
-            this.f_Side.HeaderText = "Side";
-            this.f_Side.Name = "f_Side";
-            this.f_Side.ReadOnly = true;
-            this.f_Side.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_Side.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.f_Side.Visible = false;
-            // 
-            // f_BBG_Broker
-            // 
-            this.f_BBG_Broker.HeaderText = "BBG_Broker";
-            this.f_BBG_Broker.Name = "f_BBG_Broker";
-            this.f_BBG_Broker.ReadOnly = true;
-            this.f_BBG_Broker.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_BBG_Broker.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.f_BBG_Broker.Visible = false;
-            // 
-            // f_BBG_StrategyType
-            // 
-            this.f_BBG_StrategyType.HeaderText = "BBG_StrategyType";
-            this.f_BBG_StrategyType.Name = "f_BBG_StrategyType";
-            this.f_BBG_StrategyType.ReadOnly = true;
-            this.f_BBG_StrategyType.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.f_BBG_StrategyType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.f_BBG_StrategyType.Visible = false;
             // 
             // dg_Fills_Allocation
             // 
@@ -865,6 +727,150 @@
             this.cb_PartFilled.UseVisualStyleBackColor = true;
             this.cb_PartFilled.CheckedChanged += new System.EventHandler(this.cb_PartFilled_CheckedChanged);
             // 
+            // f_OrderRefID
+            // 
+            this.f_OrderRefID.HeaderText = "OrderRefID";
+            this.f_OrderRefID.Name = "f_OrderRefID";
+            this.f_OrderRefID.ReadOnly = true;
+            this.f_OrderRefID.Visible = false;
+            // 
+            // f_FillNo
+            // 
+            this.f_FillNo.HeaderText = "FillNo";
+            this.f_FillNo.Name = "f_FillNo";
+            this.f_FillNo.ReadOnly = true;
+            this.f_FillNo.Visible = false;
+            // 
+            // f_BBG_Ticker
+            // 
+            this.f_BBG_Ticker.HeaderText = "BBG_Ticker";
+            this.f_BBG_Ticker.Name = "f_BBG_Ticker";
+            this.f_BBG_Ticker.ReadOnly = true;
+            this.f_BBG_Ticker.Visible = false;
+            // 
+            // f_BrokerID
+            // 
+            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.MediumBlue;
+            this.f_BrokerID.DefaultCellStyle = dataGridViewCellStyle8;
+            this.f_BrokerID.HeaderText = "Broker Name";
+            this.f_BrokerID.MinimumWidth = 150;
+            this.f_BrokerID.Name = "f_BrokerID";
+            this.f_BrokerID.ReadOnly = true;
+            this.f_BrokerID.Width = 150;
+            // 
+            // f_FillAmount
+            // 
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            dataGridViewCellStyle9.Format = "N0";
+            this.f_FillAmount.DefaultCellStyle = dataGridViewCellStyle9;
+            this.f_FillAmount.HeaderText = "Fill Amount";
+            this.f_FillAmount.Name = "f_FillAmount";
+            this.f_FillAmount.ReadOnly = true;
+            this.f_FillAmount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_FillAmount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // f_FillPrice
+            // 
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            dataGridViewCellStyle10.Format = "N6";
+            dataGridViewCellStyle10.NullValue = null;
+            this.f_FillPrice.DefaultCellStyle = dataGridViewCellStyle10;
+            this.f_FillPrice.HeaderText = "Fill Price";
+            this.f_FillPrice.Name = "f_FillPrice";
+            this.f_FillPrice.ReadOnly = true;
+            this.f_FillPrice.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_FillPrice.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // f_ManualFill
+            // 
+            this.f_ManualFill.FalseValue = "N";
+            this.f_ManualFill.HeaderText = "Manual";
+            this.f_ManualFill.Name = "f_ManualFill";
+            this.f_ManualFill.ReadOnly = true;
+            this.f_ManualFill.TrueValue = "Y";
+            // 
+            // f_Confirmed
+            // 
+            this.f_Confirmed.FalseValue = "N";
+            this.f_Confirmed.HeaderText = "Confirmed";
+            this.f_Confirmed.Name = "f_Confirmed";
+            this.f_Confirmed.ReadOnly = true;
+            this.f_Confirmed.TrueValue = "Y";
+            this.f_Confirmed.Visible = false;
+            // 
+            // f_TradeDate
+            // 
+            dataGridViewCellStyle11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            dataGridViewCellStyle11.Format = "dd-MMM-yyyy";
+            this.f_TradeDate.DefaultCellStyle = dataGridViewCellStyle11;
+            this.f_TradeDate.HeaderText = "Trade Date";
+            this.f_TradeDate.Name = "f_TradeDate";
+            this.f_TradeDate.ReadOnly = true;
+            this.f_TradeDate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_TradeDate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // f_SettlementDate
+            // 
+            dataGridViewCellStyle12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            dataGridViewCellStyle12.Format = "dd-MMM-yyyy";
+            this.f_SettlementDate.DefaultCellStyle = dataGridViewCellStyle12;
+            this.f_SettlementDate.HeaderText = "Settlement Date";
+            this.f_SettlementDate.Name = "f_SettlementDate";
+            this.f_SettlementDate.ReadOnly = true;
+            this.f_SettlementDate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // f_Amount
+            // 
+            this.f_Amount.HeaderText = "Amount";
+            this.f_Amount.Name = "f_Amount";
+            this.f_Amount.ReadOnly = true;
+            this.f_Amount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_Amount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.f_Amount.Visible = false;
+            // 
+            // f_RoutedAmount
+            // 
+            this.f_RoutedAmount.HeaderText = "Routed Amount";
+            this.f_RoutedAmount.Name = "f_RoutedAmount";
+            this.f_RoutedAmount.ReadOnly = true;
+            this.f_RoutedAmount.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_RoutedAmount.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.f_RoutedAmount.Visible = false;
+            // 
+            // f_Side
+            // 
+            dataGridViewCellStyle13.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.f_Side.DefaultCellStyle = dataGridViewCellStyle13;
+            this.f_Side.HeaderText = "Side";
+            this.f_Side.Items.AddRange(new object[] {
+            "S",
+            "SS",
+            "B",
+            "BS"});
+            this.f_Side.Name = "f_Side";
+            this.f_Side.ReadOnly = true;
+            this.f_Side.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // f_BBG_Broker
+            // 
+            this.f_BBG_Broker.HeaderText = "BBG_Broker";
+            this.f_BBG_Broker.Name = "f_BBG_Broker";
+            this.f_BBG_Broker.ReadOnly = true;
+            this.f_BBG_Broker.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_BBG_Broker.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.f_BBG_Broker.Visible = false;
+            // 
+            // f_BBG_StrategyType
+            // 
+            this.f_BBG_StrategyType.HeaderText = "BBG_StrategyType";
+            this.f_BBG_StrategyType.Name = "f_BBG_StrategyType";
+            this.f_BBG_StrategyType.ReadOnly = true;
+            this.f_BBG_StrategyType.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.f_BBG_StrategyType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.f_BBG_StrategyType.Visible = false;
+            // 
             // ProcessOrders
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -967,7 +973,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn f_SettlementDate;
         private System.Windows.Forms.DataGridViewTextBoxColumn f_Amount;
         private System.Windows.Forms.DataGridViewTextBoxColumn f_RoutedAmount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn f_Side;
+        private System.Windows.Forms.DataGridViewComboBoxColumn f_Side;
         private System.Windows.Forms.DataGridViewTextBoxColumn f_BBG_Broker;
         private System.Windows.Forms.DataGridViewTextBoxColumn f_BBG_StrategyType;
     }

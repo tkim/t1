@@ -37,6 +37,9 @@ namespace T1MultiAsset
 
             cb_Fund.SelectedIndex = 0;
 
+            mySql = "Select Max(EffectiveDate) From Positions Where EffectiveDate < (Select  Max(EffectiveDate) From Positions)";
+            dtp_AsAtDate.Value = SystemLibrary.SQLSelectDateTime(mySql, dtp_AsAtDate.Value);
+
         } //NAVReconcileReport_Load()
 
         public void FromParent(Form inForm)

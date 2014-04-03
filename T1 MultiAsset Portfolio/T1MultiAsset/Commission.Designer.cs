@@ -69,6 +69,7 @@
             this.bt_New.TabIndex = 2;
             this.bt_New.Text = "New";
             this.bt_New.UseVisualStyleBackColor = true;
+            this.bt_New.Click += new System.EventHandler(this.bt_New_Click);
             // 
             // bt_Save
             // 

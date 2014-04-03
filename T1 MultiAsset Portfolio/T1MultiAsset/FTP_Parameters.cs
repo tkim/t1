@@ -37,6 +37,10 @@ namespace T1MultiAsset
             tb_Interval_seconds.Text = SystemLibrary.FTPVars.Interval_seconds.ToString();
             tb_LastUpdate.Text = SystemLibrary.FTPVars.LastUpdate.ToShortDateString();
 
+            tb_gnupg_Path.Text = SystemLibrary.SQLSelectString("select dbo.f_GetParamString('gnupg_Path')");
+            tb_EMSI_Crypt_Key.Text = SystemLibrary.SQLSelectString("select dbo.f_GetParamString('EMSI_Crypt_Key')");
+            tb_EMSI_Path.Text = SystemLibrary.SQLSelectString("select dbo.f_GetParamString('EMSI_Path')");
+
         } // FTP_Parameters_Load()
 
         public void Startup(object myParent)
@@ -47,8 +51,16 @@ namespace T1MultiAsset
 
         private void bt_Save_Click(object sender, EventArgs e)
         {
+            // Local Variables
+            String mySql;
+            int myRows;
             String retVal;
             Int32 Interval_seconds = 0;
+
+
+            // Set the Cursor
+            Cursor.Current = Cursors.WaitCursor;
+
             retVal = SystemLibrary.FTPTestStructure(tb_ServerIP.Text, tb_UserID.Text, tb_Password.Text);
             // Now make sure EMSX fields loaded
             if (tb_EMSXFileNameStartsWith.Text.Length < 1)
@@ -67,6 +79,8 @@ namespace T1MultiAsset
                                    this.Text + " - Test Connection", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
                     == DialogResult.No)
                 {
+                    // reset the Cursor
+                    Cursor.Current = Cursors.Default;
                     return;
                 }
             }
@@ -84,6 +98,37 @@ namespace T1MultiAsset
 
             SystemLibrary.FTPSaveStructure();
             frm1.BloombergEMSXFileConfigured = true;
+
+            // gnupg_Path
+            mySql = "Update System_Parameters Set p_string = '" + tb_gnupg_Path.Text + "' Where Parameter_Name = 'gnupg_Path'";
+            myRows = SystemLibrary.SQLExecute(mySql);
+            if (myRows < 1)
+            {
+                mySql = "Insert Into System_Parameters (Parameter_Name, p_string) Select 'gnupg_Path','" + tb_gnupg_Path.Text + "' Where Not Exists (Select 'x' From System_Parameters Where Parameter_Name = 'gnupg_Path')";
+                myRows = SystemLibrary.SQLExecute(mySql);
+            }
+
+            // EMSI_Crypt_Key
+            mySql = "Update System_Parameters Set p_string = '" + tb_EMSI_Crypt_Key.Text + "' Where Parameter_Name = 'EMSI_Crypt_Key'";
+            myRows = SystemLibrary.SQLExecute(mySql);
+            if (myRows < 1)
+            {
+                mySql = "Insert Into System_Parameters (Parameter_Name, p_string) Select 'EMSI_Crypt_Key','" + tb_EMSI_Crypt_Key.Text + "' Where Not Exists (Select 'x' From System_Parameters Where Parameter_Name = 'EMSI_Crypt_Key')";
+                myRows = SystemLibrary.SQLExecute(mySql);
+            }
+
+            // EMSI_Path
+            mySql = "Update System_Parameters Set p_string = '" + tb_EMSI_Path.Text + "' Where Parameter_Name = 'EMSI_Path'";
+            myRows = SystemLibrary.SQLExecute(mySql);
+            if (myRows < 1)
+            {
+                mySql = "Insert Into System_Parameters (Parameter_Name, p_string) Select 'EMSI_Path','" + tb_EMSI_Path.Text + "' Where Not Exists (Select 'x' From System_Parameters Where Parameter_Name = 'EMSI_Path')";
+                myRows = SystemLibrary.SQLExecute(mySql);
+            }
+
+            // reset the Cursor
+            Cursor.Current = Cursors.Default;
+
             this.Close();
 
         } //bt_Save_Click()

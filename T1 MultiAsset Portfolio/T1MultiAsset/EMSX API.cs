@@ -354,9 +354,15 @@ namespace T1MultiAsset
                     Element reason = msg.GetElement(REASON);
                     try
                     {
+                        String CATEGORY = "";
+                        String DESCRIPTION = "";
+                        if (reason.HasElement(CATEGORY))
+                            CATEGORY = reason.GetElement(CATEGORY).GetValueAsString();
+                        if (reason.HasElement(DESCRIPTION))
+                            DESCRIPTION = reason.GetElement(DESCRIPTION).GetValueAsString();
+
                         Console.WriteLine("EMSX API[" + evt.Type.ToString() + " - " + msg.MessageType.ToString() + "(" + msg.TopicName + "] Reason=" +
-                                reason.GetElement(CATEGORY).GetValueAsString() +
-                                ": " + reason.GetElement(DESCRIPTION).GetValueAsString());
+                                CATEGORY + ": " + DESCRIPTION);
                     }
                     catch
                     {
@@ -863,7 +869,8 @@ namespace T1MultiAsset
             {
                 // Even though this code is on a seperate thread it seems to lock up the main code, so release resources on each loop.
                 Application.DoEvents();
-                SystemLibrary.DebugLine("ProcessBlpEvent - message Loop");
+                SystemLibrary.DebugLine("ProcessBlpEvent - message Loop ");
+                //Console.WriteLine("ProcessBlpEvent - message Loop {0}", message);
 
                 if (message.HasElement("MSG_TYPE") && message.HasElement("MSG_SUB_TYPE") && message.HasElement("EVENT_STATUS"))
                 {

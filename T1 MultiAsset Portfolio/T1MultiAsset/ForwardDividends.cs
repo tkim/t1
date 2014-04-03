@@ -31,6 +31,8 @@ namespace T1MultiAsset
             public DateTime EffectiveDate; // Payable Date
             public Decimal Quantity;
             public Decimal Amount;
+            public String CustodianName;
+            public String GPB_Transaction_ID;
         }
 
         public static DivStruct Div = new DivStruct();
@@ -171,7 +173,7 @@ namespace T1MultiAsset
 
             dt_Dividends = SystemLibrary.SQLSelectToDataTable(mySql);
             dg_Dividends.DataSource = dt_Dividends;
-            ParentForm1.SetFormatColumn(dg_Dividends, @"DPS $", Color.Empty, Color.LightCyan, "N6", "0");
+            ParentForm1.SetFormatColumn(dg_Dividends, @"DPS $", Color.Empty, Color.LightCyan, "N8", "0");
             ParentForm1.SetFormatColumn(dg_Dividends, "Franking", Color.Empty, Color.Empty, "0.0%", "0");
             ParentForm1.SetFormatColumn(dg_Dividends, "Withholding Tax Rate", Color.Empty, Color.Empty, "0.000%", "0.000%");
             dg_Dividends.Columns["BBG_Ticker"].HeaderText = "Ticker";
@@ -277,9 +279,11 @@ namespace T1MultiAsset
                 }
 
                 // Apply Dividends From minDate
+                int oldTimeOut = SystemLibrary.SQLAlterTimeOut(0);
                 mySQL = "Exec sp_Apply_Dividends_From '" + minDate.ToString("dd-MMM-yyyy") + "' ";
                 SystemLibrary.SQLExecute(mySQL);
                 SystemLibrary.SQLExecute("Exec sp_SOD_Positions");
+                SystemLibrary.SQLAlterTimeOut(oldTimeOut);
 
                 // Refresh the Data
                 dateTimePicker1_ValueChanged(null, null);
@@ -528,6 +532,8 @@ namespace T1MultiAsset
             if (inRow < 0)
                 return;
 
+            Div.CustodianName = SystemLibrary.ToString(dg_MissingDivs["CustodianName", inRow].Value);
+            Div.GPB_Transaction_ID = SystemLibrary.ToString(dg_MissingDivs["GPB_Transaction_ID", inRow].Value);
             Div.ParentFundID = SystemLibrary.ToInt32(dg_MissingDivs["FundID", inRow].Value);
             Div.BBG_Ticker = SystemLibrary.ToString(dg_MissingDivs["BBG_Ticker", inRow].Value);
             if (dg_MissingDivs["Ex Date", inRow].Value == DBNull.Value)
@@ -577,6 +583,12 @@ namespace T1MultiAsset
             dg_Transactions.Refresh();
             if (dg_Transactions.Rows.Count == 1)
             {
+                Decimal NewTranAmount = SystemLibrary.ToDecimal(dg_Transactions["Amount", 0].Value) - SystemLibrary.ToDecimal(dt_Transactions.Rows[0]["Amount", DataRowVersion.Original]);
+                String TranType = "Misc Income";
+
+                if (NewTranAmount < 0)
+                    TranType = "Misc Expenses";
+
                 if (SystemLibrary.ToDecimal(dg_Transactions["Amount", 0].Value) != Div.Amount)
                 {
                     if (MessageBox.Show("Dividend Amount of "+SystemLibrary.ToDecimal(dg_Transactions["Amount", 0].Value).ToString("$#,###.00") + "\r\n" +
@@ -589,13 +601,30 @@ namespace T1MultiAsset
                 // hourglass cursor
                 Cursor.Current = Cursors.WaitCursor;
 
-                String mySql = "Update Transactions Set Amount = " + dg_Transactions["Amount", 0].Value.ToString() + " Where TranID = " + dg_Transactions["TranID", 0].Value.ToString();
-                SystemLibrary.SQLExecute(mySql);
+                String TranId = SystemLibrary.SQLSelectString("Exec sp_GetNextID 'TranID'");
+                String JournalID = SystemLibrary.SQLSelectString("Exec sp_GetNextID 'JournalID'");
+
+                String mySql = "Insert into Transactions (TranID, AccountID, FundID, PortfolioID, crncy, EffectiveDate, RecordDate, Amount, Reconcilled, Description, TranType, JournalID) " +
+                               "Select " + TranId + ", AccountID, FundID, PortfolioID, crncy, EffectiveDate, RecordDate, " + NewTranAmount.ToString() + ", " +
+                               "       'Y', Substring(Description + ' - Journal Adjustment',1, 200), " +
+                               "       '" + TranType + "', " + JournalID + " " + 
+                               "From Transactions " +
+                               "Where TranID = " + dg_Transactions["TranID", 0].Value.ToString();
+                int myRows = SystemLibrary.SQLExecute(mySql);
+                mySql = "Update Transactions Set JournalID = " + JournalID + ", Reconcilled = 'Y' Where TranID = " + dg_Transactions["TranID", 0].Value.ToString();
+                myRows = SystemLibrary.SQLExecute(mySql);
+                /*
+                if (Div.CustodianName=='SCOTIA')
+                {
+                    mySql = "Update SCOTIA_CASHSTMNT Set 
+                }
+                 */
                 SystemLibrary.SQLExecute("Exec sp_ML_Process_File '', 'ML_E239'");
                 SystemLibrary.SQLExecute("Exec sp_Scotia_Process_File '', 'SCOTIA_CASHSTMNT'");
                 SystemLibrary.SQLExecute("Exec sp_Scotia_Process_File '', 'SCOTIA_ACCTHIST'");
-                SystemLibrary.SQLExecute("Exec sp_Calc_Profit_RebuildFrom '" + Div.EffectiveDate.ToString("dd-MMM-yyyy") + "' ");
-                SystemLibrary.SQLExecute("Exec sp_SOD_Positions ");
+                SystemLibrary.SQLExecute("Exec sp_apply_Trans_To_Profit");
+                //SystemLibrary.SQLExecute("Exec sp_Calc_Profit_RebuildFrom '" + Div.EffectiveDate.ToString("dd-MMM-yyyy") + "' ");
+                //SystemLibrary.SQLExecute("Exec sp_SOD_Positions ");
                 dt_Transactions.Rows.Clear();
                 LoadMissingDivs();
 

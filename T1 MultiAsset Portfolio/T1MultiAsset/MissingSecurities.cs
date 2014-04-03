@@ -157,5 +157,24 @@ namespace T1MultiAsset
 
         } //bt_SendToBrokers_Click()
 
+        private void bt_Manual_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("If the security is a valid Bloomberg Ticker, then this is the WRONG path to take.\r\n\r\n" +
+                                "In that case, please model the Ticker in the [Trade] area and the system will look after you.\r\n\r\n" +
+                                "Do you wish to continue?", "Manual Ticker Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            {
+                String BBG_Ticker = "";
+                MaintainSecurities f = new MaintainSecurities();
+                f = (MaintainSecurities)SystemLibrary.FormExists(f, false);
+                if (dg_MissingSecurities.Rows.Count > 0)
+                {
+                    BBG_Ticker = SystemLibrary.ToString(dg_MissingSecurities.Rows[0].Cells["PARSEKYABLE_DES"].Value);
+                }
+                f.FromParent(ParentForm1, BBG_Ticker);
+                f.Show(); //(this);
+            }
+
+        } //bt_SendToBrokers_Click()
+
     }
 }

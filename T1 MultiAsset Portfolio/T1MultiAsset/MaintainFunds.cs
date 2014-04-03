@@ -79,7 +79,7 @@ namespace T1MultiAsset
             // Reseting dt_fund based in Active = 'Y' can cause issues.
             dg_Fund.Rows.Clear();
 
-            mySql = "Select FundID, ExtID, FundName, ShortName, FundAmount, crncy, CreatedDate, ClosedDate, Active, ParentFundID, AllowTrade " +
+            mySql = "Select FundID, ExtID, ExtID2, ExtID3, FundName, ShortName, FundAmount, crncy, CreatedDate, ClosedDate, Active, ParentFundID, AllowTrade " +
                     "From   Fund ";
             if (cb_Active.Checked == true)
                 mySql = mySql + "Where    Active = 'Y ' ";
@@ -111,6 +111,8 @@ namespace T1MultiAsset
                     int myRow = dg_Fund.Rows.Add();
                     dg_Fund["FundID", myRow].Value = dr["FundID"];
                     dg_Fund["_ExtID", myRow].Value = dr["ExtID"];
+                    dg_Fund["_ExtID2", myRow].Value = dr["ExtID2"];
+                    dg_Fund["_ExtID3", myRow].Value = dr["ExtID3"];
                     dg_Fund["FundName", myRow].Value = dr["FundName"].ToString();
                     dg_Fund["ShortName", myRow].Value = dr["ShortName"].ToString();
                     dg_Fund["FundAmount", myRow].Value = dr["FundAmount"].ToString();
@@ -225,6 +227,14 @@ namespace T1MultiAsset
                     {
                         dgr.Cells["_ExtID"].Value = "";
                     }
+                    if (dgr.Cells["_ExtID2"].Value == null)
+                    {
+                        dgr.Cells["_ExtID2"].Value = "";
+                    }
+                    if (dgr.Cells["_ExtID3"].Value == null)
+                    {
+                        dgr.Cells["_ExtID3"].Value = "";
+                    }
                     if (SystemLibrary.ToString(dgr.Cells["CreatedDate"].Value).Trim().Length == 0)
                     {
                         dgr.Cells["CreatedDate"].Value = DateTime.Now.Date;
@@ -268,6 +278,8 @@ namespace T1MultiAsset
                     SystemLibrary.DebugLine(dgr.Cells["FundID"].Value.ToString());
                     String mySql = "Update  Fund " +
                                    "Set     ExtID = '" + dgr.Cells["_ExtID"].Value.ToString().Replace("'", "''") + "', " +
+                                   "        ExtID2 = '" + dgr.Cells["_ExtID2"].Value.ToString().Replace("'", "''") + "', " +
+                                   "        ExtID3 = '" + dgr.Cells["_ExtID3"].Value.ToString().Replace("'", "''") + "', " +
                                    "        FundName = '" + dgr.Cells["FundName"].Value.ToString().Replace("'", "''") + "', " +
                                    "        ShortName = '" + dgr.Cells["ShortName"].Value.ToString().Replace("'", "''") + "', " +
                                    "        crncy = '" + dgr.Cells["crncy"].Value.ToString() + "', " +
@@ -300,8 +312,10 @@ namespace T1MultiAsset
                         else
                             ClosedDate = " null ";
 
-                        mySql = "Insert into Fund (FundID, ExtID, FundName, ShortName, FundAmount, crncy, CreatedDate, ClosedDate, Active, ParentFundID, AllowTrade) " +
+                        mySql = "Insert into Fund (FundID, ExtID, ExtID2, ExtID3, FundName, ShortName, FundAmount, crncy, CreatedDate, ClosedDate, Active, ParentFundID, AllowTrade) " +
                                 "Values (" + dgr.Cells["FundID"].Value.ToString() + ", '" + dgr.Cells["_ExtID"].Value.ToString().Replace("'", "''") + "', " +
+                                "        '" + dgr.Cells["_ExtID2"].Value.ToString().Replace("'", "''") + "', " +
+                                "        '" + dgr.Cells["_ExtID3"].Value.ToString().Replace("'", "''") + "', " +
                                 "        '" + dgr.Cells["FundName"].Value.ToString().Replace("'", "''") + "', " +
                                 "        '" + dgr.Cells["ShortName"].Value.ToString().Replace("'", "''") + "', 0, '" + dgr.Cells["crncy"].Value.ToString() + "', " +
                                 "        '" + Convert.ToDateTime(dgr.Cells["CreatedDate"].Value).ToString("dd-MMM-yyyy") + "', " +

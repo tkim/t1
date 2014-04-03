@@ -28,14 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint1 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(39083, 10000);
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint2 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(39448, -5000);
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint3 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(39814, 45000);
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint4 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(40179, 20000);
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint9 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(39083, 10000);
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint10 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(39448, -5000);
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint11 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(39814, 45000);
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint12 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(40179, 20000);
             this.cb_hasFundID = new System.Windows.Forms.CheckBox();
             this.cb_Fund = new System.Windows.Forms.ComboBox();
             this.cb_Portfolio = new System.Windows.Forms.ComboBox();
@@ -62,6 +63,12 @@
             this.cb_PCT = new System.Windows.Forms.CheckBox();
             this.cb_OnlyTotal = new System.Windows.Forms.CheckBox();
             this.bt_Back = new System.Windows.Forms.Button();
+            this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
+            this.cb_BySector = new System.Windows.Forms.CheckBox();
+            this.cb_ByCountry = new System.Windows.Forms.CheckBox();
+            this.cb_ByIndustry = new System.Windows.Forms.CheckBox();
+            this.cb_BySubIndustry = new System.Windows.Forms.CheckBox();
+            this.cb_TotalByStock = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dg_ReportProfit)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tp_Chart.SuspendLayout();
@@ -184,14 +191,14 @@
             this.dg_ReportProfit.Location = new System.Drawing.Point(6, 6);
             this.dg_ReportProfit.Name = "dg_ReportProfit";
             this.dg_ReportProfit.ReadOnly = true;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.MidnightBlue;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.AliceBlue;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dg_ReportProfit.RowHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.MidnightBlue;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.AliceBlue;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dg_ReportProfit.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dg_ReportProfit.RowHeadersVisible = false;
             this.dg_ReportProfit.Size = new System.Drawing.Size(1007, 394);
             this.dg_ReportProfit.TabIndex = 10;
@@ -298,35 +305,34 @@
             this.chart1.BorderlineColor = System.Drawing.Color.DimGray;
             this.chart1.BorderSkin.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Scaled;
             this.chart1.BorderSkin.BorderWidth = 0;
-            chartArea1.BackColor = System.Drawing.Color.Transparent;
-            chartArea1.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
-            chartArea1.BackSecondaryColor = System.Drawing.Color.White;
-            chartArea1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            chartArea1.Name = "ChartArea1";
-            chartArea1.ShadowColor = System.Drawing.Color.Transparent;
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.BackColor = System.Drawing.Color.Transparent;
-            legend1.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Row;
-            legend1.Name = "Legend1";
-            legend1.TableStyle = System.Windows.Forms.DataVisualization.Charting.LegendTableStyle.Wide;
-            this.chart1.Legends.Add(legend1);
+            chartArea3.BackColor = System.Drawing.Color.Transparent;
+            chartArea3.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
+            chartArea3.BackSecondaryColor = System.Drawing.Color.White;
+            chartArea3.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            chartArea3.Name = "ChartArea1";
+            chartArea3.ShadowColor = System.Drawing.Color.Transparent;
+            this.chart1.ChartAreas.Add(chartArea3);
+            legend3.BackColor = System.Drawing.Color.Transparent;
+            legend3.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
+            legend3.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend3.LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Row;
+            legend3.Name = "Legend1";
+            this.chart1.Legends.Add(legend3);
             this.chart1.Location = new System.Drawing.Point(3, 3);
             this.chart1.Margin = new System.Windows.Forms.Padding(0);
             this.chart1.Name = "chart1";
-            series1.BorderWidth = 3;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
-            series1.Legend = "Legend1";
-            series1.Name = "Profit";
-            series1.Points.Add(dataPoint1);
-            series1.Points.Add(dataPoint2);
-            series1.Points.Add(dataPoint3);
-            series1.Points.Add(dataPoint4);
-            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Date;
-            series1.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            this.chart1.Series.Add(series1);
+            series3.BorderWidth = 3;
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
+            series3.Legend = "Legend1";
+            series3.Name = "Profit";
+            series3.Points.Add(dataPoint9);
+            series3.Points.Add(dataPoint10);
+            series3.Points.Add(dataPoint11);
+            series3.Points.Add(dataPoint12);
+            series3.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Date;
+            series3.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            this.chart1.Series.Add(series3);
             this.chart1.Size = new System.Drawing.Size(1013, 403);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
@@ -406,11 +412,81 @@
             this.bt_Back.Visible = false;
             this.bt_Back.Click += new System.EventHandler(this.bt_Back_Click);
             // 
+            // toolTip2
+            // 
+            this.toolTip2.IsBalloon = true;
+            // 
+            // cb_BySector
+            // 
+            this.cb_BySector.AutoSize = true;
+            this.cb_BySector.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cb_BySector.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.cb_BySector.Location = new System.Drawing.Point(854, 23);
+            this.cb_BySector.Name = "cb_BySector";
+            this.cb_BySector.Size = new System.Drawing.Size(81, 17);
+            this.cb_BySector.TabIndex = 26;
+            this.cb_BySector.Text = "By Sector";
+            this.cb_BySector.UseVisualStyleBackColor = true;
+            // 
+            // cb_ByCountry
+            // 
+            this.cb_ByCountry.AutoSize = true;
+            this.cb_ByCountry.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cb_ByCountry.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.cb_ByCountry.Location = new System.Drawing.Point(764, 23);
+            this.cb_ByCountry.Name = "cb_ByCountry";
+            this.cb_ByCountry.Size = new System.Drawing.Size(87, 17);
+            this.cb_ByCountry.TabIndex = 27;
+            this.cb_ByCountry.Text = "By Country";
+            this.cb_ByCountry.UseVisualStyleBackColor = true;
+            // 
+            // cb_ByIndustry
+            // 
+            this.cb_ByIndustry.AutoSize = true;
+            this.cb_ByIndustry.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cb_ByIndustry.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.cb_ByIndustry.Location = new System.Drawing.Point(941, 22);
+            this.cb_ByIndustry.Name = "cb_ByIndustry";
+            this.cb_ByIndustry.Size = new System.Drawing.Size(89, 17);
+            this.cb_ByIndustry.TabIndex = 28;
+            this.cb_ByIndustry.Text = "By Industry";
+            this.cb_ByIndustry.UseVisualStyleBackColor = true;
+            // 
+            // cb_BySubIndustry
+            // 
+            this.cb_BySubIndustry.AutoSize = true;
+            this.cb_BySubIndustry.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cb_BySubIndustry.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.cb_BySubIndustry.Location = new System.Drawing.Point(854, 53);
+            this.cb_BySubIndustry.Name = "cb_BySubIndustry";
+            this.cb_BySubIndustry.Size = new System.Drawing.Size(115, 17);
+            this.cb_BySubIndustry.TabIndex = 29;
+            this.cb_BySubIndustry.Text = "By Sub-Industry";
+            this.cb_BySubIndustry.UseVisualStyleBackColor = true;
+            // 
+            // cb_TotalByStock
+            // 
+            this.cb_TotalByStock.AutoSize = true;
+            this.cb_TotalByStock.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cb_TotalByStock.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.cb_TotalByStock.Location = new System.Drawing.Point(674, 53);
+            this.cb_TotalByStock.Name = "cb_TotalByStock";
+            this.cb_TotalByStock.Size = new System.Drawing.Size(110, 17);
+            this.cb_TotalByStock.TabIndex = 30;
+            this.cb_TotalByStock.Text = "Total By Stock";
+            this.cb_TotalByStock.UseVisualStyleBackColor = true;
+            this.cb_TotalByStock.Visible = false;
+            // 
             // ReportProfit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1051, 564);
+            this.Controls.Add(this.cb_TotalByStock);
+            this.Controls.Add(this.cb_BySubIndustry);
+            this.Controls.Add(this.cb_ByIndustry);
+            this.Controls.Add(this.cb_ByCountry);
+            this.Controls.Add(this.cb_BySector);
             this.Controls.Add(this.bt_Back);
             this.Controls.Add(this.cb_OnlyTotal);
             this.Controls.Add(this.cb_PCT);
@@ -476,5 +552,11 @@
         private System.Windows.Forms.CheckBox cb_PCT;
         private System.Windows.Forms.CheckBox cb_OnlyTotal;
         private System.Windows.Forms.Button bt_Back;
+        private System.Windows.Forms.ToolTip toolTip2;
+        private System.Windows.Forms.CheckBox cb_BySector;
+        private System.Windows.Forms.CheckBox cb_ByCountry;
+        private System.Windows.Forms.CheckBox cb_ByIndustry;
+        private System.Windows.Forms.CheckBox cb_BySubIndustry;
+        private System.Windows.Forms.CheckBox cb_TotalByStock;
     }
 }

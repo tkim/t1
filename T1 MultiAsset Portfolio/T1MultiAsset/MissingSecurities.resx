@@ -121,10 +121,11 @@
     <value>This Screen is to deal with Securities that arrive via 3rd party systems that we do not have details on.
 It is currently extracting the security data from Bloomberg?
 
-If the security is a valid Bloomberg Ticker, then you can get the latest securities details in the system by Modeling a Trade. 
+IF THE SECURITY IS A VALID BLOOMBERG TICKER
+- Model the Security in the [TRADE] area
 You do not need to actually create an order, just access the ticker.
 
-If this security has come from say ML Prime and is different than the internal system, then you may choose to [Mark as Confirmed] the Trade casuing the issue. 
+If this security has come from say a Prime Broker and is different than the internal system, then you may choose to [Mark as Confirmed] the Trade causing the issue. 
 This screen will then be cleared.
 
 Press Refresh to test what Securities are outstanding.

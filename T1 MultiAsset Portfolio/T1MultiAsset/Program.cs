@@ -136,10 +136,21 @@ namespace T1MultiAsset
                                         // Get the file & remove from FTP server
                                         if (SystemLibrary.FTPDownloadFile(SystemLibrary.FTPVars, myFilePath, "", myFileName))
                                         {
+                                            // See if Encrypted
+                                            if (myFileName.EndsWith(".enc"))
+                                            {
+                                                String myDecryptName = "";
+                                                if (SystemLibrary.EMSX_Decrypt(myFilePath, myFileName, ref myDecryptName))
+                                                {
+                                                    SystemLibrary.EMSXSaveData(myFilePath, myDecryptName);
+                                                }
+                                            }
+                                            else
+                                                SystemLibrary.EMSXSaveData(myFilePath, myFileName);
                                             // Load into the Database
                                             //ToDo (3) 11-Mar-2011 - FTPDeleteFile() not removing files - why?
-                                            if (SystemLibrary.EMSXSaveData(myFilePath, myFileName))
-                                                SystemLibrary.FTPDeleteFile(SystemLibrary.FTPVars, "", myFileName);
+                                            //if (SystemLibrary.EMSXSaveData(myFilePath, myFileName))
+                                            //    SystemLibrary.FTPDeleteFile(SystemLibrary.FTPVars, "", myFileName);
                                         }
                                     }
                                 }

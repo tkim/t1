@@ -1,0 +1,15 @@
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\bin\Release\Tamir.SharpSSH.dll
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Release\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Release\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Release\Tamir.SharpSSH.dll
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Release\Tamir.SharpSSH.dll
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\ResolveAssemblyReference.cache
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\Tamir.SharpSSH.dll
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Release\Tamir.SharpSSH.dll
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\ResolveAssemblyReference.cache
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Release\Tamir.SharpSSH.dll

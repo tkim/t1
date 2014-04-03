@@ -185,7 +185,7 @@ namespace T1MultiAsset
             Cursor.Current = Cursors.Default;
             lb_Status.Text = "Completed. Please close this window"; Application.DoEvents();
             if (ErrorMessages.Length > 0)
-                lb_Status.Text = lb_Status.Text + "\r\n" + ErrorMessages;
+                lb_Status.Text = lb_Status.Text + "\r\n\r\nFound Error:\r\n" + ErrorMessages;
             //MessageBox.Show("EOD Prioes - Completed");
 
             // Reset the database timout

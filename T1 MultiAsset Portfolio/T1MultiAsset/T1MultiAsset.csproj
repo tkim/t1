@@ -311,6 +311,18 @@
     <Compile Include="MaintainFunds.Designer.cs">
       <DependentUpon>MaintainFunds.cs</DependentUpon>
     </Compile>
+    <Compile Include="MaintainPrices.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MaintainPrices.Designer.cs">
+      <DependentUpon>MaintainPrices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MaintainSecurities.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MaintainSecurities.designer.cs">
+      <DependentUpon>MaintainSecurities.cs</DependentUpon>
+    </Compile>
     <Compile Include="MissingSecurities.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -515,6 +527,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MaintainFunds.resx">
       <DependentUpon>MaintainFunds.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MaintainPrices.resx">
+      <DependentUpon>MaintainPrices.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MaintainSecurities.resx">
+      <DependentUpon>MaintainSecurities.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MissingSecurities.resx">
@@ -835,6 +855,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{967B4E0D-AD0C-4609-AB67-0FA40C0206D8}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SharpSSH\SharpSSH.csproj">
+      <Project>{D27CF69D-4681-492A-BE4D-D3D209104423}</Project>
+      <Name>SharpSSH</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

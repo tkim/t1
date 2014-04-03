@@ -1,0 +1,28 @@
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\bin\Debug\Tamir.SharpSSH.dll
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\bin\Debug\Tamir.SharpSSH.pdb
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Debug\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Debug\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Debug\Tamir.SharpSSH.dll
+C:\Users\Dad\Documents\Visual Studio 2008\Projects\Obelysk Backups\SharpSSH-1.1.1.13.src\SharpSSH-1.1.1.13.src\SharpSSH\obj\Debug\Tamir.SharpSSH.pdb
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Debug\Tamir.SharpSSH.dll
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Debug\Tamir.SharpSSH.pdb
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSSH.dll
+C:\Users\Dad\Documents\111_FromPhone\My Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSSH.pdb
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Debug\Tamir.SharpSSH.dll
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Debug\Tamir.SharpSSH.pdb
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSSH.dll
+C:\Users\colinr.AGORA\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSSH.pdb
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Debug\Tamir.SharpSSH.dll
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\bin\Debug\Tamir.SharpSSH.pdb
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSsh.jsch.examples.InputForm.resources
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\SharpSSH.csproj.GenerateResource.Cache
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSSH.dll
+C:\Users\petera\Documents\Visual Studio 2008\Projects\T1 MultiAsset Portfolio\SharpSSH\obj\Debug\Tamir.SharpSSH.pdb

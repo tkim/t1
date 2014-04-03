@@ -64,8 +64,13 @@ namespace T1MultiAsset
             Cursor.Current = Cursors.WaitCursor;
 
             // Let the Parent know this has close
+            SystemLibrary.SQLExecute("Exec sp_Update_Positions 'Y' ");
             if (ParentForm1 != null)
+            {
+                ParentForm1.SetUpSecurities_DataTable();
+                ParentForm1.LoadPortfolioIncr();
                 ParentForm1.LoadActionTab(true);
+            }
             SystemLibrary.DebugLine("ProcessOrders_FormClosed: Post LoadActionTab() ");
 
             Cursor.Current = Cursors.Default;

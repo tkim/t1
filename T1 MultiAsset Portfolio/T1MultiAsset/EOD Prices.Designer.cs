@@ -33,11 +33,14 @@
             // 
             // lb_Status
             // 
+            this.lb_Status.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lb_Status.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lb_Status.ForeColor = System.Drawing.Color.DarkGreen;
             this.lb_Status.Location = new System.Drawing.Point(29, 23);
             this.lb_Status.Name = "lb_Status";
-            this.lb_Status.Size = new System.Drawing.Size(470, 75);
+            this.lb_Status.Size = new System.Drawing.Size(470, 147);
             this.lb_Status.TabIndex = 0;
             this.lb_Status.Text = "Running Overnight Prices.";
             // 
@@ -45,7 +48,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(535, 107);
+            this.ClientSize = new System.Drawing.Size(535, 179);
             this.Controls.Add(this.lb_Status);
             this.Name = "EOD_Prices";
             this.Text = "EOD_Prices";

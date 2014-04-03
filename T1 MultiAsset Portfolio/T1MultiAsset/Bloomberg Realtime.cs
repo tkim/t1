@@ -28,9 +28,10 @@ namespace T1MultiAsset
         static private AutoResetEvent sm_apiSeqReceived = new AutoResetEvent(false);
 
         static String mktFields = "LAST_PRICE,THEO_PRICE";
-        static String refFields = "PX_POS_MULT_FACTOR,PX_ROUND_LOT_SIZE,PREV_CLOSE_VAL,UNDERLYING_SECURITY_DES,UNDL_CURRENCY,UNDL_SPOT_TICKER," +
+        static String refFields = "PX_POS_MULT_FACTOR,PX_ROUND_LOT_SIZE,PREV_CLOSE_VAL,UNDERLYING_SECURITY_DES,ADR_UNDL_TICKER,UNDL_CURRENCY,UNDL_SPOT_TICKER," +
                            "SECURITY_NAME,CRNCY,ID_BB_COMPANY,ID_BB_UNIQUE,ID_BB_GLOBAL,COUNTRY_FULL_NAME,INDUSTRY_SECTOR,INDUSTRY_GROUP,INDUSTRY_SUBGROUP,ID_CUSIP,ID_ISIN,ID_SEDOL1,SECURITY_TYP,SECURITY_TYP2,EXCH_CODE" +
-                           ",MARKET_SECTOR_DES,FUTURES_CATEGORY,NAME";
+                           ",MARKET_SECTOR_DES,FUTURES_CATEGORY,NAME,OCC_SYMBOL,DELTA";
+        static String OptionFields = "BID,ASK,DELTA_BID_RT,DELTA_ASK_RT,DELTA_LAST_RT";
         //static String refFieldsIndex = ",MARKET_SECTOR_DES,FUTURES_CATEGORY"; // INDUSTRY_SECTOR,INDUSTRY_GROUP
         //static String refFieldsComdty = ",MARKET_SECTOR_DES,FUTURES_CATEGORY";
         static private Boolean isClosing = false;
@@ -59,7 +60,7 @@ namespace T1MultiAsset
             // Create the dt_MktFields structure
             dt_MktFields.Columns.Add("BBG_Ticker");
 
-            String[] mktFieldsElements = mktFields.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            String[] mktFieldsElements = (mktFields + "," + OptionFields).Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             for (int j = 0; j < mktFieldsElements.Length; j++)
             {
                 DataColumn myCol = dt_MktFields.Columns.Add(mktFieldsElements[j]);
@@ -122,6 +123,7 @@ namespace T1MultiAsset
                 String myTicker = "";
                 String[] myFields = new String[1];
                 String[] myItems = new String[1];
+                String Req_mktFields;
                 int myColumns = dt_MktFields.Columns.Count;
 
 
@@ -217,14 +219,18 @@ namespace T1MultiAsset
                     {
                         String TickerID = SystemLibrary.ToString(dt_Port.Rows[i]["Ticker"]);
                         Boolean IsAggregate = SystemLibrary.YN_To_Bool(SystemLibrary.ToString(dt_Port.Rows[i]["IsAggregate"]));
+                        if (SystemLibrary.YN_To_Bool(SystemLibrary.ToString(dt_Port.Rows[i]["isOption"])))
+                            Req_mktFields = mktFields + "," + OptionFields;
+                        else
+                            Req_mktFields = mktFields;
                         if (TickerID.Length > 0 && !IsAggregate && !TickerCheck.Contains(TickerID))
                         {
                             TickerCheck.Add(TickerID);
                             securities.AppendValue(TickerID); // For Ref Data
                             if (TickerID.ToUpper().EndsWith(" CURNCY"))
-                                subscription = new Subscription(TickerID, mktFields, "interval=1");  // Slow down high frequency fields like Currency
+                                subscription = new Subscription(TickerID, Req_mktFields, "interval=1");  // Slow down high frequency fields like Currency
                             else
-                                subscription = new Subscription(TickerID, mktFields, sub_options);
+                                subscription = new Subscription(TickerID, Req_mktFields, sub_options);
                             subscriptions.Add(subscription);
 
                             // Check for Currency First (Otherwise a Ticker will cause the FX call later)
@@ -234,7 +240,7 @@ namespace T1MultiAsset
                                 TickerID = dt_Port.Rows[i]["crncy"].ToString() + inFund_Crncy + " Curncy";
                                 TickerCheck.Add(TickerID);
                                 securities.AppendValue(TickerID); // For Ref Data
-                                subscription = new Subscription(TickerID, mktFields, "interval=1");  // Slow down high frequency fields like Currency
+                                subscription = new Subscription(TickerID, Req_mktFields, "interval=1");  // Slow down high frequency fields like Currency
                                 subscriptions.Add(subscription);
                             }
 
@@ -328,8 +334,13 @@ namespace T1MultiAsset
 
         } //Bloomberg_RealtimeDisconnect()
 
-        public void Bloomberg_Request(String myTicker)
+        public void Bloomberg_Request(String myTicker, Boolean isOption)
         {
+            String MktSubscribeFields = mktFields;
+
+            if (isOption)
+                MktSubscribeFields = MktSubscribeFields + "," + OptionFields;
+
             try
             {
                 if (d_session == null)
@@ -343,7 +354,7 @@ namespace T1MultiAsset
                  */
                 List<Subscription> subscriptions = new List<Subscription>();
 
-                Subscription subscription = new Subscription(myTicker, mktFields);
+                Subscription subscription = new Subscription(myTicker, MktSubscribeFields);
                 subscriptions.Add(subscription);
                 d_session.Subscribe(subscriptions);
 
@@ -543,7 +554,7 @@ namespace T1MultiAsset
 
                     SystemLibrary.DebugLine(myTicker);
 
-                    String[] mktFieldsElements = mktFields.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    String[] mktFieldsElements = (mktFields + "," + OptionFields).Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     Array.Resize(ref myFields, mktFieldsElements.Length);
                     Array.Resize(ref myItems, mktFieldsElements.Length);
                     for (int j = 0; j < mktFieldsElements.Length; j++)
@@ -594,6 +605,8 @@ namespace T1MultiAsset
                                         ")myFields[0]=" + myFields[0] + ",myItems[0]=" + myItems[0] +
                                         ",myFields[1]=" + myFields[1] + ",myItems[1]=" + myItems[1]);
                         */
+                        //if (myTicker.StartsWith("NSC US 0"))
+                        //    Console.WriteLine("A");
                         m_form.SetValue(myTicker, myFields, myItems);
                         DataHasChanged = false;
                     }

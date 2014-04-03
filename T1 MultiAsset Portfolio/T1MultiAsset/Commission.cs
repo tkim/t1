@@ -143,6 +143,11 @@ namespace T1MultiAsset
             e.Row.Cells["Style"].Value = dgv_Commission.Rows[0].Cells["Style"].Value;
         } //cb_CommModel_SelectionChangeCommitted()
 
+        private void bt_New_Click(object sender, EventArgs e)
+        {
+
+        } //bt_New_Click()
+
 
     }
 }

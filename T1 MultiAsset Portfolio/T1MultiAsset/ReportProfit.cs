@@ -220,6 +220,11 @@ namespace T1MultiAsset
                     "Order by FundName, PortfolioName, EffectiveDate, BBG_Ticker, LS ";
 
             mySqlChart = mySqlChart + ", '" + SystemLibrary.Bool_To_YN(cb_OnlyTotal.Checked) + "' ";
+            mySqlChart = mySqlChart + ", '" + SystemLibrary.Bool_To_YN(cb_TotalByStock.Checked) + "' ";
+            mySqlChart = mySqlChart + ", '" + SystemLibrary.Bool_To_YN(cb_ByCountry.Checked) + "' ";
+            mySqlChart = mySqlChart + ", '" + SystemLibrary.Bool_To_YN(cb_BySector.Checked) + "' ";
+            mySqlChart = mySqlChart + ", '" + SystemLibrary.Bool_To_YN(cb_ByIndustry.Checked) + "' ";
+            mySqlChart = mySqlChart + ", '" + SystemLibrary.Bool_To_YN(cb_BySubIndustry.Checked) + "' ";
 
             dt_ReportProfit = SystemLibrary.SQLSelectToDataTable(mySql);
             dt_ChartProfit = SystemLibrary.SQLSelectToDataTable(mySqlChart);
@@ -265,83 +270,88 @@ namespace T1MultiAsset
 
         private void LoadChart()
         {
-            String myColumn = "Profit";
-            String myColumnAccum = "Accum_Profit";
-
-            if (cb_PCT.Checked)
+            try
             {
-                myColumn = "PCT";
-                myColumnAccum = "PCT";
-            }
+                String myColumn = "Profit";
+                String myColumnAccum = "Accum_Profit";
 
-            chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;
-
-            // Dispose of old series
-            for (int i = chart1.Series.Count; i > 0; i--)
-            {
-                //chart1.Series[0].Points.AddXY("fred", 6);
-                chart1.Series.RemoveAt(i - 1);
-            }
-
-            if (cb_DailyProfitnLoss.Checked)
-            {
-                // Not Accum
-                DataView dvData = new DataView(dt_ChartProfit);
-                chart1.DataBindCrossTable(dvData, "BBG_Ticker", "EffectiveDate", myColumn, ""); //, "Label=Profit{C}");
-
-                // Now set layout
-                for (int i = 0; i < chart1.Series.Count; i++)
-                {
-                    chart1.Series[i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
-                    chart1.Series[i].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Date;
-                }
                 if (cb_PCT.Checked)
-                    chart1.ChartAreas[0].AxisY.LabelStyle.Format = "0.00%"; 
-                else
-                    chart1.ChartAreas[0].AxisY.LabelStyle.Format = "$#,###";
-            }
-            else
-            {
-                // Not Accum
-                DataView dvData = new DataView(dt_ChartProfit);
-                chart1.DataBindCrossTable(dvData, "BBG_Ticker", "EffectiveDate", myColumnAccum, ""); //, "Label=Profit{C}");
-
-                // Now set layout as Stacked Area
-                int mySeriesCount = chart1.Series.Count;
-                for (int i = 0; i < mySeriesCount; i++)
                 {
-                    if (chart1.Series[i].Name == "Total")
+                    myColumn = "PCT";
+                    myColumnAccum = "PCT";
+                }
+
+                chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;
+
+                // Dispose of old series
+                for (int i = chart1.Series.Count; i > 0; i--)
+                {
+                    //chart1.Series[0].Points.AddXY("fred", 6);
+                    chart1.Series.RemoveAt(i - 1);
+                }
+
+                if (cb_DailyProfitnLoss.Checked)
+                {
+                    // Not Accum
+                    DataView dvData = new DataView(dt_ChartProfit);
+                    chart1.DataBindCrossTable(dvData, "BBG_Ticker", "EffectiveDate", myColumn, ""); //, "Label=Profit{C}");
+
+                    // Now set layout
+                    for (int i = 0; i < chart1.Series.Count; i++)
                     {
-                        chart1.Series[i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                        chart1.Series[i].Color = Color.Black;
-                        chart1.Series[i].BorderWidth = 3;
+                        chart1.Series[i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
+                        chart1.Series[i].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Date;
                     }
+                    if (cb_PCT.Checked)
+                        chart1.ChartAreas[0].AxisY.LabelStyle.Format = "0.00%";
                     else
-                        chart1.Series[i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
-                    chart1.Series[i].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Date;
-                    chart1.Series[i].Tag = chart1.Series[i].Name;
+                        chart1.ChartAreas[0].AxisY.LabelStyle.Format = "$#,###";
                 }
-                if (mySeriesCount == 1)
-                {
-                    chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    //chart1.Series[0].Color = Color.Black;
-                    chart1.Series[0].BorderWidth = 2;
-                }
-                if (cb_PCT.Checked)
-                    chart1.ChartAreas[0].AxisY.LabelStyle.Format = "0.00%";
                 else
-                    chart1.ChartAreas[0].AxisY.LabelStyle.Format = "$#,###";
-            }
+                {
+                    // Not Accum
+                    DataView dvData = new DataView(dt_ChartProfit);
+                    chart1.DataBindCrossTable(dvData, "BBG_Ticker", "EffectiveDate", myColumnAccum, ""); //, "Label=Profit{C}");
 
-            chart1.ChartAreas[0].AxisX.LabelStyle.Format = "dd-MMM-yy";
-            if (chart1.Legends.Count>0)
-            {
-                chart1.Legends[0].LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Table;
-                chart1.Legends[0].LegendItemOrder = System.Windows.Forms.DataVisualization.Charting.LegendItemOrder.ReversedSeriesOrder;
+                    // Now set layout as Stacked Area
+                    int mySeriesCount = chart1.Series.Count;
+                    for (int i = 0; i < mySeriesCount; i++)
+                    {
+                        if (chart1.Series[i].Name == "Total")
+                        {
+                            chart1.Series[i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                            chart1.Series[i].Color = Color.Black;
+                            chart1.Series[i].BorderWidth = 3;
+                        }
+                        else
+                            chart1.Series[i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
+                        chart1.Series[i].XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Date;
+                        chart1.Series[i].Tag = chart1.Series[i].Name;
+                    }
+                    if (mySeriesCount == 1)
+                    {
+                        chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                        //chart1.Series[0].Color = Color.Black;
+                        chart1.Series[0].BorderWidth = 2;
+                    }
+                    if (cb_PCT.Checked)
+                        chart1.ChartAreas[0].AxisY.LabelStyle.Format = "0.00%";
+                    else
+                        chart1.ChartAreas[0].AxisY.LabelStyle.Format = "$#,###";
+                }
+
+                chart1.ChartAreas[0].AxisX.LabelStyle.Format = "dd-MMM-yy";
+                if (chart1.Legends.Count > 0)
+                {
+                    //chart1.Legends[0].LegendStyle = System.Windows.Forms.DataVisualization.Charting.LegendStyle.Table;
+                    chart1.Legends[0].LegendItemOrder = System.Windows.Forms.DataVisualization.Charting.LegendItemOrder.ReversedSeriesOrder;
+                }
+
+                // Redraw
+                chart1.Invalidate();
+                chart1.ResetAutoValues();
             }
-            // Redraw
-            chart1.Invalidate();
-            chart1.ResetAutoValues();
+            catch { }
 
         } //LoadChart()
 
@@ -427,18 +437,43 @@ namespace T1MultiAsset
                 String myFormat = chart1.ChartAreas[0].AxisY.LabelStyle.Format;
                 DataPoint point = chart1.Series[result.Series.Name].Points[result.PointIndex];
 
-                // Change the appearance of the data point
-                point.BackSecondaryColor = Color.White;
-                point.BackHatchStyle = ChartHatchStyle.Percent25;
-                //point.BorderWidth = 2;
-                if (chart1.Series.Count>1)
-                    point.Label = result.Series.Name + "\r\n" + Convert.ToDouble(point.YValues[0]).ToString(myFormat);
+                if (1 == 1)
+                {
+                    String myToolTipTag = "";
+                    String myLabel = "";
+                    String myPointText = Convert.ToDouble(point.YValues[0]).ToString(myFormat);
+                    if (chart1.Series.Count > 1)
+                    {
+                        myLabel = result.Series.Name;
+                        myToolTipTag = result.Series.Name + "\r\n" + myPointText;
+                    }
+                    else
+                        myToolTipTag = myPointText;
+
+                    if (SystemLibrary.ToString(this.toolTip2.Tag) != myToolTipTag)
+                    {
+                        // Stops flickering
+                        this.toolTip2.Tag = myToolTipTag;
+                        this.toolTip2.ToolTipTitle = myLabel; 
+                        this.toolTip2.SetToolTip(this.chart1, myPointText);
+                    }
+                }
                 else
-                    point.Label = Convert.ToDouble(point.YValues[0]).ToString(myFormat);
-                point.LabelForeColor = Color.Blue;
-                //point.Font.Bold = true;
-                Font FontBold = new Font(point.Font, FontStyle.Bold);
-                //point.Font = FontBold;
+                {
+
+                    // Change the appearance of the data point
+                    point.BackSecondaryColor = Color.White;
+                    point.BackHatchStyle = ChartHatchStyle.Percent25;
+                    //point.BorderWidth = 2;
+                    if (chart1.Series.Count > 1)
+                        point.Label = result.Series.Name + "\r\n" + Convert.ToDouble(point.YValues[0]).ToString(myFormat);
+                    else
+                        point.Label = Convert.ToDouble(point.YValues[0]).ToString(myFormat);
+                    point.LabelForeColor = Color.Blue;
+                    //point.Font.Bold = true;
+                    Font FontBold = new Font(point.Font, FontStyle.Bold);
+                    //point.Font = FontBold;
+                }
             }
             else
             {
@@ -485,6 +520,15 @@ namespace T1MultiAsset
                     LoadTrades();
                 }
             }
+            else if (result.ChartElementType == ChartElementType.LegendItem)
+            {
+                Legend myLeg = (Legend)((LegendItem)result.Object).Legend;
+                
+                if (myLeg.LegendStyle == LegendStyle.Row)
+                    myLeg.LegendStyle = LegendStyle.Table;
+                else
+                    myLeg.LegendStyle = LegendStyle.Row;
+            }
 
         } //chart1_MouseDown()
 
@@ -507,6 +551,12 @@ namespace T1MultiAsset
             SystemLibrary.PositionFormOverParent(this, ParentForm1);
 
         } //ReportProfit_Shown()
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            LoadChart();
+
+        } //button1_Click()
 
 
     }

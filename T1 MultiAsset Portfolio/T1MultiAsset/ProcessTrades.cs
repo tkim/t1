@@ -176,7 +176,8 @@ namespace T1MultiAsset
                 ParentForm1.SetColumn(dg_Trades, "Commission", i);
                 ParentForm1.SetColumn(dg_Trades, "Stamp", i);
                 ParentForm1.SetColumn(dg_Trades, "GST", i);
-                ParentForm1.SetColumn(dg_Trades, "NetValue", i);
+                if (Math.Round(SystemLibrary.ToDecimal(dg_Trades.Rows[0].Cells["Quantity"].Value), 0) != SystemLibrary.ToDecimal(dg_Trades.Rows[0].Cells["Quantity"].Value))
+                    dg_Trades.Rows[0].Cells["Quantity"].Style.Format = "N2";
             }
 
 
@@ -329,6 +330,10 @@ namespace T1MultiAsset
                     dg_ForBrokers["RecordType", i].Style.ForeColor = Color.Red;
                 else
                     dg_ForBrokers["RecordType", i].Style.ForeColor = Color.Green;
+
+                if (Math.Round(SystemLibrary.ToDecimal(dg_ForBrokers.Rows[0].Cells["Quantity"].Value), 0) != SystemLibrary.ToDecimal(dg_ForBrokers.Rows[0].Cells["Quantity"].Value))
+                    dg_ForBrokers.Rows[0].Cells["Quantity"].Style.Format = "N2";
+
             }
 
         } //FormatForBrokers()
@@ -440,6 +445,8 @@ namespace T1MultiAsset
             {
                 if (dgr.Cells["ConfirmationNo"].Value.ToString().Length > 0)
                     dgr.Cells["Send"].Value = "Y";
+                if (Math.Round(SystemLibrary.ToDecimal(dgr.Cells["Quantity"].Value), 0) != SystemLibrary.ToDecimal(dgr.Cells["Quantity"].Value))
+                    dgr.Cells["Quantity"].Style.Format = "N2";
             }
 
             tabControl1.TabPages["tp_TradesForCustodian"].Text = "Step 3 - Broker Confirm / Trades For Custodian (" + dg_ForCustodians.Rows.Count.ToString() + ")";
@@ -500,15 +507,20 @@ namespace T1MultiAsset
             String mySql;
             String RunSODPositionsRebuild = "N";
             int myLastSendRow = -1;
-
+            DataTable dt_Check;
 
             // hourglass cursor
             Cursor.Current = Cursors.WaitCursor;
+
+            //Get the state from the database again to make sure hasn't already been processed.
+            mySql = "Exec sp_ProcessTrade_Load '" + SystemLibrary.Bool_To_YN(cb_AggregateTrades.Checked) + "' ";
+            dt_Check = SystemLibrary.SQLSelectToDataTable(mySql);
 
             // Establish the last Row with Send = 'Y'
             for (int i = 0; i < dg_Trades.Rows.Count; i++)
                 if (dg_Trades["Send", i].Value.ToString() == "Y")
                     myLastSendRow = i;
+
 
             for (int i = 0; i < dg_Trades.Rows.Count; i++)
             {
@@ -528,6 +540,15 @@ namespace T1MultiAsset
                         )
                     {
                         MessageBox.Show("Found NetValue does not equal sum of parts. Please adjust and try again.", bt_CreateTrades.Text);
+                        return;
+                    }
+                    // Make sure it hasn't already been processed
+                    DataRow[] dr = dt_Check.Select("OrderRefID='" + SystemLibrary.ToString(dg_Trades["OrderRefID", i].Value) + "'");
+                    if (dr.Length < 1)
+                    {
+                        MessageBox.Show("Found Some of the Orders had already been processed.\r\n\r\n" +
+                                        "Will run a Refresh on your behalf so that only unprocessed Orders remain on screen.", bt_CreateTrades.Text);
+                        LoadAll();
                         return;
                     }
                 }
@@ -622,7 +643,23 @@ namespace T1MultiAsset
             myFilePath = Broker_Path + @"\OutBound";
             if (!System.IO.Directory.Exists(myFilePath))
                 myFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            
+
+            //Get the state from the database again to make sure hasn't already been processed.
+            mySql = "Exec sp_ProcessTrade_ForBroker ";
+            DataTable dt_Check = SystemLibrary.SQLSelectToDataTable(mySql);
+
+            for (int i = 0; i < dg_ForBrokers.Rows.Count; i++)
+            {
+                // Make sure it hasn't already been processed
+                DataRow[] dr = dt_Check.Select("TradeID='" + SystemLibrary.ToString(dg_ForBrokers["TradeID", i].Value) + "'");
+                if (dr.Length < 1)
+                {
+                    MessageBox.Show("Found Some of the Trades have already been processed.\r\n\r\n" +
+                                    "Will run a Refresh on your behalf so that only unprocessed Trades remain on screen.", bt_SendToBrokers.Text);
+                    LoadAll();
+                    return;
+                }
+            }
             
             // TODO (5) When upgrade to .NET 4.0, then can use this
             // using (SmtpClient SmtpServer = new SmtpClient(ContractNote_SmtpClient))
@@ -1713,8 +1750,10 @@ namespace T1MultiAsset
                     mail.CC.Add(myStr);
             }
             if (Prime_BCCEmail != "")
-                mail.Bcc.Add(Prime_BCCEmail);
-
+            {
+                foreach (String myStr in Prime_BCCEmail.Split(",;".ToCharArray()))
+                    mail.Bcc.Add(myStr);
+            }
 
             mail.Attachments.Add(new Attachment(myFilePath));
 
@@ -1891,6 +1930,24 @@ namespace T1MultiAsset
         {
             //Local Variables
             String mySql;
+
+            //Get the state from the database again to make sure hasn't already been processed.
+            mySql = "Exec sp_ProcessTrade_ForBroker ";
+            DataTable dt_Check = SystemLibrary.SQLSelectToDataTable(mySql);
+
+            for (int i = 0; i < dg_ForBrokers.Rows.Count; i++)
+            {
+                // Make sure it hasn't already been processed
+                DataRow[] dr = dt_Check.Select("TradeID='" + SystemLibrary.ToString(dg_ForBrokers["TradeID", i].Value) + "'");
+                if (dr.Length < 1)
+                {
+                    MessageBox.Show("Found Some of the Trades have already been Marked as Sent.\r\n\r\n" +
+                                    "Will run a Refresh on your behalf so that only unsent Trades remain on screen.", bt_MarkAsSent.Text);
+                    LoadAll();
+                    return;
+                }
+            }
+
 
             if (MessageBox.Show(this, "WARNING: This will process the Trades\r\r\r\n" +
                           "\tHowever:  It WILL NOT generate any email telling the Broker the allocation.\r\n\r\n\r\n" +
@@ -2075,7 +2132,8 @@ namespace T1MultiAsset
                                     // Now filter the dt_ForCustodians
                                     DataRow[] FoundRows = dt_ForCustodians.Select("BBG_Ticker like '" + dr["Ticker"].ToString() + @"%' and " +
                                                                                   "BS = '" + dr["BS"].ToString() + "' and " +
-                                                                                  "Quantity = " + dr["Quantity"].ToString());
+                                                                                  "Quantity = " + dr["Quantity"].ToString() + " and " +
+                                                                                  "RecordType<>'cancel'");
                                     foreach (DataRow drt in FoundRows)
                                     {
                                         // Search myText for key items
@@ -2088,6 +2146,41 @@ namespace T1MultiAsset
                                             drt["ConfirmationNo"] = dr["ConfirmationNo"].ToString();
                                             dr["TradeID"] = drt["TradeID"];
                                             dr["Processed"] = "Y";
+
+                                            // Now update the database with all the data on this record, as the user may have changed to get it to match
+                                            String ClientTransactionID = SystemLibrary.ToString(drt["Client Transaction ID"]);
+                                            String myQuantity = SystemLibrary.ToString(drt["Quantity"]);
+                                            String Price = SystemLibrary.ToString(drt["Price"]);
+                                            Decimal d_GrossValue = SystemLibrary.ToDecimal(drt["GrossValue"]);
+                                            Decimal d_Commission = SystemLibrary.ToDecimal(drt["Commission"]);
+                                            String GrossValue = SystemLibrary.ToString(drt["GrossValue"]);
+                                            String Commission = SystemLibrary.ToString(drt["Commission"]);
+                                            String Stamp = SystemLibrary.ToDecimal(drt["Stamp"]).ToString();
+                                            String GST = SystemLibrary.ToString(drt["GST"]);
+                                            String NetValue = SystemLibrary.ToString(drt["NetValue"]);
+                                            Decimal CommissionRate = Math.Abs(Math.Round(d_Commission / d_GrossValue, 6));
+                                            DateTime Settlement_Date = Convert.ToDateTime(drt["SettlementDate"]);
+                                            String ConfirmationNo = SystemLibrary.ToString(drt["ConfirmationNo"]);
+
+                                            mySql = "Update Trade " +
+                                                    "Set    Quantity = " + myQuantity.ToString() + ", " +
+                                                    "       Price = " + Price.ToString() + ", " +
+                                                    "       GrossValue = " + GrossValue.ToString() + ", " +
+                                                    "       Commission = " + Commission.ToString() + ", " +
+                                                    "       Stamp = " + Stamp.ToString() + ", " +
+                                                    "       GST = " + GST.ToString() + ", " +
+                                                    "       NetValue = " + NetValue.ToString() + ", " +
+                                                    "       CommissionRate = " + CommissionRate.ToString() + ", " +
+                                                    "       SettlementDate = '" + Settlement_Date.ToString("dd-MMM-yyyy") + "', " +
+                                                    "       ConfirmationNo = '" + ConfirmationNo + "' " +
+                                                    "Where TradeID =  " + ClientTransactionID;
+
+                                            SystemLibrary.SQLExecute(mySql);
+
+                                            // Set the Transaction record to reflect the Trade record
+                                            mySql = "exec sp_ApplyTradeChangeToTransaction " + ClientTransactionID;
+                                            SystemLibrary.SQLExecute(mySql);
+
                                         }
                                     }
                                 }
@@ -2688,7 +2781,8 @@ namespace T1MultiAsset
                             File.WriteAllText(myFilePath + @"\" + myFileName, sb_Out.ToString());
 
                             // Drop the file into the Scotia Prime Web site.
-                            if (myForm.FTPToPrime("SCOTIA", myFilePath, myFileName))
+                            Boolean FtpResult = myForm.FTPToPrime("SCOTIA", myFilePath, myFileName);
+                            if (FtpResult)
                             {
                                 mySql = "Update SCOTIA_Out " +
                                         "Set    FileSent = dbo.f_GetDate(), " +
@@ -2701,7 +2795,8 @@ namespace T1MultiAsset
 
                                 myMessage = "Scotia file sent.\r\n\r\n";
                             }
-                            else
+
+                            if (!FtpResult || Custodian.ToLower() == "scotia")
                             {
                                 // FTP Failed, so trying email
                                 if (myForm.EmailToPrime("SCOTIA", myFilePath + @"\" + myFileName))

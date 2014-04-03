@@ -332,9 +332,10 @@
             this.label2.ForeColor = System.Drawing.Color.Blue;
             this.label2.Location = new System.Drawing.Point(3, 7);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(282, 13);
+            this.label2.Size = new System.Drawing.Size(621, 13);
             this.label2.TabIndex = 13;
-            this.label2.Text = "Alternatively Alter the Amount on the transaction";
+            this.label2.Text = "Alternatively Alter the Amount on the transaction which will add an Additional Tr" +
+                "ansaction for the difference.";
             // 
             // dg_Transactions
             // 

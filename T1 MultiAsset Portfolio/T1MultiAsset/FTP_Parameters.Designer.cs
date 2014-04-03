@@ -45,8 +45,16 @@
             this.bt_Save = new System.Windows.Forms.Button();
             this.bt_Test = new System.Windows.Forms.Button();
             this.bt_Cancel = new System.Windows.Forms.Button();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.tb_gnupg_Path = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.tb_EMSI_Crypt_Key = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.tb_EMSI_Path = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -124,7 +132,7 @@
             this.groupBox2.Controls.Add(this.tb_Interval_seconds);
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.tb_EMSXFileNameStartsWith);
-            this.groupBox2.Location = new System.Drawing.Point(12, 184);
+            this.groupBox2.Location = new System.Drawing.Point(12, 317);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(341, 155);
             this.groupBox2.TabIndex = 3;
@@ -188,7 +196,7 @@
             this.bt_Save.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.bt_Save.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bt_Save.ForeColor = System.Drawing.Color.DarkBlue;
-            this.bt_Save.Location = new System.Drawing.Point(21, 358);
+            this.bt_Save.Location = new System.Drawing.Point(21, 477);
             this.bt_Save.Name = "bt_Save";
             this.bt_Save.Size = new System.Drawing.Size(65, 30);
             this.bt_Save.TabIndex = 4;
@@ -200,7 +208,7 @@
             // 
             this.bt_Test.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bt_Test.ForeColor = System.Drawing.Color.Green;
-            this.bt_Test.Location = new System.Drawing.Point(101, 358);
+            this.bt_Test.Location = new System.Drawing.Point(101, 477);
             this.bt_Test.Name = "bt_Test";
             this.bt_Test.Size = new System.Drawing.Size(65, 30);
             this.bt_Test.TabIndex = 5;
@@ -213,7 +221,7 @@
             this.bt_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.bt_Cancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bt_Cancel.ForeColor = System.Drawing.Color.DarkBlue;
-            this.bt_Cancel.Location = new System.Drawing.Point(276, 358);
+            this.bt_Cancel.Location = new System.Drawing.Point(276, 477);
             this.bt_Cancel.Name = "bt_Cancel";
             this.bt_Cancel.Size = new System.Drawing.Size(65, 30);
             this.bt_Cancel.TabIndex = 6;
@@ -221,12 +229,79 @@
             this.bt_Cancel.UseVisualStyleBackColor = true;
             this.bt_Cancel.Click += new System.EventHandler(this.bt_Cancel_Click);
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Controls.Add(this.tb_gnupg_Path);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.tb_EMSI_Crypt_Key);
+            this.groupBox3.Controls.Add(this.label9);
+            this.groupBox3.Controls.Add(this.tb_EMSI_Path);
+            this.groupBox3.Location = new System.Drawing.Point(12, 170);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(341, 141);
+            this.groupBox3.TabIndex = 7;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Encryption Details";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.ForeColor = System.Drawing.Color.DarkBlue;
+            this.label7.Location = new System.Drawing.Point(10, 96);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(155, 13);
+            this.label7.TabIndex = 4;
+            this.label7.Text = "gnupg Directory if not c:\\gnupg";
+            // 
+            // tb_gnupg_Path
+            // 
+            this.tb_gnupg_Path.Location = new System.Drawing.Point(13, 112);
+            this.tb_gnupg_Path.Name = "tb_gnupg_Path";
+            this.tb_gnupg_Path.Size = new System.Drawing.Size(317, 20);
+            this.tb_gnupg_Path.TabIndex = 5;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.ForeColor = System.Drawing.Color.DarkBlue;
+            this.label8.Location = new System.Drawing.Point(10, 60);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(221, 13);
+            this.label8.TabIndex = 2;
+            this.label8.Text = "Crypt Key/passphrase needed to extract data";
+            // 
+            // tb_EMSI_Crypt_Key
+            // 
+            this.tb_EMSI_Crypt_Key.Location = new System.Drawing.Point(13, 76);
+            this.tb_EMSI_Crypt_Key.Name = "tb_EMSI_Crypt_Key";
+            this.tb_EMSI_Crypt_Key.Size = new System.Drawing.Size(317, 20);
+            this.tb_EMSI_Crypt_Key.TabIndex = 3;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.ForeColor = System.Drawing.Color.DarkBlue;
+            this.label9.Location = new System.Drawing.Point(9, 21);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(179, 13);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "\"keyrings\" Parent Directory Location";
+            // 
+            // tb_EMSI_Path
+            // 
+            this.tb_EMSI_Path.Location = new System.Drawing.Point(12, 37);
+            this.tb_EMSI_Path.Name = "tb_EMSI_Path";
+            this.tb_EMSI_Path.Size = new System.Drawing.Size(317, 20);
+            this.tb_EMSI_Path.TabIndex = 1;
+            // 
             // FTP_Parameters
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bt_Cancel;
-            this.ClientSize = new System.Drawing.Size(388, 411);
+            this.ClientSize = new System.Drawing.Size(388, 514);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.bt_Cancel);
             this.Controls.Add(this.bt_Test);
             this.Controls.Add(this.bt_Save);
@@ -239,6 +314,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -262,5 +339,12 @@
         private System.Windows.Forms.Button bt_Save;
         private System.Windows.Forms.Button bt_Test;
         private System.Windows.Forms.Button bt_Cancel;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox tb_EMSI_Crypt_Key;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox tb_EMSI_Path;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox tb_gnupg_Path;
     }
 }

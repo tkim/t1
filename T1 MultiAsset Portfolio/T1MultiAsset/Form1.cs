@@ -111,6 +111,7 @@ namespace T1MultiAsset
         public DateTime LastUpdated; // Used for dt_Port background calls to Update table if needed.
         private Boolean inStartUp = true;
         public DataTable dt_FX = new DataTable();
+        public DataTable dt_Options = new DataTable();
         public DataTable dt_Action = new DataTable();
         public DataTable dt_Last_Price = new DataTable();
 
@@ -194,7 +195,7 @@ namespace T1MultiAsset
         public int PortfolioID;
         public String Portfolio_Name;
         public Decimal Portfolio_Amount; // ??? Real ??
-        public String Portfolio_Crncy; // ??? Real ??
+        //public String Portfolio_Crncy; // ??? Real ??
 
         // dg_Port
         private object LastValue;
@@ -214,6 +215,9 @@ namespace T1MultiAsset
         // Splash screen
         SplashScreen frm_Splash;
         Boolean CloseForm = false;
+
+        // Visualisation
+        Boolean RitchViewerInstalled = false;
 
         // Process Creation DateTime
         DateTime ProcessDateTime;
@@ -245,7 +249,11 @@ namespace T1MultiAsset
             dg_Port_AltStyle = dg_Port.AlternatingRowsDefaultCellStyle;
             isBloombergUserLoad();
             isBloombergUser1Load();
+            isAnimateLoad();
             //isBloombergUser = false; //CFR 20140130
+
+            RitchViewerInstalled = FoundRitchViewer();
+            cb_Animate.Visible = RitchViewerInstalled;
 
             // initialize events
             m_SetValueCallback = new SetValueCallback(this.SetValue);
@@ -345,7 +353,7 @@ namespace T1MultiAsset
                 else
                     button4.Visible = false;
 
-                button4.Visible = true;
+                //button4.Visible = true;
 
                 // SOme objects Need to be called after the form has been created. Hence the Load event.
                 PositionLoad();
@@ -354,6 +362,7 @@ namespace T1MultiAsset
 
                 frm_Splash.SetPanelStatus(0.7, "Setting up data...");
                 SetUpFX_DataTable();
+                SetUpOptions_DataTable();
                 SetUpHeader();
 
                 // Get FundID & PortfolioID from the Registry
@@ -1066,7 +1075,7 @@ namespace T1MultiAsset
 
         private void SetUpLast_Price_DataTable()
         {
-            String mySql = "Select BBG_Ticker as Ticker, ID_BB_UNIQUE, Max(Prev_Close) as LAST_PRICE, 'N' as isNew From Positions_today Group By BBG_Ticker, ID_BB_UNIQUE Order BY BBG_Ticker";
+            String mySql = "Select BBG_Ticker as Ticker, ID_BB_UNIQUE, Max(Prev_Close) as LAST_PRICE, Max(Delta) as Delta, 'N' as isNew From Positions_today Group By BBG_Ticker, ID_BB_UNIQUE Order BY BBG_Ticker";
             dt_Last_Price = SystemLibrary.SQLSelectToDataTable(mySql);
 
             if (BPS_Index_Ticker.Length > 0)
@@ -1097,6 +1106,17 @@ namespace T1MultiAsset
             dt_FX.Columns.Add("ToFX");
             dt_FX.Columns.Add("PX_POS_MULT_FACTOR", System.Type.GetType("System.Decimal"));
             dt_FX.Columns.Add("LAST_PRICE", System.Type.GetType("System.Decimal"));
+        }
+
+        private void SetUpOptions_DataTable()
+        {
+            // BID,ASK,DELTA_BID_RT,DELTA_ASK_RT,DELTA_LAST_RT
+            dt_Options.Columns.Add("BBG_Ticker");
+            dt_Options.Columns.Add("BID", System.Type.GetType("System.Decimal"));
+            dt_Options.Columns.Add("ASK", System.Type.GetType("System.Decimal"));
+            dt_Options.Columns.Add("DELTA_BID_RT", System.Type.GetType("System.Decimal"));
+            dt_Options.Columns.Add("DELTA_ASK_RT", System.Type.GetType("System.Decimal"));
+            dt_Options.Columns.Add("DELTA_LAST_RT", System.Type.GetType("System.Decimal"));
         }
 
         private void SetUpHeader()
@@ -1302,12 +1322,12 @@ namespace T1MultiAsset
                 {
                     SetValueRG(dg_Header.Rows[5], "PL", (Long_PL + Short_PL + Future_PL) / Fund_Amount * 100m);
                     SetValueRG(dg_Header.Rows[5], "PL_Yest", BPS_PL_Yest * 100m);
-                    SetValueRG(dg_Header.Rows[5], "PL_MTD", (((1 + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1 + BPS_PL_MTD)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[5], "PL_WRoll", (((1 + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1 + BPS_PL_WRoll)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[5], "PL_MRoll", (((1 + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1 + BPS_PL_MRoll)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[5], "PL_Inception", (((1 + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1 + BPS_PL_Inception)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[5], "PL_YTD", (((1 + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1 + BPS_PL_YTD)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[5], "PL_YTD_July", (((1 + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1 + BPS_PL_YTD_July)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[5], "PL_MTD", (((1m + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1m + BPS_PL_MTD)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[5], "PL_WRoll", (((1m + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1m + BPS_PL_WRoll)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[5], "PL_MRoll", (((1m + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1m + BPS_PL_MRoll)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[5], "PL_Inception", (((1m + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1m + BPS_PL_Inception)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[5], "PL_YTD", (((1m + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1m + BPS_PL_YTD)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[5], "PL_YTD_July", (((1m + ((Long_PL + Short_PL + Future_PL) / Fund_Amount)) * (1m + BPS_PL_YTD_July)) - 1m) * 100m);
                 }
 
                 // BPS Index
@@ -1322,12 +1342,12 @@ namespace T1MultiAsset
                     //Console.WriteLine("BPS_Index_Close="+BPS_Index_Close.ToString()+",BPS_Index_Prev_Close=" + BPS_Index_Prev_Close.ToString() + ",BPS_Index_DIV_TODAY=" + BPS_Index_DIV_TODAY.ToString());
                     SetValueRG(dg_Header.Rows[6], "PL", Day_Perf * 100m);
                     SetValueRG(dg_Header.Rows[6], "PL_Yest", BPS_Index_Yest * 100m);
-                    SetValueRG(dg_Header.Rows[6], "PL_MTD", (((1 + (Day_Perf)) * (1 + BPS_Index_MTD)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[6], "PL_WRoll", (((1 + (Day_Perf)) * (1 + BPS_Index_WRoll)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[6], "PL_MRoll", (((1 + (Day_Perf)) * (1 + BPS_Index_MRoll)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[6], "PL_Inception", (((1 + (Day_Perf)) * (1 + BPS_Index_Inception)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[6], "PL_YTD", (((1 + (Day_Perf)) * (1 + BPS_Index_YTD)) - 1m) * 100m);
-                    SetValueRG(dg_Header.Rows[6], "PL_YTD_July", (((1 + (Day_Perf)) * (1 + BPS_Index_YTD_July)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[6], "PL_MTD", (((1m + (Day_Perf)) * (1m + BPS_Index_MTD)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[6], "PL_WRoll", (((1m + (Day_Perf)) * (1m + BPS_Index_WRoll)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[6], "PL_MRoll", (((1m + (Day_Perf)) * (1m + BPS_Index_MRoll)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[6], "PL_Inception", (((1m + (Day_Perf)) * (1 + BPS_Index_Inception)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[6], "PL_YTD", (((1m + (Day_Perf)) * (1m + BPS_Index_YTD)) - 1m) * 100m);
+                    SetValueRG(dg_Header.Rows[6], "PL_YTD_July", (((1m + (Day_Perf)) * (1m + BPS_Index_YTD_July)) - 1m) * 100m);
                 }
             }
             catch (Exception e)
@@ -1529,6 +1549,46 @@ namespace T1MultiAsset
 
                     foreach (DataRow drt in FoundTickerRow)
                     {
+                        // See if this is an Option
+                        if (SystemLibrary.YN_To_Bool(SystemLibrary.ToString(drt["isOption"])))
+                        {
+                            Boolean FoundOptionField = false;
+                            DataRow[] drOptions = dt_Options.Select("BBG_Ticker='" + myTicker + "'");
+                            if (drOptions.Length < 1)
+                            {
+                                DataRow drNew = dt_Options.NewRow();
+                                drNew["BBG_Ticker"] = myTicker;
+                                dt_Options.Rows.Add(drNew);
+                                drOptions = dt_Options.Select("BBG_Ticker='" + myTicker + "'");
+                            }
+
+                            for (int i = 0; i < myFields.Length; i++)
+                            {
+                                try
+                                {
+                                    if (myItems[i].Substring(0, Math.Min("#N/A".Length, myItems[i].Length)) != "#N/A" && myItems[i].Length > 0)
+                                    {
+                                        //SystemLibrary.SetDebugLevel(4);
+                                        SystemLibrary.DebugLine(myTicker + "\t" + myFields[i] + "\t" + myItems[i]);
+                                        switch (myFields[i])
+                                        {
+                                            case "BID":
+                                            case "ASK":
+                                            case "DELTA_BID_RT":
+                                            case "DELTA_ASK_RT":
+                                            case "DELTA_LAST_RT":
+                                                drOptions[0][myFields[i]] = SystemLibrary.ToDecimal(myItems[i]);
+                                                FoundOptionField = true;
+                                                break;
+                                        }
+                                    }
+                                }
+                                catch { }
+                            }
+                            if (FoundOptionField)
+                                PriceColour = GetLast_and_Delta(drt, ref NeedCalc);
+                        }
+
                         // Loop around fields
                         for (int i = 0; i < myFields.Length; i++)
                         {
@@ -1590,6 +1650,12 @@ namespace T1MultiAsset
                                         case "EXCH_CODE":
                                             LoadValue(drt, "BBG_Exchange", true, myItems[i], Securities);
                                             break;
+                                        case "OCC_SYMBOL":
+                                            LoadValue(drt, "OCC_SYMBOL", true, myItems[i], Securities);
+                                            break;
+                                        case "DELTA":
+                                            LoadValue(drt, "Delta", true, myItems[i], Securities);
+                                            break;
                                         case "FUTURES_CATEGORY":
                                             LoadValue(drt, "Industry_Group", true, myItems[i], Securities);
                                             // Is there a better field for this - eg. Tell me a Gold Future is "Gold"?
@@ -1602,7 +1668,16 @@ namespace T1MultiAsset
                                             if (!LoadedUndelying.ContainsKey(Undl_Ticker))
                                             {
                                                 LoadedUndelying.Add(Undl_Ticker, Undl_Ticker);
-                                                BRT.Bloomberg_Request(Undl_Ticker);
+                                                BRT.Bloomberg_Request(Undl_Ticker,false);
+                                            }
+                                            break;
+                                        case "ADR_UNDL_TICKER":
+                                            Undl_Ticker = myItems[i] + " Equity";
+                                            LoadValue(drt, "Undl_Ticker", true, Undl_Ticker, Securities);
+                                            if (!LoadedUndelying.ContainsKey(Undl_Ticker))
+                                            {
+                                                LoadedUndelying.Add(Undl_Ticker, Undl_Ticker);
+                                                BRT.Bloomberg_Request(Undl_Ticker, false);
                                             }
                                             break;
                                         case "UNDL_SPOT_TICKER":
@@ -1613,7 +1688,7 @@ namespace T1MultiAsset
                                                 if (!LoadedUndelying.ContainsKey(Undl_Ticker))
                                                 {
                                                     LoadedUndelying.Add(Undl_Ticker, Undl_Ticker);
-                                                    BRT.Bloomberg_Request(Undl_Ticker);
+                                                    BRT.Bloomberg_Request(Undl_Ticker, false);
                                                 }
                                             }
                                             else
@@ -1623,7 +1698,7 @@ namespace T1MultiAsset
                                                 if (!LoadedUndelying.ContainsKey(Undl_Ticker))
                                                 {
                                                     LoadedUndelying.Add(Undl_Ticker, Undl_Ticker);
-                                                    BRT.Bloomberg_Request(Undl_Ticker);
+                                                    BRT.Bloomberg_Request(Undl_Ticker, false);
                                                 }
                                             }
                                             break;
@@ -1671,7 +1746,8 @@ namespace T1MultiAsset
                                             //if (myTicker == "RIO AU Equity")
                                             //    Console.Write("A");
                                             // Set the foreground color, but probably just want the format to be up/down arrow?
-                                            if (myFields[i]=="LAST_PRICE" || (UseTheo_Price && myFields[i]=="THEO_PRICE"))
+                                            //if (!SystemLibrary.YN_To_Bool(SystemLibrary.ToString(drt["isOption"])))
+                                            if (myFields[i] == "LAST_PRICE" || (UseTheo_Price && myFields[i] == "THEO_PRICE"))
                                             {
                                                 try
                                                 {
@@ -1699,6 +1775,10 @@ namespace T1MultiAsset
                                                     TestPrice = myItems[i];
                                                 }
                                                 drt["BBG_last_updatetime"] = SystemLibrary.f_Now();
+                                                if (SystemLibrary.YN_To_Bool(SystemLibrary.ToString(drt["isOption"])))
+                                                {
+                                                    PriceColour = GetLast_and_Delta(drt, ref NeedCalc);
+                                                }
                                             }
                                             break;
                                     }
@@ -1708,57 +1788,60 @@ namespace T1MultiAsset
                         }
                     }
                     // Update Securities Table
-                    String mySql = "";
-                    String mySqlAnd = "";
-                    DataRow[] drSecurities = dt_Securities.Select("BBG_Ticker='" + myTicker + "'");
-
-                    foreach (String myKey in Securities.Keys)
+                    if (Securities.Count > 0)
                     {
-                        if (drSecurities.Length > 0)
+                        String mySql = "";
+                        String mySqlAnd = "";
+                        DataRow[] drSecurities = dt_Securities.Select("BBG_Ticker='" + myTicker + "'");
+
+                        foreach (String myKey in Securities.Keys)
                         {
-                            if (!(SystemLibrary.ToString(drSecurities[0][myKey]) == Securities[myKey].ToString() || "'" + SystemLibrary.ToString(drSecurities[0][myKey]) + "'" == Securities[myKey].ToString()))
+                            if (drSecurities.Length > 0)
                             {
-                                // Double check rounding for a decimal
-                                if (dt_Securities.Columns[myKey].DataType.Name.ToString() == "Decimal")
+                                if (!(SystemLibrary.ToString(drSecurities[0][myKey]) == Securities[myKey].ToString() || "'" + SystemLibrary.ToString(drSecurities[0][myKey]) + "'" == Securities[myKey].ToString()))
                                 {
-                                    try
+                                    // Double check rounding for a decimal
+                                    if (dt_Securities.Columns[myKey].DataType.Name.ToString() == "Decimal")
                                     {
-                                        int Ordinal = SystemLibrary.ToInt32(dt_Securities.Columns[myKey].Ordinal) - 1;
-                                        if (Math.Round(SystemLibrary.ToDecimal(drSecurities[0][myKey]), Ordinal) == Math.Round(SystemLibrary.ToDecimal(Securities[myKey]), Ordinal))
-                                            continue;
+                                        try
+                                        {
+                                            int Ordinal = SystemLibrary.ToInt32(dt_Securities.Columns[myKey].Ordinal) - 1;
+                                            if (Math.Round(SystemLibrary.ToDecimal(drSecurities[0][myKey]), Ordinal) == Math.Round(SystemLibrary.ToDecimal(Securities[myKey]), Ordinal))
+                                                continue;
+                                        }
+                                        catch { }
                                     }
-                                    catch { }
+                                    mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
+                                    mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
                                 }
+                            }
+                            else
+                            {
                                 mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
                                 mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
                             }
                         }
-                        else
+                        if (mySql.Length > 0)
                         {
-                            mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
-                            mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
+                            if (SystemLibrary.SQLSelectRowsCount("Select BBG_Ticker from Securities Where BBG_Ticker='" + myTicker + "' ") == 0)
+                            {
+                                String myInsert = "Insert into Securities (BBG_Ticker, Round_Lot_Size) Select '" + myTicker + "', 1 " +
+                                                  "Where not Exists (Select 'x' From Securities Where BBG_Ticker = '" + myTicker + "') ";
+                                SystemLibrary.SQLExecute(myInsert);
+                            }
+                            mySql = mySql.Substring(0, mySql.Length - 2); // Strip off last ", "
+                            if (mySqlAnd.Length > 0)
+                            {
+                                mySqlAnd = "And (" + mySqlAnd.Substring(0, mySqlAnd.Length - 3) + ") "; // Strip off last "Or "
+                            }
+                            mySql = "Update Securities Set " + mySql + " Where BBG_Ticker='" + myTicker + "' " + mySqlAnd;
+                            SystemLibrary.SQLExecute(mySql);
+                            //Console.WriteLine("pos2: " + mySql);
                         }
+                        Securities.Clear();
+                        mySql = "";
+                        mySqlAnd = "";
                     }
-                    if (mySql.Length > 0)
-                    {
-                        if (SystemLibrary.SQLSelectRowsCount("Select BBG_Ticker from Securities Where BBG_Ticker='" + myTicker + "' ") == 0)
-                        {
-                            String myInsert = "Insert into Securities (BBG_Ticker, Round_Lot_Size) Select '" + myTicker + "', 1 " +
-                                              "Where not Exists (Select 'x' From Securities Where BBG_Ticker = '" + myTicker + "') ";
-                            SystemLibrary.SQLExecute(myInsert);
-                        }
-                        mySql = mySql.Substring(0, mySql.Length - 2); // Strip off last ", "
-                        if (mySqlAnd.Length > 0)
-                        {
-                            mySqlAnd = "And (" + mySqlAnd.Substring(0, mySqlAnd.Length - 3) + ") "; // Strip off last "Or "
-                        }
-                        mySql = "Update Securities Set " + mySql + " Where BBG_Ticker='" + myTicker + "' " + mySqlAnd;
-                        SystemLibrary.SQLExecute(mySql);
-                        //Console.WriteLine("pos2: " + mySql);
-                    }
-                    Securities.Clear();
-                    mySql = "";
-                    mySqlAnd = "";
                     // Load up each Undl_Ticker
                     FoundTickerRow = dt_Port.Select("Undl_Ticker='" + myTicker + "'");
                     foreach (DataRow drt in FoundTickerRow)
@@ -1853,53 +1936,58 @@ namespace T1MultiAsset
                         }
                     }
                     // Update Securities Table for the Security record of the Underlying Ticker
-                    drSecurities = dt_Securities.Select("BBG_Ticker='" + myTicker + "'");
-                    foreach (String myKey in Securities.Keys)
+                    if (Securities.Count > 0)
                     {
-                        if (drSecurities.Length > 0)
+                        String mySql = "";
+                        String mySqlAnd = "";
+                        DataRow[] drSecurities = dt_Securities.Select("BBG_Ticker='" + myTicker + "'");
+                        foreach (String myKey in Securities.Keys)
                         {
-                            if (!(SystemLibrary.ToString(drSecurities[0][myKey]) == Securities[myKey].ToString() || "'" + SystemLibrary.ToString(drSecurities[0][myKey]) + "'" == Securities[myKey].ToString()))
+                            if (drSecurities.Length > 0)
                             {
-                                // Double check rounding for a decimal
-                                if (dt_Securities.Columns[myKey].DataType.Name.ToString() == "Decimal")
+                                if (!(SystemLibrary.ToString(drSecurities[0][myKey]) == Securities[myKey].ToString() || "'" + SystemLibrary.ToString(drSecurities[0][myKey]) + "'" == Securities[myKey].ToString()))
                                 {
-                                    try
+                                    // Double check rounding for a decimal
+                                    if (dt_Securities.Columns[myKey].DataType.Name.ToString() == "Decimal")
                                     {
-                                        int Ordinal = SystemLibrary.ToInt32(dt_Securities.Columns[myKey].Ordinal) - 1;
-                                        if (Math.Round(SystemLibrary.ToDecimal(drSecurities[0][myKey]), Ordinal) == Math.Round(SystemLibrary.ToDecimal(Securities[myKey]), Ordinal))
-                                            continue;
+                                        try
+                                        {
+                                            int Ordinal = SystemLibrary.ToInt32(dt_Securities.Columns[myKey].Ordinal) - 1;
+                                            if (Math.Round(SystemLibrary.ToDecimal(drSecurities[0][myKey]), Ordinal) == Math.Round(SystemLibrary.ToDecimal(Securities[myKey]), Ordinal))
+                                                continue;
+                                        }
+                                        catch { }
                                     }
-                                    catch { }
+                                    mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
+                                    mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
                                 }
+                            }
+                            else
+                            {
                                 mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
                                 mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
                             }
                         }
-                        else
+                        if (mySql.Length > 0)
                         {
-                            mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
-                            mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
+                            if (SystemLibrary.SQLSelectRowsCount("Select BBG_Ticker from Securities Where BBG_Ticker='" + myTicker + "' ") == 0)
+                            {
+                                String myInsert = "Insert into Securities (BBG_Ticker, Round_Lot_Size) Select '" + myTicker + "', 1 " +
+                                                  "Where not Exists (Select 'x' From Securities Where BBG_Ticker = '" + myTicker + "') ";
+                                SystemLibrary.SQLExecute(myInsert);
+                            }
+
+                            mySql = mySql.Substring(0, mySql.Length - 2); // Strip off last ", "
+                            if (mySqlAnd.Length > 0)
+                            {
+                                mySqlAnd = "And (" + mySqlAnd.Substring(0, mySqlAnd.Length - 3) + ") "; // Strip off last "Or "
+                            }
+                            mySql = "Update Securities Set " + mySql + " Where BBG_Ticker='" + myTicker + "' " + mySqlAnd;
+                            SystemLibrary.SQLExecute(mySql);
+                            //Console.WriteLine("pos3: " + mySql);
                         }
+                        Securities.Clear();
                     }
-                    if (mySql.Length > 0)
-                    {
-                        if (SystemLibrary.SQLSelectRowsCount("Select BBG_Ticker from Securities Where BBG_Ticker='" + myTicker + "' ") == 0)
-                        {
-                            String myInsert = "Insert into Securities (BBG_Ticker, Round_Lot_Size) Select '" + myTicker + "', 1 " +
-                                              "Where not Exists (Select 'x' From Securities Where BBG_Ticker = '" + myTicker + "') ";
-                            SystemLibrary.SQLExecute(myInsert);
-                        }
-                        
-                        mySql = mySql.Substring(0, mySql.Length - 2); // Strip off last ", "
-                        if (mySqlAnd.Length > 0)
-                        {
-                            mySqlAnd = "And (" + mySqlAnd.Substring(0, mySqlAnd.Length - 3) + ") "; // Strip off last "Or "
-                        }
-                        mySql = "Update Securities Set " + mySql + " Where BBG_Ticker='" + myTicker + "' " + mySqlAnd;
-                        SystemLibrary.SQLExecute(mySql);
-                        //Console.WriteLine("pos3: " + mySql);
-                    }
-                    Securities.Clear();
 
                     // Update Last Price table for database storage
                     int myPos = Array.IndexOf(myFields, "LAST_PRICE");
@@ -2024,53 +2112,57 @@ namespace T1MultiAsset
                                 }
                             }
                             // Update Securities Table for the Security record of the Underlying Ticker
-                            drSecurities = dt_Securities.Select("BBG_Ticker='" + myTicker + "'");
-                            foreach (String myKey in Securities.Keys)
+                            if (Securities.Count > 0)
                             {
-                                if (drSecurities.Length > 0)
+                                String mySql = "";
+                                String mySqlAnd = "";
+                                DataRow[] drSecurities = dt_Securities.Select("BBG_Ticker='" + myTicker + "'");
+                                foreach (String myKey in Securities.Keys)
                                 {
-                                    if (!(SystemLibrary.ToString(drSecurities[0][myKey]) == Securities[myKey].ToString() || "'" + SystemLibrary.ToString(drSecurities[0][myKey]) + "'" == Securities[myKey].ToString()))
+                                    if (drSecurities.Length > 0)
                                     {
-                                        // Double check rounding for a decimal
-                                        if (dt_Securities.Columns[myKey].DataType.Name.ToString() == "Decimal")
+                                        if (!(SystemLibrary.ToString(drSecurities[0][myKey]) == Securities[myKey].ToString() || "'" + SystemLibrary.ToString(drSecurities[0][myKey]) + "'" == Securities[myKey].ToString()))
                                         {
-                                            try
+                                            // Double check rounding for a decimal
+                                            if (dt_Securities.Columns[myKey].DataType.Name.ToString() == "Decimal")
                                             {
-                                                int Ordinal = SystemLibrary.ToInt32(dt_Securities.Columns[myKey].Ordinal) - 1;
-                                                if (Math.Round(SystemLibrary.ToDecimal(drSecurities[0][myKey]), Ordinal) == Math.Round(SystemLibrary.ToDecimal(Securities[myKey]), Ordinal))
-                                                    continue;
+                                                try
+                                                {
+                                                    int Ordinal = SystemLibrary.ToInt32(dt_Securities.Columns[myKey].Ordinal) - 1;
+                                                    if (Math.Round(SystemLibrary.ToDecimal(drSecurities[0][myKey]), Ordinal) == Math.Round(SystemLibrary.ToDecimal(Securities[myKey]), Ordinal))
+                                                        continue;
+                                                }
+                                                catch { }
                                             }
-                                            catch { }
+                                            mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
+                                            mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
                                         }
+                                    }
+                                    else
+                                    {
                                         mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
                                         mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
                                     }
-                                }
-                                else
-                                {
-                                    mySql = mySql + myKey + " = " + Securities[myKey].ToString() + ", ";
-                                    mySqlAnd = mySqlAnd + myKey + " is Null Or " + myKey + " <> " + Securities[myKey].ToString() + " Or ";
-                                }
 
-                            }
-                            if (mySql.Length > 0)
-                            {
-                                if (SystemLibrary.SQLSelectRowsCount("Select BBG_Ticker from Securities Where BBG_Ticker='" + myTicker + "' ") == 0)
-                                {
-                                    String myInsert = "Insert into Securities (BBG_Ticker, Round_Lot_Size, Sector, Industry_Group, Industry_SubGroup) Select '" + myTicker + "', 1, 'Currency', 'Currency', 'Currency' " +
-                                                      "Where not Exists (Select 'x' From Securities Where BBG_Ticker = '" + myTicker + "') ";
-                                    SystemLibrary.SQLExecute(myInsert);
                                 }
-                                mySql = mySql.Substring(0, mySql.Length - 2); // Strip off last ", "
-                                if (mySqlAnd.Length > 0)
+                                if (mySql.Length > 0)
                                 {
-                                    mySqlAnd = "And (" + mySqlAnd.Substring(0, mySqlAnd.Length - 3) + ") "; // Strip off last "Or "
+                                    if (SystemLibrary.SQLSelectRowsCount("Select BBG_Ticker from Securities Where BBG_Ticker='" + myTicker + "' ") == 0)
+                                    {
+                                        String myInsert = "Insert into Securities (BBG_Ticker, Round_Lot_Size, Sector, Industry_Group, Industry_SubGroup) Select '" + myTicker + "', 1, 'Currency', 'Currency', 'Currency' " +
+                                                          "Where not Exists (Select 'x' From Securities Where BBG_Ticker = '" + myTicker + "') ";
+                                        SystemLibrary.SQLExecute(myInsert);
+                                    }
+                                    mySql = mySql.Substring(0, mySql.Length - 2); // Strip off last ", "
+                                    if (mySqlAnd.Length > 0)
+                                    {
+                                        mySqlAnd = "And (" + mySqlAnd.Substring(0, mySqlAnd.Length - 3) + ") "; // Strip off last "Or "
+                                    }
+                                    mySql = "Update Securities Set " + mySql + " Where BBG_Ticker='" + myTicker + "' " + mySqlAnd;
+                                    SystemLibrary.SQLExecute(mySql);
+                                    //Console.WriteLine("pos4: " + mySql);
                                 }
-                                mySql = "Update Securities Set " + mySql + " Where BBG_Ticker='" + myTicker + "' " + mySqlAnd;
-                                SystemLibrary.SQLExecute(mySql);
-                                //Console.WriteLine("pos4: " + mySql);
                             }
-
                         }
                     }
                 }
@@ -2079,8 +2171,6 @@ namespace T1MultiAsset
                 //if (myTicker.EndsWith("Curncy"))
                 //    Console.Write("A");
                 //Application.DoEvents();
-                if (myTicker == "DOW AU Equity")
-                    Console.WriteLine(myTicker + "," + inEditMode.ToString() + NeedCalc.ToString());
                 if (!inEditMode && NeedCalc)
                 {
                     //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - pre: SetCalc(" + myTicker + "," + TestPrice + ")");
@@ -2113,14 +2203,16 @@ namespace T1MultiAsset
                    drt["Ticker"].ToString().ToUpper().Contains(" LN ")
                   )
                 {
-                    myItem = Convert.ToString(SystemLibrary.ToDecimal(myItem) / 100.0M);
+                    myItem = SystemLibrary.ToString(SystemLibrary.ToDecimal(myItem) / 100.0M);
                 }
             }
             catch { }
 
             try
             {
+                // TODO (1) What about Options on Futures?
                 if (ColName == "Security_Typ2")
+                {
                     if (myItem.ToUpper() == "Future".ToUpper())
                     {
                         if (drt["isFuture"].ToString() == "Y")
@@ -2135,6 +2227,21 @@ namespace T1MultiAsset
                         else
                             drt["isFuture"] = "N";
                     }
+                    if (myItem.ToUpper() == "Option".ToUpper())
+                    {
+                        if (drt["isOption"].ToString() == "Y")
+                            itemChanged = false;
+                        else
+                            drt["isOption"] = "Y";
+                    }
+                    else
+                    {
+                        if (drt["isOption"].ToString() == "N")
+                            itemChanged = false;
+                        else
+                            drt["isOption"] = "N";
+                    }
+                }
                 if (drt.Table.Columns.Contains(ColName))
                 {
                     switch(drt[ColName].GetType().Name)
@@ -2172,7 +2279,7 @@ namespace T1MultiAsset
             try
             {
                 //drt.ItemArray.Contains(ColName)
-                if (drt.Table.Columns.Contains(ColName) || ColName == "Security_Typ" || ColName == "Security_Typ2" || ColName == "BBG_Exchange")
+                if (drt.Table.Columns.Contains(ColName) || ColName == "Security_Typ" || ColName == "Security_Typ2" || ColName == "BBG_Exchange" || ColName == "OCC_SYMBOL")
                 {
                     if (itemChanged)
                     {
@@ -2297,6 +2404,99 @@ namespace T1MultiAsset
 
         } //LoadValue_undl()
 
+        /*
+         * This routine expects the calling code to have checked that the OutRow is actually an Option.
+         * 
+         * It basically mimics the fieldin Bloomberg called OPT_PX - But this is Not realtime
+         * 
+         * Definition Summary: (March-2014) NB: Bloomberg have different models, so read the original text
+         * The 'best price' is the last trade if it is between the bid price and the ask price. 
+         * The 'best price' is the bid price if the last trade is lower than the bid price. 
+         * The 'best price' is the ask price if the last trade is higher than the ask price. 
+         * If there is no last trade, then 'best price' is ask or bid with ask taking precedence.
+         */
+        public Color GetLast_and_Delta(DataRow outRow, ref Boolean NeedCalc)
+        {
+            // Local Variables
+            String myTicker = SystemLibrary.ToString(outRow["Ticker"]);
+            Color PriceColour = Color.Black;
+            Decimal outPrice;
+            Decimal outDelta;
+            DataRow[] FoundTickerRows = dt_Last_Price.Select("Ticker='" + myTicker + "'");
+
+            DataRow[] drOption = dt_Options.Select("BBG_Ticker='" + myTicker + "'");
+            if (drOption.Length == 0)
+                return(PriceColour);
+
+            // Get current values
+            Decimal inPrice = SystemLibrary.ToDecimal(outRow["Price"]);
+            Decimal inDelta = SystemLibrary.ToDecimal(outRow["Delta"]);
+
+            // Get latest values from the dt_Option table
+            Decimal LastDelta = SystemLibrary.ToDecimal(drOption[0]["DELTA_LAST_RT"]);
+            Decimal BidPrice = SystemLibrary.ToDecimal(drOption[0]["BID"]);
+            Decimal AskPrice = SystemLibrary.ToDecimal(drOption[0]["ASK"]);
+            if (inPrice < BidPrice)
+            {
+                // Last is lower than Bid Price
+                outPrice = BidPrice;
+                outDelta = SystemLibrary.ToDecimal(drOption[0]["DELTA_BID_RT"]);
+            }
+            else if (inPrice > AskPrice && AskPrice > 0)
+            {
+                // Last is higher than Ask Price
+                outPrice = AskPrice;
+                outDelta = SystemLibrary.ToDecimal(drOption[0]["DELTA_ASK_RT"]);
+            }
+            else
+            {
+                // Last is between BID & Ask
+                outPrice = inPrice;
+                if (LastDelta == 0)
+                    outDelta = SystemLibrary.ToDecimal(drOption[0]["DELTA_MID_RT"]); // Use Mid if Last is 0
+                else
+                    outDelta = LastDelta;
+            }
+
+            // Only change datatable if significant change
+            // TODO (1) How many decimal places, should I look at Multiplier>
+            if (outDelta != 0.0M && Math.Round(outDelta, 8) != Math.Round(inDelta, 8))
+            {
+                outRow["Delta"] = outDelta;
+                NeedCalc = true;
+
+                foreach (DataRow dr in FoundTickerRows)
+                {
+                    dr["Delta"] = outDelta;
+                    dr["isNew"] = "Y";
+                }
+            }
+            if (Math.Round(outPrice, 8) != Math.Round(inPrice, 8))
+            {
+                outRow["Price"] = outPrice;
+                NeedCalc = true;
+
+                foreach (DataRow dr in FoundTickerRows)
+                {
+                    dr["Delta"] = outDelta;
+                    dr["isNew"] = "Y";
+                }
+            }
+            outRow["BBG_last_updatetime"] = SystemLibrary.f_Now();
+
+            // Set Colour            
+            if (outPrice < inPrice)
+                PriceColour = Color.Red;
+            else if (outPrice > inPrice)
+                PriceColour = Color.Green;
+            else
+                PriceColour = Color.Black;
+
+
+            return (PriceColour);
+
+        } //GetLast_and_Delta()
+
         public void SetFXRate(DataRow drt, String myCrncy)
         {
             // Local Variables
@@ -2355,7 +2555,7 @@ namespace T1MultiAsset
                 dt_FX.Rows.Add(dr);
                 if (Ticker_Crncy != Fund_Crncy && FromAdvise)
                 {
-                    BRT.Bloomberg_Request(dr["Ticker"].ToString());
+                    BRT.Bloomberg_Request(dr["Ticker"].ToString(),false);
                 }
             }
 
@@ -2436,7 +2636,9 @@ namespace T1MultiAsset
             Color myColour;
             try
             {
-                if (SystemLibrary.ToDecimal(dgr.Cells[myColumn].Value) != myValue)
+                if (dgr.Cells[myColumn].Value == null) 
+                    dgr.Cells[myColumn].Value = myValue;
+                else if (SystemLibrary.ToDecimal(dgr.Cells[myColumn].Value) != myValue)
                     dgr.Cells[myColumn].Value = myValue;
                 /*
                  * Colin Ritchie; 22-Feb-2014
@@ -2521,6 +2723,9 @@ namespace T1MultiAsset
             // Purpose: Update dg_Port for all the calculated columns.
             //          I know at this stage that a refresh is needed for the ticker
             //
+            // Modifed: Colin Ritchie 13 March 2014
+            //          Now that this does not set colours, it would be better to update the datatable directly
+            //          Hence moved from dg_ to dt_
 
             // Local Variables
             Decimal POS_Mult_Factor;
@@ -2531,8 +2736,8 @@ namespace T1MultiAsset
             Decimal Value_Prev;
             Decimal LocalValue;
             Decimal Value;
-            Decimal Value_SOD;
-            Decimal Value_Filled;
+            Decimal Exposure_SOD;
+            Decimal Exposure_Filled;
             Decimal Exposure;
             Decimal Pct_FUM;
             Decimal Pct_SOD;
@@ -2544,7 +2749,7 @@ namespace T1MultiAsset
             Decimal Qty_Order;
             Decimal Qty_Fill;
             Decimal Div_Adjusted;
-            Color PriceColour_From_dg_Port;
+            Color PriceColour_From_dg_Port = PriceColour;
 
 
             //SystemLibrary.DebugLine("SetCalc(" + myTicker + "," + PriceColour.ToString() + ", " + PartOfArray.ToString() + ")");
@@ -2555,85 +2760,111 @@ namespace T1MultiAsset
 
             // See if this is a valid Ticker, or Undl_Ticker and update all the calculated fields
             DataGridViewRow[] dg_in = FindValue(dg_Port, "Ticker", myTicker);
-            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Post FindValue()=" + dg_in.Length.ToString());
             if (dg_in.Length > 0)
             {
-                Prev_Close = SystemLibrary.ToDecimal(dg_in[0].Cells["prev_Close"].Value);
-                Price = SystemLibrary.ToDecimal(dg_in[0].Cells["Price"].Value);
                 PriceColour_From_dg_Port = dg_in[0].Cells["Price"].Style.ForeColor;
                 for (Int32 j = 0; j < dg_in.Length; j++)
                 {
                     // Only do for live ticker
                     if (dg_in[j].Cells["IsAggregate"].Value.ToString().ToUpper() == "N")
                     {
-                        FXRate = SystemLibrary.ToDecimal(dg_in[j].Cells["FXRate"].Value);
-                        if (FXRate == 0)
-                            if (SystemLibrary.ToString(dg_in[j].Cells["Crncy"].Value) == Fund_Crncy)
-                            {
-                                dg_in[j].Cells["FXRate"].Value = 1;
-                                FXRate = 1;
-                            }
-
                         // Set the PriceColour
                         if (PriceColour != Color.Empty)
                             dg_in[j].Cells["Price"].Style.ForeColor = PriceColour;
+                    }
+                }
+            }
+
+            DataRow[] dr = dt_Port.Select("Ticker = '" + myTicker + "' And IsAggregate = 'N'");
+            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Post FindValue()=" + dg_in.Length.ToString());
+            if (dr.Length > 0)
+            {
+                Prev_Close = SystemLibrary.ToDecimal(dr[0]["prev_Close"]);
+                Price = SystemLibrary.ToDecimal(dr[0]["Price"]);
+                for (Int32 j = 0; j < dr.Length; j++)
+                {
+                    // Only do for live ticker
+                    if (dr[j]["IsAggregate"].ToString().ToUpper() == "N")
+                    {
+                        FXRate = SystemLibrary.ToDecimal(dr[j]["FXRate"]);
+                        if (FXRate == 0)
+                            if (SystemLibrary.ToString(dr[j]["Crncy"]) == Fund_Crncy)
+                            {
+                                dr[j]["FXRate"] = 1;
+                                FXRate = 1;
+                            }
+
                         // Get The POS_Mult_Factor
-                        POS_Mult_Factor = SystemLibrary.ToDecimal(dg_in[j].Cells["POS_Mult_Factor"].Value);
+                        POS_Mult_Factor = SystemLibrary.ToDecimal(dr[j]["POS_Mult_Factor"]);
                         if (POS_Mult_Factor <= 0)
                             POS_Mult_Factor = 1;
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2399: SetCalc(" + myTicker + ")");
 
                         // Calcs 
-                        Quantity = SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity"].Value);
-                        Qty_Order = SystemLibrary.ToDecimal(dg_in[j].Cells["Qty_Order"].Value);
-                        Qty_Fill = SystemLibrary.ToDecimal(dg_in[j].Cells["Qty_Fill"].Value);
-                        Div_Adjusted = SystemLibrary.ToDecimal(dg_in[j].Cells["Div_Adjusted"].Value);
-                        LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value)));
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["LocalValue"].Value),2) != Math.Round(LocalValue,2))
-                            dg_in[j].Cells["LocalValue"].Value = LocalValue;
-                        //SetValueRG(dg_in[j], "LocalValue", SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value))));
-                        Value_Filled = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Fill)) * FXRate;
-                        Value_Prev = SystemLibrary.ToDecimal(dg_in[j].Cells["Value"].Value);
-                        Value = SystemLibrary.ToDecimal(dg_in[j].Cells["LocalValue"].Value) * FXRate;
-                        Value_SOD = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity)) * FXRate;
+                        Quantity = SystemLibrary.ToDecimal(dr[j]["Quantity"]);
+                        Qty_Order = SystemLibrary.ToDecimal(dr[j]["Qty_Order"]);
+                        Qty_Fill = SystemLibrary.ToDecimal(dr[j]["Qty_Fill"]);
+                        Div_Adjusted = SystemLibrary.ToDecimal(dr[j]["Div_Adjusted"]);
+                        LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dr[j]["Quantity_incr"])));
+                        //if (myTicker == "AMZN US Equity")
+                        //    Console.WriteLine("A");
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j]["LocalValue"]),2) != Math.Round(LocalValue,2))
+                            dr[j]["LocalValue"] = LocalValue;
+                        Value_Prev = SystemLibrary.ToDecimal(dr[j]["Value"]);
+                        Value = LocalValue * FXRate;
                         Gross_Amount = Gross_Amount - Math.Abs(Value_Prev) + Math.Abs(Value);
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2412: SetCalc(" + myTicker + ")");
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Value"].Value), 2) != Math.Round(Value, 2))
-                            dg_in[j].Cells["Value"].Value = Value;
-                        //SetValueRG(dg_in[j], "Value", Value);
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j]["Value"]), 2) != Math.Round(Value, 2))
+                            dr[j]["Value"] = Value;
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2414: SetCalc(" + myTicker + ")");
+
+                        if (SystemLibrary.YN_To_Bool(SystemLibrary.ToString(dr[j]["isOption"])))
+                        {
+                            Decimal Delta = SystemLibrary.ToDecimal(dr[0]["Delta"]);
+                            Decimal Undl_Price = SystemLibrary.ToDecimal(dr[0]["Undl_Price"]);
+                            Exposure = Delta * Undl_Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dr[j]["Quantity_incr"])) * FXRate;
+                            // Temporarily write out option details.
+                            /*
+                            Console.WriteLine("{0},Exposure[{1}] = Delta[{2}] * Undl_Price[{3}] * POS_Mult_Factor[{4}] * (Quantity[{5}] + Qty_Order[{6}] + Quantity_incr[{7}]) * FXRate[{8}]", 
+                                myTicker, Exposure, Delta, Undl_Price, POS_Mult_Factor, Quantity, Qty_Order, SystemLibrary.ToDecimal(dr[j]["Quantity_incr"]), FXRate);
+                            PL_Day = (Quantity * POS_Mult_Factor * (Price - (Prev_Close - Div_Adjusted))) * FXRate; //NB: Copied from later in code to facilitate this Console.Writeline()
+                            Console.WriteLine("{0},PL_Day[{1}] = (Quantity[{2}] * POS_Mult_Factor[{3}] * (Price[{4}] - (Prev_Close[{5}] - Div_Adjusted[{6}]))) * FXRate[{7}]", myTicker, PL_Day, Quantity, POS_Mult_Factor, Price, Prev_Close, Div_Adjusted, FXRate);
+                            */
+                            Exposure_Filled = Delta * Undl_Price * POS_Mult_Factor * (Quantity + Qty_Fill) * FXRate;
+                            Exposure_SOD = Delta * Undl_Price * POS_Mult_Factor * (Quantity) * FXRate;
+                        }
+                        else
+                        {
+                            Exposure = Value;
+                            Exposure_Filled = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Fill)) * FXRate;
+                            Exposure_SOD = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity)) * FXRate;
+                        }
+
+                        //Console.WriteLine("{0},{1},{2},{3}", myTicker, Exposure, Exposure_Filled, Exposure_SOD);
                         if (Fund_Amount != 0)
                         {
-                            Pct_FUM = Value / Fund_Amount;
-                            Pct_SOD = Value_SOD / Fund_Amount;
-                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% FUM"].Value),4) != Math.Round(Pct_FUM,4))
-                                dg_in[j].Cells[@"% FUM"].Value = Pct_FUM;
-                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% SOD"].Value),4) != Math.Round(Pct_SOD,4))
-                                dg_in[j].Cells[@"% SOD"].Value = Pct_SOD;
-                            //SetValueRG(dg_in[j], @"% FUM", Value / Fund_Amount);
-                            //SetValueRG(dg_in[j], @"% SOD", Value_SOD / Fund_Amount);
+                            Pct_FUM = Exposure / Fund_Amount;
+                            Pct_SOD = Exposure_SOD / Fund_Amount;
+                            if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"% FUM"]), 4) != Math.Round(Pct_FUM, 4))
+                                dr[j][@"% FUM"] = Pct_FUM;
+                            if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"% SOD"]), 4) != Math.Round(Pct_SOD, 4))
+                                dr[j][@"% SOD"] = Pct_SOD;
                         }
-                        // TODO (4) Exposure calc needs to be changed for options - ie. Using Underlying price & Delta. (Now Exposures = Value)
-                        // TODO (4) Exposure then needs to be used for %FUM & %GROSS
-                        Exposure = Value * FXRate;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Exposure"].Value),2) != Math.Round(Exposure,2))
-                            dg_in[j].Cells["Exposure"].Value = Exposure;
-                        if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Exposure_Filled"].Value),2) != Math.Round(Value_Filled,2))
-                            dg_in[j].Cells["Exposure_Filled"].Value = Value_Filled;
-                        //SetValueRG(dg_in[j], "Exposure", Value * FXRate);
-                        //SetValueRG(dg_in[j], "Exposure_Filled", Value_Filled);
+
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j]["Exposure"]),2) != Math.Round(Exposure,2))
+                            dr[j]["Exposure"] = Exposure;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j]["Exposure_Filled"]), 2) != Math.Round(Exposure_Filled, 2))
+                            dr[j]["Exposure_Filled"] = Exposure_Filled;
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2424: SetCalc(" + myTicker + ")");
 
                         // MTD, et al P&L's rely on Todays data, so extract the old values for PL_DAY & PL_EXEC before updating
-                        PL_Today_Prev = SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Day"].Value) + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Exec"].Value);
+                        PL_Today_Prev = SystemLibrary.ToDecimal(dr[j]["PL_Day"]) + SystemLibrary.ToDecimal(dr[j]["PL_Exec"]);
                         PL_Day = (Quantity * POS_Mult_Factor * (Price - (Prev_Close - Div_Adjusted))) * FXRate;
-                        PL_Exec = (Qty_Fill * POS_Mult_Factor * (Price - SystemLibrary.ToDecimal(dg_in[j].Cells["Avg_Price"].Value))) * FXRate;
-                        if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Day"].Value), 2) != Math.Round(PL_Day, 2))
-                            dg_in[j].Cells["PL_Day"].Value = PL_Day;
-                        if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Exec"].Value),2) != Math.Round(PL_Exec,2))
-                            dg_in[j].Cells["PL_Exec"].Value = PL_Exec;
-                        //SetValueRG(dg_in[j], "PL_Day", PL_Day);
-                        //SetValueRG(dg_in[j], "PL_Exec", PL_Exec);
+                        PL_Exec = (Qty_Fill * POS_Mult_Factor * (Price - SystemLibrary.ToDecimal(dr[j]["Avg_Price"]))) * FXRate;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j]["PL_Day"]), 2) != Math.Round(PL_Day, 2))
+                            dr[j]["PL_Day"] = PL_Day;
+                        if(Math.Round(SystemLibrary.ToDecimal(dr[j]["PL_Exec"]),2) != Math.Round(PL_Exec,2))
+                            dr[j]["PL_Exec"] = PL_Exec;
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2432: SetCalc(" + myTicker + ")");
                         if (Fund_Amount != 0)
                         {
@@ -2642,69 +2873,55 @@ namespace T1MultiAsset
                             Decimal PL_EOD;
                             Decimal Qty_EOD;
                             Decimal Qty_EOD_Fill;
-                            Pct_Fill = Value_Filled / Fund_Amount;
+                            Pct_Fill = Exposure_Filled / Fund_Amount;
                             PL_BPS = (PL_Day + PL_Exec) / Fund_Amount * 100m;
                             PL_EOD = PL_Day + PL_Exec;
                             Qty_EOD = Quantity + Qty_Order;
                             Qty_EOD_Fill = Quantity + Qty_Fill;
 
-                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% Fill"].Value),4) != Math.Round(Pct_Fill,4))
-                                dg_in[j].Cells[@"% Fill"].Value = Pct_Fill;
-                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL BPS"].Value),2) != Math.Round(PL_BPS,2))
-                                dg_in[j].Cells[@"PL BPS"].Value = PL_BPS;
-                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_EOD"].Value),2) != Math.Round(PL_EOD,2))
-                                dg_in[j].Cells[@"PL_EOD"].Value = PL_EOD;
-                            if(Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"Qty_EOD"].Value),2) != Math.Round(Qty_EOD,2))
-                                dg_in[j].Cells[@"Qty_EOD"].Value = Qty_EOD;
-                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"Qty_EOD_Fill"].Value), 2) != Math.Round(Qty_EOD_Fill, 2))
-                                dg_in[j].Cells[@"Qty_EOD_Fill"].Value = Qty_EOD_Fill;
-                            //SetValueRG(dg_in[j], @"% Fill", Value_Filled / Fund_Amount);
-                            //SetValueRG(dg_in[j], @"PL BPS", (PL_Day + PL_Exec) / Fund_Amount * 100m);
-                            //SetValueRG(dg_in[j], @"PL_EOD", PL_Day + PL_Exec);
-                            //SetValueRG(dg_in[j], @"Qty_EOD", Quantity + Qty_Order);
-                            //SetValueRG(dg_in[j], @"Qty_EOD_Fill", Quantity + Qty_Fill);
+                            if(Math.Round(SystemLibrary.ToDecimal(dr[j][@"% Fill"]),4) != Math.Round(Pct_Fill,4))
+                                dr[j][@"% Fill"] = Pct_Fill;
+                            if(Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL BPS"]),2) != Math.Round(PL_BPS,2))
+                                dr[j][@"PL BPS"] = PL_BPS;
+                            if(Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_EOD"]),2) != Math.Round(PL_EOD,2))
+                                dr[j][@"PL_EOD"] = PL_EOD;
+                            if(Math.Round(SystemLibrary.ToDecimal(dr[j][@"Qty_EOD"]),2) != Math.Round(Qty_EOD,2))
+                                dr[j][@"Qty_EOD"] = Qty_EOD;
+                            if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"Qty_EOD_Fill"]), 2) != Math.Round(Qty_EOD_Fill, 2))
+                                dr[j][@"Qty_EOD_Fill"] = Qty_EOD_Fill;
                         }
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2440: SetCalc(" + myTicker + ")");
 
                         // - Below are P&L's that need diff between this update & last update
                         PL_Diff = PL_Day + PL_Exec - PL_Today_Prev;
 
-                        Decimal PL_TradePeriod = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value);
-                        Decimal PL_WRoll = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value);
-                        Decimal PL_MRoll = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value);
-                        Decimal PL_MTD = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value);
-                        Decimal PL_DeltaMax = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value);
-                        Decimal PL_Inception = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value);
-                        Decimal PL_YTD = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value);
-                        Decimal PL_YTD_July = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value);
+                        Decimal PL_TradePeriod = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_TradePeriod"]);
+                        Decimal PL_WRoll = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_WRoll"]);
+                        Decimal PL_MRoll = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_MRoll"]);
+                        //Console.WriteLine("{0},dr[PL_MTD]={1},PL_Diff={2},PL_Day={3},PL_Exec={4},PL_Today_Prev={5}", myTicker, SystemLibrary.ToDecimal(dr[j]["PL_MTD"]), PL_Diff, PL_Day, PL_Exec, PL_Today_Prev);
+                        Decimal PL_MTD = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_MTD"]);
+                        Decimal PL_DeltaMax = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_DeltaMax"]);
+                        Decimal PL_Inception = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_Inception"]);
+                        Decimal PL_YTD = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_YTD"]);
+                        Decimal PL_YTD_July = PL_Diff + SystemLibrary.ToDecimal(dr[j]["PL_YTD_July"]);
 
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_TradePeriod"].Value),2) != Math.Round(PL_TradePeriod,2))
-                            dg_in[j].Cells[@"PL_TradePeriod"].Value = PL_TradePeriod;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_WRoll"].Value),2) != Math.Round(PL_WRoll, 2))
-                            dg_in[j].Cells[@"PL_WRoll"].Value = PL_WRoll;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_MRoll"].Value),2) != Math.Round(PL_MRoll,2))
-                            dg_in[j].Cells[@"PL_MRoll"].Value = PL_MRoll;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_MTD"].Value),2) != Math.Round(PL_MTD,2))
-                            dg_in[j].Cells[@"PL_MTD"].Value = PL_MTD;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_DeltaMax"].Value),2) != Math.Round(PL_DeltaMax,2))
-                            dg_in[j].Cells[@"PL_DeltaMax"].Value = PL_DeltaMax;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_Inception"].Value),2) != Math.Round(PL_Inception,2))
-                            dg_in[j].Cells[@"PL_Inception"].Value = PL_Inception;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_YTD"].Value),2) != Math.Round(PL_YTD,2))
-                            dg_in[j].Cells[@"PL_YTD"].Value = PL_YTD;
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_YTD_July"].Value),2) != Math.Round(PL_YTD_July,2))
-                            dg_in[j].Cells[@"PL_YTD_July"].Value = PL_YTD_July;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_TradePeriod"]),2) != Math.Round(PL_TradePeriod,2))
+                            dr[j][@"PL_TradePeriod"] = PL_TradePeriod;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_WRoll"]),2) != Math.Round(PL_WRoll, 2))
+                            dr[j][@"PL_WRoll"] = PL_WRoll;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_MRoll"]),2) != Math.Round(PL_MRoll,2))
+                            dr[j][@"PL_MRoll"] = PL_MRoll;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_MTD"]),2) != Math.Round(PL_MTD,2))
+                            dr[j][@"PL_MTD"] = PL_MTD;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_DeltaMax"]),2) != Math.Round(PL_DeltaMax,2))
+                            dr[j][@"PL_DeltaMax"] = PL_DeltaMax;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_Inception"]),2) != Math.Round(PL_Inception,2))
+                            dr[j][@"PL_Inception"] = PL_Inception;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_YTD"]),2) != Math.Round(PL_YTD,2))
+                            dr[j][@"PL_YTD"] = PL_YTD;
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"PL_YTD_July"]),2) != Math.Round(PL_YTD_July,2))
+                            dr[j][@"PL_YTD_July"] = PL_YTD_July;
 
-                        
-                        //SetValueRG(dg_in[j], "PL_TradePeriod", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value));
-                        //SetValueRG(dg_in[j], "PL_WRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value));
-                        //SetValueRG(dg_in[j], "PL_MRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value));
-                        //SetValueRG(dg_in[j], "PL_MTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value));
-                        //SetValueRG(dg_in[j], "PL_DeltaMax", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value));
-                        //SetValueRG(dg_in[j], "PL_Inception", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value));
-                        //SetValueRG(dg_in[j], "PL_YTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value));
-                        //SetValueRG(dg_in[j], "PL_YTD_July", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value));
-                        
                         // PCT Change
                         try
                         {
@@ -2717,9 +2934,8 @@ namespace T1MultiAsset
                         {
                             PCT_Change = 0;
                         }
-                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% Chg"].Value), 4) != Math.Round(PCT_Change, 4))
-                            dg_in[j].Cells[@"% Chg"].Value = PCT_Change;
-                        //SetValueRG(dg_in[j], @"% Chg", PCT_Change);
+                        if (Math.Round(SystemLibrary.ToDecimal(dr[j][@"% Chg"]), 4) != Math.Round(PCT_Change, 4))
+                            dr[j][@"% Chg"] = PCT_Change;
                         //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2466: SetCalc(" + myTicker + ")");
 
                         //if (myTicker.ToUpper() == "XPM2 INDEX")
@@ -2752,10 +2968,10 @@ namespace T1MultiAsset
                                             String[] myFundIDFundAmount = AllFunds[af].Split('\t');
                                             if (myFundIDFundAmount.Length == 2)
                                             {
-                                                int myFund = Convert.ToInt32(myFundIDFundAmount[0]);
+                                                int myFund = SystemLibrary.ToInt32(myFundIDFundAmount[0]);
                                                 // TODO (5) Using Start-of-Day Fund_Amount where could also take into account value change on the day using Price & Prev_Close.
                                                 //          Very little incremental value though. If Portfolio is up 5% on the day, then position would be 5% out, so on a 5% pos, this would be 0.25%.
-                                                Decimal myFund_Amount = Convert.ToDecimal(myFundIDFundAmount[1]);
+                                                Decimal myFund_Amount = SystemLibrary.ToDecimal(myFundIDFundAmount[1]);
                                                 LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (SystemLibrary.ToDecimal(dg_tran[k].Cells["Quantity_" + myFundIDFundAmount[0]].Value) + SystemLibrary.ToDecimal(dg_tran[k].Cells["Incr_" + myFundIDFundAmount[0]].Value)));
                                                 if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value), 2) != Math.Round(LocalValue, 2))
                                                     dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value = LocalValue;
@@ -2833,6 +3049,326 @@ namespace T1MultiAsset
 
         } // SetCalc()
 
+        public void SetCalc_Pre20140313(String myTicker, Color PriceColour, Boolean PartOfArray)
+        {
+            // Procedure: SetCalc
+            //
+            // Purpose: Update dg_Port for all the calculated columns.
+            //          I know at this stage that a refresh is needed for the ticker
+            //
+
+            // Local Variables
+            Decimal POS_Mult_Factor;
+            Decimal PL_Today_Prev;
+            Decimal PL_Day;
+            Decimal PL_Exec;
+            Decimal PL_Diff;
+            Decimal Value_Prev;
+            Decimal LocalValue;
+            Decimal Value;
+            Decimal Value_SOD;
+            Decimal Value_Filled;
+            Decimal Exposure;
+            Decimal Pct_FUM;
+            Decimal Pct_SOD;
+            Decimal FXRate = -12345;
+            Decimal PCT_Change;
+            Decimal Price;
+            Decimal Prev_Close;
+            Decimal Quantity;
+            Decimal Qty_Order;
+            Decimal Qty_Fill;
+            Decimal Div_Adjusted;
+            Color PriceColour_From_dg_Port;
+
+
+            //SystemLibrary.DebugLine("SetCalc(" + myTicker + "," + PriceColour.ToString() + ", " + PartOfArray.ToString() + ")");
+
+            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Start: SetCalc(" + myTicker + ", Array=" + SystemLibrary.Bool_To_YN(PartOfArray) + ")");
+
+            SystemLibrary.DebugLine("SetCalc(" + myTicker + ") - Start");
+
+            // See if this is a valid Ticker, or Undl_Ticker and update all the calculated fields
+            DataGridViewRow[] dg_in = FindValue(dg_Port, "Ticker", myTicker);
+            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Post FindValue()=" + dg_in.Length.ToString());
+            if (dg_in.Length > 0)
+            {
+                Prev_Close = SystemLibrary.ToDecimal(dg_in[0].Cells["prev_Close"].Value);
+                Price = SystemLibrary.ToDecimal(dg_in[0].Cells["Price"].Value);
+                PriceColour_From_dg_Port = dg_in[0].Cells["Price"].Style.ForeColor;
+                for (Int32 j = 0; j < dg_in.Length; j++)
+                {
+                    // Only do for live ticker
+                    if (dg_in[j].Cells["IsAggregate"].Value.ToString().ToUpper() == "N")
+                    {
+                        FXRate = SystemLibrary.ToDecimal(dg_in[j].Cells["FXRate"].Value);
+                        if (FXRate == 0)
+                            if (SystemLibrary.ToString(dg_in[j].Cells["Crncy"].Value) == Fund_Crncy)
+                            {
+                                dg_in[j].Cells["FXRate"].Value = 1;
+                                FXRate = 1;
+                            }
+
+                        // Set the PriceColour
+                        if (PriceColour != Color.Empty)
+                            dg_in[j].Cells["Price"].Style.ForeColor = PriceColour;
+                        // Get The POS_Mult_Factor
+                        POS_Mult_Factor = SystemLibrary.ToDecimal(dg_in[j].Cells["POS_Mult_Factor"].Value);
+                        if (POS_Mult_Factor <= 0)
+                            POS_Mult_Factor = 1;
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2399: SetCalc(" + myTicker + ")");
+
+                        // Calcs 
+                        Quantity = SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity"].Value);
+                        Qty_Order = SystemLibrary.ToDecimal(dg_in[j].Cells["Qty_Order"].Value);
+                        Qty_Fill = SystemLibrary.ToDecimal(dg_in[j].Cells["Qty_Fill"].Value);
+                        Div_Adjusted = SystemLibrary.ToDecimal(dg_in[j].Cells["Div_Adjusted"].Value);
+                        LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value)));
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["LocalValue"].Value), 2) != Math.Round(LocalValue, 2))
+                            dg_in[j].Cells["LocalValue"].Value = LocalValue;
+                        //SetValueRG(dg_in[j], "LocalValue", SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Order + SystemLibrary.ToDecimal(dg_in[j].Cells["Quantity_incr"].Value))));
+                        Value_Filled = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity + Qty_Fill)) * FXRate;
+                        Value_Prev = SystemLibrary.ToDecimal(dg_in[j].Cells["Value"].Value);
+                        Value = SystemLibrary.ToDecimal(dg_in[j].Cells["LocalValue"].Value) * FXRate;
+                        Value_SOD = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (Quantity)) * FXRate;
+                        Gross_Amount = Gross_Amount - Math.Abs(Value_Prev) + Math.Abs(Value);
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2412: SetCalc(" + myTicker + ")");
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Value"].Value), 2) != Math.Round(Value, 2))
+                            dg_in[j].Cells["Value"].Value = Value;
+                        //SetValueRG(dg_in[j], "Value", Value);
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2414: SetCalc(" + myTicker + ")");
+                        if (Fund_Amount != 0)
+                        {
+                            Pct_FUM = Value / Fund_Amount;
+                            Pct_SOD = Value_SOD / Fund_Amount;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% FUM"].Value), 4) != Math.Round(Pct_FUM, 4))
+                                dg_in[j].Cells[@"% FUM"].Value = Pct_FUM;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% SOD"].Value), 4) != Math.Round(Pct_SOD, 4))
+                                dg_in[j].Cells[@"% SOD"].Value = Pct_SOD;
+                            //SetValueRG(dg_in[j], @"% FUM", Value / Fund_Amount);
+                            //SetValueRG(dg_in[j], @"% SOD", Value_SOD / Fund_Amount);
+                        }
+                        // TODO (4) Exposure calc needs to be changed for options - ie. Using Underlying price & Delta. (Now Exposures = Value)
+                        // TODO (4) Exposure then needs to be used for %FUM & %GROSS
+                        Exposure = Value * FXRate;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Exposure"].Value), 2) != Math.Round(Exposure, 2))
+                            dg_in[j].Cells["Exposure"].Value = Exposure;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["Exposure_Filled"].Value), 2) != Math.Round(Value_Filled, 2))
+                            dg_in[j].Cells["Exposure_Filled"].Value = Value_Filled;
+                        //SetValueRG(dg_in[j], "Exposure", Value * FXRate);
+                        //SetValueRG(dg_in[j], "Exposure_Filled", Value_Filled);
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2424: SetCalc(" + myTicker + ")");
+
+                        // MTD, et al P&L's rely on Todays data, so extract the old values for PL_DAY & PL_EXEC before updating
+                        PL_Today_Prev = SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Day"].Value) + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Exec"].Value);
+                        PL_Day = (Quantity * POS_Mult_Factor * (Price - (Prev_Close - Div_Adjusted))) * FXRate;
+                        PL_Exec = (Qty_Fill * POS_Mult_Factor * (Price - SystemLibrary.ToDecimal(dg_in[j].Cells["Avg_Price"].Value))) * FXRate;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Day"].Value), 2) != Math.Round(PL_Day, 2))
+                            dg_in[j].Cells["PL_Day"].Value = PL_Day;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Exec"].Value), 2) != Math.Round(PL_Exec, 2))
+                            dg_in[j].Cells["PL_Exec"].Value = PL_Exec;
+                        //SetValueRG(dg_in[j], "PL_Day", PL_Day);
+                        //SetValueRG(dg_in[j], "PL_Exec", PL_Exec);
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2432: SetCalc(" + myTicker + ")");
+                        if (Fund_Amount != 0)
+                        {
+                            Decimal Pct_Fill;
+                            Decimal PL_BPS;
+                            Decimal PL_EOD;
+                            Decimal Qty_EOD;
+                            Decimal Qty_EOD_Fill;
+                            Pct_Fill = Value_Filled / Fund_Amount;
+                            PL_BPS = (PL_Day + PL_Exec) / Fund_Amount * 100m;
+                            PL_EOD = PL_Day + PL_Exec;
+                            Qty_EOD = Quantity + Qty_Order;
+                            Qty_EOD_Fill = Quantity + Qty_Fill;
+
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% Fill"].Value), 4) != Math.Round(Pct_Fill, 4))
+                                dg_in[j].Cells[@"% Fill"].Value = Pct_Fill;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL BPS"].Value), 2) != Math.Round(PL_BPS, 2))
+                                dg_in[j].Cells[@"PL BPS"].Value = PL_BPS;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_EOD"].Value), 2) != Math.Round(PL_EOD, 2))
+                                dg_in[j].Cells[@"PL_EOD"].Value = PL_EOD;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"Qty_EOD"].Value), 2) != Math.Round(Qty_EOD, 2))
+                                dg_in[j].Cells[@"Qty_EOD"].Value = Qty_EOD;
+                            if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"Qty_EOD_Fill"].Value), 2) != Math.Round(Qty_EOD_Fill, 2))
+                                dg_in[j].Cells[@"Qty_EOD_Fill"].Value = Qty_EOD_Fill;
+                            //SetValueRG(dg_in[j], @"% Fill", Value_Filled / Fund_Amount);
+                            //SetValueRG(dg_in[j], @"PL BPS", (PL_Day + PL_Exec) / Fund_Amount * 100m);
+                            //SetValueRG(dg_in[j], @"PL_EOD", PL_Day + PL_Exec);
+                            //SetValueRG(dg_in[j], @"Qty_EOD", Quantity + Qty_Order);
+                            //SetValueRG(dg_in[j], @"Qty_EOD_Fill", Quantity + Qty_Fill);
+                        }
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2440: SetCalc(" + myTicker + ")");
+
+                        // - Below are P&L's that need diff between this update & last update
+                        PL_Diff = PL_Day + PL_Exec - PL_Today_Prev;
+
+                        Decimal PL_TradePeriod = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value);
+                        Decimal PL_WRoll = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value);
+                        Decimal PL_MRoll = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value);
+                        Decimal PL_MTD = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value);
+                        Decimal PL_DeltaMax = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value);
+                        Decimal PL_Inception = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value);
+                        Decimal PL_YTD = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value);
+                        Decimal PL_YTD_July = PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value);
+
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_TradePeriod"].Value), 2) != Math.Round(PL_TradePeriod, 2))
+                            dg_in[j].Cells[@"PL_TradePeriod"].Value = PL_TradePeriod;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_WRoll"].Value), 2) != Math.Round(PL_WRoll, 2))
+                            dg_in[j].Cells[@"PL_WRoll"].Value = PL_WRoll;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_MRoll"].Value), 2) != Math.Round(PL_MRoll, 2))
+                            dg_in[j].Cells[@"PL_MRoll"].Value = PL_MRoll;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_MTD"].Value), 2) != Math.Round(PL_MTD, 2))
+                            dg_in[j].Cells[@"PL_MTD"].Value = PL_MTD;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_DeltaMax"].Value), 2) != Math.Round(PL_DeltaMax, 2))
+                            dg_in[j].Cells[@"PL_DeltaMax"].Value = PL_DeltaMax;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_Inception"].Value), 2) != Math.Round(PL_Inception, 2))
+                            dg_in[j].Cells[@"PL_Inception"].Value = PL_Inception;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_YTD"].Value), 2) != Math.Round(PL_YTD, 2))
+                            dg_in[j].Cells[@"PL_YTD"].Value = PL_YTD;
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"PL_YTD_July"].Value), 2) != Math.Round(PL_YTD_July, 2))
+                            dg_in[j].Cells[@"PL_YTD_July"].Value = PL_YTD_July;
+
+
+                        //SetValueRG(dg_in[j], "PL_TradePeriod", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_TradePeriod"].Value));
+                        //SetValueRG(dg_in[j], "PL_WRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_WRoll"].Value));
+                        //SetValueRG(dg_in[j], "PL_MRoll", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MRoll"].Value));
+                        //SetValueRG(dg_in[j], "PL_MTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_MTD"].Value));
+                        //SetValueRG(dg_in[j], "PL_DeltaMax", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_DeltaMax"].Value));
+                        //SetValueRG(dg_in[j], "PL_Inception", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_Inception"].Value));
+                        //SetValueRG(dg_in[j], "PL_YTD", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD"].Value));
+                        //SetValueRG(dg_in[j], "PL_YTD_July", PL_Diff + SystemLibrary.ToDecimal(dg_in[j].Cells["PL_YTD_July"].Value));
+
+                        // PCT Change
+                        try
+                        {
+                            if ((Prev_Close - Div_Adjusted) != 0)
+                                PCT_Change = (Price / (Prev_Close - Div_Adjusted) - 1.0M);
+                            else
+                                PCT_Change = 0;
+                        }
+                        catch
+                        {
+                            PCT_Change = 0;
+                        }
+                        if (Math.Round(SystemLibrary.ToDecimal(dg_in[j].Cells[@"% Chg"].Value), 4) != Math.Round(PCT_Change, 4))
+                            dg_in[j].Cells[@"% Chg"].Value = PCT_Change;
+                        //SetValueRG(dg_in[j], @"% Chg", PCT_Change);
+                        //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2466: SetCalc(" + myTicker + ")");
+
+                        //if (myTicker.ToUpper() == "XPM2 INDEX")
+                        //    Console.WriteLine("here XPM2 INDEX");
+                        if (isAlive_PortfolioTranspose)
+                        {
+                            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2472: SetCalc(" + myTicker + ")");
+                            // See if this is a valid Ticker, or Undl_Ticker and update all the calculated fields
+                            DataGridViewRow[] dg_tran = FindValue(dg_PortfolioTranspose, "BBG_Ticker", myTicker);
+                            if (dg_tran.Length > 0)
+                            {
+                                Char[] mySeperatorRow = { ',' };
+                                String[] AllFunds = dg_PortfolioTranspose.Columns["BBG_Ticker"].Tag.ToString().Split(mySeperatorRow, StringSplitOptions.RemoveEmptyEntries);
+
+                                for (Int32 k = 0; k < dg_tran.Length; k++)
+                                {
+                                    //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2482: SetCalc(" + myTicker + ")");
+                                    // Set the PriceColour
+                                    if (PriceColour != Color.Empty)
+                                        dg_tran[k].Cells["Price"].Style.ForeColor = PriceColour;
+                                    else
+                                        dg_tran[k].Cells["Price"].Style.ForeColor = PriceColour_From_dg_Port;
+                                    dg_tran[k].Cells["Price"].Value = Price;
+
+                                    if (AllFunds.Length > 0)
+                                    {
+                                        for (Int32 af = 0; af < AllFunds.Length; af++)
+                                        {
+                                            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part 2494: SetCalc(" + myTicker + ")");
+                                            String[] myFundIDFundAmount = AllFunds[af].Split('\t');
+                                            if (myFundIDFundAmount.Length == 2)
+                                            {
+                                                int myFund = SystemLibrary.ToInt32(myFundIDFundAmount[0]);
+                                                // TODO (5) Using Start-of-Day Fund_Amount where could also take into account value change on the day using Price & Prev_Close.
+                                                //          Very little incremental value though. If Portfolio is up 5% on the day, then position would be 5% out, so on a 5% pos, this would be 0.25%.
+                                                Decimal myFund_Amount = SystemLibrary.ToDecimal(myFundIDFundAmount[1]);
+                                                LocalValue = SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (SystemLibrary.ToDecimal(dg_tran[k].Cells["Quantity_" + myFundIDFundAmount[0]].Value) + SystemLibrary.ToDecimal(dg_tran[k].Cells["Incr_" + myFundIDFundAmount[0]].Value)));
+                                                if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value), 2) != Math.Round(LocalValue, 2))
+                                                    dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value = LocalValue;
+                                                //SetValueRG(dg_tran[k], "LocalValue_" + myFundIDFundAmount[0], SystemLibrary.ToDecimal(Price * POS_Mult_Factor * (SystemLibrary.ToDecimal(dg_tran[k].Cells["Quantity_" + myFundIDFundAmount[0]].Value) + SystemLibrary.ToDecimal(dg_tran[k].Cells["Incr_" + myFundIDFundAmount[0]].Value))));
+                                                //Value = SystemLibrary.ToDecimal(dg_tran[k].Cells["LocalValue_" + myFundIDFundAmount[0]].Value) * FXRate;
+                                                Value = LocalValue * FXRate;
+                                                if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells["Value_" + myFundIDFundAmount[0]].Value), 2) != Math.Round(Value, 2))
+                                                    dg_tran[k].Cells["Value_" + myFundIDFundAmount[0]].Value = Value;
+                                                //SetValueRG(dg_tran[k], "Value_" + myFundIDFundAmount[0], Value);
+                                                if (myFund_Amount != 0)
+                                                {
+                                                    Decimal Weight = Value / myFund_Amount;
+                                                    if (Math.Round(SystemLibrary.ToDecimal(dg_tran[k].Cells[@"Weight_" + myFundIDFundAmount[0]].Value), 2) != Math.Round(Weight, 2))
+                                                        dg_tran[k].Cells[@"Weight_" + myFundIDFundAmount[0]].Value = Weight;
+                                                    //SetValueRG(dg_tran[k], @"Weight_" + myFundIDFundAmount[0], Value / myFund_Amount);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //drt["Price"] = myItems[i];
+                    //drt["BBG_last_updatetime"] = System.DateTime.Now;
+                }
+            }
+            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Part: SetCalc(" + myTicker + ")");
+
+
+            // See if the Ticker is FX, and if so update all the records with this currency
+            if (myTicker.ToUpper().EndsWith("CURNCY"))
+            {
+                //SystemLibrary.DebugLine(myTicker + " - " + DateTime.Now.ToString());
+                // Get the FXRate from dt_FX
+                //Ticker_Crncy = SystemLibrary.BBGTicker(myTicker);
+                DataRow[] FoundRows = dt_FX.Select("Ticker='" + myTicker + "'");
+                if (FoundRows.Length > 0)
+                {
+                    // Need to Update the FX rate incorporating the multiplier
+                    FXRate = SystemLibrary.ToDecimal(FoundRows[0]["LAST_PRICE"]) *
+                             SystemLibrary.ToDecimal(FoundRows[0]["PX_POS_MULT_FACTOR"]);
+                    if (FXRate > 0)
+                    {
+                        // Update the dg_Port table for each row that is this FX
+                        DataGridViewRow[] dg_fxUpdate = FindValue(dg_Port, "CRNCY", myTicker.Substring(0, 3));
+                        if (dg_fxUpdate.Length > 0)
+                        {
+                            for (int i = 0; i < dg_fxUpdate.Length; i++)
+                            {
+                                // Only bother if significant
+                                if (Math.Round(SystemLibrary.ToDecimal(dg_fxUpdate[i].Cells["FXRate"].Value) * SystemLibrary.ToDecimal(dg_fxUpdate[i].Cells["LocalValue"].Value), 2) !=
+                                    Math.Round(SystemLibrary.ToDecimal(FXRate) * SystemLibrary.ToDecimal(dg_fxUpdate[i].Cells["LocalValue"].Value), 2)
+                                   )
+                                {
+                                    dg_fxUpdate[i].Cells["FXRate"].Value = FXRate;
+                                    // SystemLibrary.DebugLine(dg_fxUpdate[i].Cells["Ticker"].Value.ToString() + "=" + FXRate.ToString()+" - "+DateTime.Now.ToString());
+                                    // Need to do calcs that require this FX rate
+                                    SetCalc(dg_fxUpdate[i].Cells["Ticker"].Value.ToString(), Color.Empty, true);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Send screen updates
+            if (!PartOfArray)
+            {
+                //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Pre: SetGrossPCT()");
+                SetGrossPCT();
+            }
+            //            SystemLibrary.DebugLine("SetCalc(" + myTicker + ") - END");
+            //Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - End: SetCalc(" + myTicker + ")");
+
+        } // SetCalc_Pre20140313()
+
+
 
         public void SetGrossPCT()
         {
@@ -2879,10 +3415,26 @@ namespace T1MultiAsset
 
                     String IsAggregate = SystemLibrary.ToString(dt_Port.Rows[i]["IsAggregate"]);
 
+
                     if (dt_Port.Rows[i]["Ticker"].ToString() != "" && IsAggregate == "N")
                     {
-                        myExposure = SystemLibrary.ToDecimal(dt_Port.Rows[i]["Exposure"]);
-                        myExposure_Filled = SystemLibrary.ToDecimal(dt_Port.Rows[i]["Exposure_Filled"]);
+                        /*
+                         * Exclude Cash item from Exposure:
+                         * - "Equity Equiv"
+                         */
+                        String Sector = SystemLibrary.ToString(dt_Port.Rows[i]["Sector"]);
+                        String Industry_Group = SystemLibrary.ToString(dt_Port.Rows[i]["Industry_Group"]);
+                        //Console.WriteLine("Sector='" + Sector + "', Industry_Group='" + Industry_Group + "'");
+                        if (Sector == "Currency" && (Industry_Group == "Equity Equiv" || Industry_Group == "Cash Equiv"))
+                        {
+                            myExposure = 0;
+                            myExposure_Filled = 0;
+                        }
+                        else
+                        {
+                            myExposure = SystemLibrary.ToDecimal(dt_Port.Rows[i]["Exposure"]);
+                            myExposure_Filled = SystemLibrary.ToDecimal(dt_Port.Rows[i]["Exposure_Filled"]);
+                        }
                         myLS = SystemLibrary.ToString(dt_Port.Rows[i]["LS"]);
                         PL_Day = SystemLibrary.ToDecimal(dt_Port.Rows[i]["PL_Day"]) + SystemLibrary.ToDecimal(dt_Port.Rows[i]["PL_Exec"]);
 
@@ -3380,7 +3932,7 @@ namespace T1MultiAsset
                             this.BeginInvoke(new myStartRTDCallback(myStartRTD), DispTicker);
                         else
                         {
-                            BRT.Bloomberg_Request(DispTicker);
+                            BRT.Bloomberg_Request(DispTicker,true); //Always assume new tickers need option fields as no rela penalty if they dont.
                         }
                     }
                 }
@@ -3469,7 +4021,7 @@ namespace T1MultiAsset
                 //dg_Port["POS_Mult_Factor", e.RowIndex].Value = 1;
             }
 
-            Round_Lot_Size = Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Round_Lot_Size", e.RowIndex].Value));
+            Round_Lot_Size = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Round_Lot_Size", e.RowIndex].Value));
             if (Round_Lot_Size <= 0)
                 Round_Lot_Size = 1;
             FXRate = SystemLibrary.ToDecimal(dg_Port["FXRate", e.RowIndex].Value);
@@ -3488,9 +4040,9 @@ namespace T1MultiAsset
                     // TODO (1) EXPOSURE - Needs to deal with Delta
                     myValue = SystemLibrary.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                     myPrice = SystemLibrary.ToDecimal(dg_Port["Price", e.RowIndex].Value);
-                    ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
+                    ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
                     if (myPrice > 0 && FXRate > 0)
-                        myQty = SendToBloomberg.RoundLot(ExistingOrder, Convert.ToInt32((myValue / FXRate / 100m * Fund_Amount) / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size); //100m is %
+                        myQty = SendToBloomberg.RoundLot(ExistingOrder, SystemLibrary.ToInt32((myValue / FXRate / 100m * Fund_Amount) / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size); //100m is %
                     else
                         myQty = 0;
                     if (Fund_Amount != 0)
@@ -3536,9 +4088,9 @@ namespace T1MultiAsset
                     // TODO (1) EXPOSURE - Needs to deal with Delta
                     myValue = SystemLibrary.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                     myPrice = SystemLibrary.ToDecimal(dg_Port["Price", e.RowIndex].Value);
-                    ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
+                    ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
                     if (myPrice > 0 && FXRate > 0)
-                        myQty = SendToBloomberg.RoundLot(ExistingOrder, Convert.ToInt32((myValue / FXRate / 100m * Fund_Amount) / myPrice / POS_Mult_Factor), Round_Lot_Size); //100m is %
+                        myQty = SendToBloomberg.RoundLot(ExistingOrder, SystemLibrary.ToInt32((myValue / FXRate / 100m * Fund_Amount) / myPrice / POS_Mult_Factor), Round_Lot_Size); //100m is %
                     else
                         myQty = 0;
                     if (Fund_Amount != 0)
@@ -3629,9 +4181,9 @@ namespace T1MultiAsset
                     else
                     {
                         myValue = SystemLibrary.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
-                        ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
+                        ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
                         if (myPrice > 0 && FXRate > 0)
-                            myQty = SendToBloomberg.RoundLot(ExistingOrder, Convert.ToInt32(myValue / FXRate / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size);
+                            myQty = SendToBloomberg.RoundLot(ExistingOrder, SystemLibrary.ToInt32(myValue / FXRate / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size);
                         else
                             myQty = 0;
                         if (Fund_Amount != 0)
@@ -3667,7 +4219,7 @@ namespace T1MultiAsset
                     {
                         // Allow 2 decimal places.
                         dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Style.Format = "N2";
-                        Decimal myFX = Math.Round(Convert.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value), 2);
+                        Decimal myFX = Math.Round(SystemLibrary.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value), 2);
                         myPrice = SystemLibrary.ToDecimal(dg_Port["Price", e.RowIndex].Value);
                         if (Fund_Amount != 0)
                             myFUM_incr = myFX * myPrice * POS_Mult_Factor * FXRate / Fund_Amount;
@@ -3686,8 +4238,8 @@ namespace T1MultiAsset
                     else
                     {
                         // Cant switch short/Long or Long/Short - Make sure This Quantity_incr < - Quantity
-                        myQty = Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value));
-                        ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
+                        myQty = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value));
+                        ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value) + SystemLibrary.ToDecimal(dg_Port["Qty_Order", e.RowIndex].Value));
                         if (ExistingOrder != 0 && Math.Sign(ExistingOrder) != Math.Sign(SystemLibrary.ToDecimal(ExistingOrder) + myQty) && (SystemLibrary.ToDecimal(ExistingOrder) + myQty) != 0)
                         {
                             MessageBox.Show("Can't switch from 'Long to Short' or 'Short to Long' in one step",
@@ -3763,7 +4315,10 @@ namespace T1MultiAsset
                         dg_Port["Delta", e.RowIndex].Value = dr[0]["Delta"];
                         dg_Port["Country_Full_Name", e.RowIndex].Value = dr[0]["Country_Full_Name"];
                         dg_Port["Sector", e.RowIndex].Value = dr[0]["Sector"];
-                        dg_Port["Industry_Group", e.RowIndex].Value = dr[0]["Industry_Group"];
+                        if (SystemLibrary.BBGDataType(NewTicker) == "Curncy")
+                            dg_Port["Industry_Group", e.RowIndex].Value = "Cash Equiv";
+                        else
+                            dg_Port["Industry_Group", e.RowIndex].Value = dr[0]["Industry_Group"];
                         dg_Port["Industry_SubGroup", e.RowIndex].Value = dr[0]["Industry_SubGroup"];
                         dg_Port["Beta", e.RowIndex].Value = dr[0]["Beta"];
                         dg_Port["ID_BB_COMPANY", e.RowIndex].Value = dr[0]["ID_BB_COMPANY"];
@@ -3817,9 +4372,9 @@ namespace T1MultiAsset
                     break;
             }
             // Set the LS column where needed
-            if (Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value))==0)
+            if (SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity", e.RowIndex].Value))==0)
             {
-                if (Convert.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity_incr", e.RowIndex].Value)) >= 0)
+                if (SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_Port["Quantity_incr", e.RowIndex].Value)) >= 0)
                 {
                     dg_Port["LS", e.RowIndex].Value = "L";
                     dg_Port["LS", e.RowIndex].Style.ForeColor = Color.Green;
@@ -3837,7 +4392,9 @@ namespace T1MultiAsset
             SystemLibrary.DebugLine("dg_Port_CellEndEdit() - END");
         } //dg_Port_CellEndEdit()
 
-
+        /*
+         * Rules: As at 20-Mar-2014 this routine is only requested on new tickers
+         */
         public delegate void myStartRTDCallback(String Ticker);
         public void myStartRTD(String Ticker)
         {
@@ -3851,7 +4408,17 @@ namespace T1MultiAsset
             else
             {
                 SystemLibrary.DebugLine("myStartRTD(" + Ticker + ")");
-                BRT.Bloomberg_Request(Ticker);
+                // If an existing ticker, the see if it is an option
+                DataRow[] dr = dt_Securities.Select("BBG_Ticker = '" + Ticker.Trim() + "'");
+                if (dr.Length > 0)
+                {
+                    if (SystemLibrary.ToString(dr[0]["Security_Typ2"]).ToLower() == "option")
+                        BRT.Bloomberg_Request(Ticker, true);
+                    else
+                        BRT.Bloomberg_Request(Ticker, false);
+                }
+                else
+                    BRT.Bloomberg_Request(Ticker, true); //Always assume new tickers need option fields as no rela penalty if they dont.
             }
         } //myStartRTD()
 
@@ -4073,10 +4640,21 @@ namespace T1MultiAsset
 
         private void button4_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - Start: SetCalc()");
-            SetCalc();
-            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " - End: SetCalc()");
+
+            SystemLibrary.TestRitchViewer();
+
+            String myFilePath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            String myFileName1 = @"OBELYSKFILLS_10823681_20140227_105310.csv.enc";
+            String myDecryptName = "";
+            if (SystemLibrary.EMSX_Decrypt(myFilePath, myFileName1, ref myDecryptName))
+            {
+                System.Diagnostics.Process.Start(myFilePath + @"\" + myDecryptName);
+            }
+            else
+                MessageBox.Show("Failed to Decrypt");
+
             return;
+            
             String Checks = "Can T1 access directories:\r\n";
 
             //MessageBox.Show("This will take 30 seconds. Press OK to continue", "FTP Check");
@@ -4207,11 +4785,24 @@ namespace T1MultiAsset
 
         } //maintainCommissiontoolStripMenuItem_Click()
 
+        private void maintainPricestoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // open an instance the connect form so the user
+            // can define a new connection
+            MaintainPrices f = new MaintainPrices();
+            f = (MaintainPrices)SystemLibrary.FormExists(f, false);
+            f.BringToFront();
+            f.FromParent(this,"");
+            f.Show(); //(this);
+
+        } //maintainPricestoolStripMenuItem_Click()
+
         private void databaseConnectionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // open an instance the connect form so the user
             // can define a new connection
             frm_DBConnect f = new frm_DBConnect();
+            f = (frm_DBConnect)SystemLibrary.FormExists(f, false);
             f.OnMessage += new frm_DBConnect.Message(SystemLibrary.SQLSaveConnectParams);
             f.Show(); //(this);
         } // databaseConnectionToolStripMenuItem_Click()
@@ -4221,6 +4812,7 @@ namespace T1MultiAsset
             // open an instance the connect form so the user
             // can define a new connection
             FTP_Parameters f = new FTP_Parameters();
+            f = (FTP_Parameters)SystemLibrary.FormExists(f, false);
             //f.OnMessage += new FTP_Parameters.Message(SystemLibrary.SQLSaveConnectParams);
             f.Startup(this);
             f.Show(); //(this);
@@ -4232,6 +4824,7 @@ namespace T1MultiAsset
             // open an instance the connect form so the user
             // can define a new connection
             SMTPSetup f = new SMTPSetup();
+            f = (SMTPSetup)SystemLibrary.FormExists(f, false);
             f.Startup(this);
             f.Show(); //(this);
 
@@ -4243,6 +4836,7 @@ namespace T1MultiAsset
             // open an instance the connect form so the user
             // can define a new connection
             FTP_MLPrime f = new FTP_MLPrime();
+            f = (FTP_MLPrime)SystemLibrary.FormExists(f, false);
             //f.OnMessage += new FTP_Parameters.Message(SystemLibrary.SQLSaveConnectParams);
             f.Startup(this);
             f.Show(); //(this);
@@ -4254,6 +4848,7 @@ namespace T1MultiAsset
             // open an instance the connect form so the user
             // can define a new connection
             FTP_ScotiaPrime f = new FTP_ScotiaPrime();
+            f = (FTP_ScotiaPrime)SystemLibrary.FormExists(f, false);
             //f.OnMessage += new FTP_Parameters.Message(SystemLibrary.SQLSaveConnectParams);
             f.Startup(this);
             f.Show(); //(this);
@@ -4309,6 +4904,7 @@ namespace T1MultiAsset
             // open an instance the connect form so the user
             // can define a new connection
             PortTabLayout f = new PortTabLayout();
+            f = (PortTabLayout)SystemLibrary.FormExists(f, false);
             f.OnMessage += new PortTabLayout.Message(ReLoadTabs);
             f.Show(); //(this);
 
@@ -4352,6 +4948,7 @@ namespace T1MultiAsset
         private void FuturesExplainWireTransferToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FuturesExplainWireTransfer rt = new FuturesExplainWireTransfer();
+            rt = (FuturesExplainWireTransfer)SystemLibrary.FormExists(rt, true);
             rt.FromParent(this, FundID, DateTime.MinValue);
             rt.Show();
 
@@ -4360,6 +4957,7 @@ namespace T1MultiAsset
         private void alterMarginRatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FutureMargins frm_FutMargin = new FutureMargins();
+            frm_FutMargin = (FutureMargins)SystemLibrary.FormExists(frm_FutMargin, false);
             frm_FutMargin.FromParent(this, true);
             frm_FutMargin.Show();
         } //alterMarginRatesToolStripMenuItem_Click()
@@ -4533,7 +5131,7 @@ namespace T1MultiAsset
                 if (inPortfolioID == -1)
                 {
                     // Need FundAmount as Currency in Top half of SQL
-                    mySql = "Select -1 as FundId, '<All>' as FundName, Sum(FundAmount) as FundAmount, 'AUD' as crncy, '<All>' as ShortName " +
+                    mySql = "Select -1 as FundId, '<All>' as FundName, Sum(FundAmount) as FundAmount, dbo.f_GetParamString('Base_crncy') as crncy, '<All>' as ShortName " +
                             "From   Fund " +
                             "Where  Active = 'Y' " +
                             "And   AllowTrade = 'Y' " +
@@ -4546,7 +5144,7 @@ namespace T1MultiAsset
                 }
                 else
                 {
-                    mySql = "Select -1 as FundId, '<All>' as FundName, Sum(FundAmount) as FundAmount, 'AUD' as crncy, '<All>' as ShortName " +
+                    mySql = "Select -1 as FundId, '<All>' as FundName, Sum(FundAmount) as FundAmount, dbo.f_GetParamString('Base_crncy') as crncy, '<All>' as ShortName " +
                             "From   Fund " +
                             "Where  Active = 'Y' " +
                             "And   AllowTrade = 'Y' " +
@@ -4557,7 +5155,7 @@ namespace T1MultiAsset
                             "And   AllowTrade = 'Y' " +
                             "And    FundID in ( Select  FundID " +
                             "                   From    Portfolio_Group " +
-                            "                   Where   PortfolioID = " + Convert.ToString(inPortfolioID) + " " +
+                            "                   Where   PortfolioID = " + SystemLibrary.ToString(inPortfolioID) + " " +
                             "                   And     StartDate <= dbo.f_GetDate() " +
                             "                   And     isNull(EndDate,dbo.f_GetDate()+90) > dbo.f_GetDate() " +
                             "                 ) " +
@@ -4571,9 +5169,9 @@ namespace T1MultiAsset
                 if (myIndex < 0)
                 {
                     myIndex = 0;
-                    FundID = Convert.ToInt16(((DataRowView)(cb_Fund.Items[myIndex])).Row.ItemArray[0].ToString());
+                    FundID = SystemLibrary.ToInt16(((DataRowView)(cb_Fund.Items[myIndex])).Row.ItemArray[0].ToString());
                     Fund_Name = ((DataRowView)(cb_Fund.Items[myIndex])).Row.ItemArray[1].ToString();
-                    Fund_Amount = Convert.ToDecimal(((DataRowView)(cb_Fund.Items[myIndex])).Row.ItemArray[2].ToString());
+                    Fund_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Fund.Items[myIndex])).Row.ItemArray[2].ToString());
                     Fund_Crncy = ((DataRowView)(cb_Fund.Items[myIndex])).Row.ItemArray[3].ToString();
                 }
                 cb_Fund.SelectedIndex = myIndex;
@@ -4603,7 +5201,7 @@ namespace T1MultiAsset
                 // Need PortfolioAmount as Currency in Top half of SQL
                 // - Use Currency from default portfolio.
                 // All Funds, All Portfolios
-                mySql = "Select -1 as PortfolioId, '<All>' as PortfolioName, Sum(PortfolioAmount) as PortfolioAmount, 'AUD' as crncy " +
+                mySql = "Select -1 as PortfolioId, '<All>' as PortfolioName, Sum(PortfolioAmount) as PortfolioAmount, dbo.f_GetParamString('Base_crncy') as crncy " +
                         "From   Portfolio " +
                         "Where  Active = 'Y' " +
                         "Union " +
@@ -4620,10 +5218,10 @@ namespace T1MultiAsset
                 if (myIndex < 0)
                 {
                     myIndex = 0;
-                    PortfolioID = Convert.ToInt16(((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[0].ToString());
+                    PortfolioID = SystemLibrary.ToInt16(((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[0].ToString());
                     Portfolio_Name = ((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[1].ToString();
-                    Portfolio_Amount = Convert.ToDecimal(((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[2].ToString());
-                    Portfolio_Crncy = ((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[3].ToString();
+                    Portfolio_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[2].ToString());
+                    //Portfolio_Crncy = ((DataRowView)(cb_Portfolio.Items[myIndex])).Row.ItemArray[3].ToString();
                 }
                 cb_Portfolio.SelectedIndex = myIndex;
 
@@ -4692,7 +5290,7 @@ namespace T1MultiAsset
                     BPS_Index_YTD = SystemLibrary.ToDecimal(dt_1.Rows[1][7]);
                     BPS_Index_YTD_July = SystemLibrary.ToDecimal(dt_1.Rows[1][8]);
                     BPS_Index_DIV_TODAY = SystemLibrary.ToDecimal(dt_1.Rows[1][9]);
-                    BPS_Index_Ticker = Convert.ToString(dt_1.Rows[1][10]);
+                    BPS_Index_Ticker = SystemLibrary.ToString(dt_1.Rows[1][10]);
                     if (dt_1.Columns.Count>12)
                         BPS_Index_Close = SystemLibrary.ToDecimal(dt_1.Rows[1][12]);
 
@@ -4724,7 +5322,7 @@ namespace T1MultiAsset
             if (cb_Fund.Items.Count > 0)
             {
                 //SystemLibrary.SetDebugLevel(0);
-                FundID = Convert.ToInt16(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[0].ToString());
+                FundID = SystemLibrary.ToInt16(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[0].ToString());
                 Fund_Name = ((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[1].ToString();
                 Fund_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[2].ToString());
                 Fund_Crncy = ((DataRowView)(cb_Fund.SelectedItem)).Row.ItemArray[3].ToString();
@@ -4753,10 +5351,10 @@ namespace T1MultiAsset
             SystemLibrary.DebugLine("cb_Portfolio_SelectionChangeCommitted - Start");
             if (cb_Portfolio.Items.Count > 0)
             {
-                PortfolioID = Convert.ToInt16(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[0].ToString());
+                PortfolioID = SystemLibrary.ToInt16(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[0].ToString());
                 Portfolio_Name = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[1].ToString();
                 Portfolio_Amount = SystemLibrary.ToDecimal(((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[2].ToString());
-                Portfolio_Crncy = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[3].ToString();
+                //Portfolio_Crncy = ((DataRowView)(cb_Portfolio.SelectedItem)).Row.ItemArray[3].ToString();
                 LoadFund(PortfolioID);
                 this.SuspendLayout();
                 LoadPortfolio(true);
@@ -4841,6 +5439,7 @@ namespace T1MultiAsset
             {
                 // Local Variables
                 DateTime myStartTime = SystemLibrary.f_Now();
+                Decimal Delta;
 
                 if (!isBloombergUser1)
                     return;
@@ -4853,8 +5452,12 @@ namespace T1MultiAsset
                         SystemLibrary.DebugLine("SavePrices:" + dt_Last_Price.Rows[i]["Ticker"].ToString() + ", " + dt_Last_Price.Rows[i]["isNew"].ToString() + ", " + dt_Last_Price.Rows[i]["LAST_PRICE"].ToString());
                         if (dt_Last_Price.Rows[i]["isNew"].ToString() == "Y")
                         {
+                            Delta = SystemLibrary.ToDecimal(dt_Last_Price.Rows[i]["Delta"].ToString());
+                            if (Delta == 0)
+                                Delta = 1;
                             String myUpdate = "Update Securities " +
-                                              "Set Last_Price = " + dt_Last_Price.Rows[i]["LAST_PRICE"].ToString() + " " +
+                                              "Set Last_Price = " + dt_Last_Price.Rows[i]["LAST_PRICE"].ToString() + ", " +
+                                              "    Delta = " + SystemLibrary.ToString(Delta) + " " +
                                               "Where BBG_Ticker = '" + dt_Last_Price.Rows[i]["Ticker"].ToString() + "' " +
                                               "And   ID_BB_UNIQUE = '" + dt_Last_Price.Rows[i]["ID_BB_UNIQUE"].ToString() + "' ";
                             SystemLibrary.SQLExecute(myUpdate);
@@ -4866,7 +5469,7 @@ namespace T1MultiAsset
                 }
                 else
                 {
-                    SystemLibrary.SQLExecute("sp_Last_Price_TableParameter", "@TempTable", ref dt_Last_Price);
+                    SystemLibrary.SQLExecute("sp_Last_Price_Delta_TableParameter", "@TempTable", ref dt_Last_Price);
                     for (int i = 0; i < dt_Last_Price.Rows.Count; i++)
                         dt_Last_Price.Rows[i]["isNew"] = "N";
                 }
@@ -4996,6 +5599,7 @@ namespace T1MultiAsset
             SetFormatColumn(dg_PortfolioTranspose, "Round_Lot_Size", Color.RoyalBlue, Color.Gainsboro, "N0", "1");
             dg_PortfolioTranspose.Columns["Country_Full_Name"].Visible = false;
 
+
             // Loop on all columns and set the Autosize mode & Header Text
             for (int i = 0; i < dg_PortfolioTranspose.Columns.Count; i++)
             {
@@ -5029,6 +5633,21 @@ namespace T1MultiAsset
                             if (dg_PortfolioTranspose["BBG_Ticker", j].Value != null)
                                 SetColumn(dg_PortfolioTranspose, myColName, j);
                         break;
+                }
+
+                // Deal with Currency
+                if ((myColName.Contains("_") || myColName == "Incr") && !(myColName.ToLower().Contains("weight") || myColName == "Round_Lot_Size"))
+                {
+                    for (Int32 j = 0; j < dg_PortfolioTranspose.Rows.Count; j++) // Last row in dg_Port is a blank row
+                    {
+                        if (dg_PortfolioTranspose["BBG_Ticker", j].Value != null)
+                        {
+                            if (SystemLibrary.BBGDataType(SystemLibrary.ToString(dg_PortfolioTranspose["BBG_Ticker", j].Value)).ToLower() == "Curncy".ToLower())
+                            {
+                                dg_PortfolioTranspose.Rows[j].Cells[myColName].Style.Format = "N2";
+                            }
+                        }
+                    }
                 }
             }
 
@@ -5077,6 +5696,15 @@ namespace T1MultiAsset
                     // Go to Database and Load dg_Port
                     DataTable dt_PortLoad = SystemLibrary.SQLSelectToDataTable(mySql);
                     //Console.WriteLine(mySql+"\r\ndt_PortLoad.Rows.Count=" + dt_PortLoad.Rows.Count.ToString());
+
+                    if (dt_PortLoad.Columns.Count > 0)
+                    {
+                        // Add Column that allows for incremental trades
+                        if (!dt_PortLoad.Columns.Contains("Quantity_incr"))
+                            dt_PortLoad.Columns.Add("Quantity_incr", typeof(Decimal));
+                        if (!dt_PortLoad.Columns.Contains("FUM_incr"))
+                            dt_PortLoad.Columns.Add("FUM_incr", typeof(Decimal));
+                    }
                     
                     //DataTable dt_Port = new System.Data.DataTable();
                     if (FullRefresh)
@@ -5096,10 +5724,18 @@ namespace T1MultiAsset
                     {
                         // See if found new data
                         if (dt_PortLoad.Rows.Count == 0)
+                        {
+                            if (tabControl_Port.SelectedTab.Text.StartsWith("ACTION"))
+                                LoadActionTab(false);
                             return (false);
+                        }
                         // See if User is in the "TRADE" Tab & do nothing if they are
                         if (tabControl_Port.SelectedTab.Text == "TRADE" || tabControl_Port.SelectedTab.Text == "ALIGN")
+                        {
+                            if (tabControl_Port.SelectedTab.Text.StartsWith("ACTION"))
+                                LoadActionTab(false);
                             return (false);
+                        }
                         // Check PortfolioTranspose
                         if (isAlive_PortfolioTranspose)
                             LoadPortfolioTranspose(FullRefresh);
@@ -5112,12 +5748,20 @@ namespace T1MultiAsset
                             IsSameTickers = PortDataTableCompare(dt_Port, dt_PortLoad);
                             //IsSameTickers = false;
                             dt_Port = dt_PortLoad.Copy();
+                            //Console.WriteLine("dt_Port = dt_PortLoad.Copy();");
                             // Redo the Calcs
-                            SetCalc();
+                            // 27-March-2014 SetCalc();
                         }
                         catch { }
                         this.ResumeLayout(true);
                     }
+
+                    // Add Column that allows for incremental trades
+                    if (!dt_Port.Columns.Contains("Quantity_incr"))
+                        dt_Port.Columns.Add("Quantity_incr", typeof(Decimal));
+                    if (!dt_Port.Columns.Contains("FUM_incr"))
+                        dt_Port.Columns.Add("FUM_incr", typeof(Decimal));
+
 
                     // Calculate the MTD long/Short P&L
                     ResetMTD();
@@ -5155,11 +5799,13 @@ namespace T1MultiAsset
                         if (dg_Port.Columns["Quantity_incr"] == null)
                         {
                             dg_Port.Columns.Add("Quantity_incr", "Incremental Qty");
+                            dg_Port.Columns["Quantity_incr"].DataPropertyName = "Quantity_incr";
                             dg_Port.Columns["Quantity_incr"].ValueType = typeof(Decimal);
                         }
                         if (dg_Port.Columns["FUM_incr"] == null)
                         {
                             dg_Port.Columns.Add("FUM_incr", "Incr FUM %");
+                            dg_Port.Columns["FUM_incr"].DataPropertyName = "FUM_incr";
                             dg_Port.Columns["FUM_incr"].ValueType = typeof(Decimal);
                         }
 
@@ -5681,7 +6327,8 @@ namespace T1MultiAsset
                         // CFR 20120327 HideAggregateRows("Y");
                         // CFR 20120327 HideFXbalanceRows();
                         myDataView.RowFilter = "IsAggregate <> 'Y' AND " +
-                                               "ISNULL(Industry_Group,'') Not In ('Equity Equiv','Cash Equiv')";
+                                               "ISNULL(Industry_Group,'') Not In ('Equity Equiv')";
+                                               //"ISNULL(Industry_Group,'') Not In ('Equity Equiv','Cash Equiv')";
 
                         // Deal with Currency display
                         for (int i = 0; i < dg_Port.Rows.Count; i++)
@@ -5793,7 +6440,7 @@ namespace T1MultiAsset
                             foreach (DataRow dr_TD in dt_Port_Tab_Detail.Select("TabName='" + TabName + "'", "ColOrder desc"))
                             {
                                 SystemLibrary.DebugLine(TabName + "," + dr_TD["ColName"].ToString() + "," + dr_TD["ColOrder"].ToString());
-                                dg_Port.Columns[dr_TD["ColName"].ToString()].DisplayIndex = Convert.ToInt16(dr_TD["ColOrder"]);
+                                dg_Port.Columns[dr_TD["ColName"].ToString()].DisplayIndex = SystemLibrary.ToInt16(dr_TD["ColOrder"]);
                             }
                             SystemLibrary.DebugLine("EndLoop:" + TabName);
 
@@ -5964,7 +6611,7 @@ namespace T1MultiAsset
             String Exch = "";
             String YellowKey = "";
             String isFuture = "N";
-            int ExistingOrder;
+            Decimal ExistingOrder;
             Decimal Quantity_incr;
             int myRows;
             int FundID;
@@ -6012,7 +6659,7 @@ namespace T1MultiAsset
                         if (SystemLibrary.ToString(currentRow.Cells["Sector"].Value).ToUpper() == "CURRENCY")
                             Quantity_incr = SystemLibrary.ToDecimal(currentRow.Cells["Quantity_incr"].Value);
                         else
-                            Quantity_incr = Convert.ToInt32(currentRow.Cells["Quantity_incr"].Value);
+                            Quantity_incr = SystemLibrary.ToInt32(currentRow.Cells["Quantity_incr"].Value);
 
                         if (Quantity_incr != 0)
                         {
@@ -6020,7 +6667,7 @@ namespace T1MultiAsset
                             BBGTicker = currentRow.Cells["Ticker"].Value.ToString();
                             Country = currentRow.Cells["Country_Full_Name"].Value.ToString();
                             isFuture = SystemLibrary.ToString(currentRow.Cells["isFuture"].Value);
-                            ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(currentRow.Cells["Quantity"].Value) + SystemLibrary.ToDecimal(currentRow.Cells["Qty_Order"].Value));
+                            ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(currentRow.Cells["Quantity"].Value) + SystemLibrary.ToDecimal(currentRow.Cells["Qty_Order"].Value));
                             SendToBloomberg.EMSTickerSplit(BBGTicker, ref Ticker, ref Exch, ref YellowKey);
                             DataRow dr = SendToBloomberg.dt_SendToBloomberg.NewRow();
                             dr["BloombergTicker"] = Ticker.ToUpper();
@@ -6029,7 +6676,7 @@ namespace T1MultiAsset
                             dr["IdentifierType"] = "C"; // C = Cusip, But unused field
                             dr["Currency"] = currentRow.Cells["crncy"].Value.ToString().ToUpper();
                             dr["OrderType"] = "MKT"; //MKT = market, But unused field
-                            dr["Side"] = SendToBloomberg.GetSide(Ticker, YellowKey, Country, ExistingOrder, (int)Quantity_incr).ToUpper();
+                            dr["Side"] = SendToBloomberg.GetSide(Ticker, YellowKey, Country, (int)ExistingOrder, (int)Quantity_incr).ToUpper();
                             dr["OrderQuantity"] = Math.Abs(Quantity_incr); // Always positive # of shares
                             dr["TimeinForce"] = "DAY";
                             dr["OrderRefID"] = SendToBloomberg.GetNextOrderRefID();
@@ -6075,7 +6722,7 @@ namespace T1MultiAsset
                             if (currentRow.Cells["Round_Lot_Size"].Value==DBNull.Value)
                                 Round_Lot_Size = 1;
                             else
-                                Round_Lot_Size = Convert.ToInt32(currentRow.Cells["Round_Lot_Size"].Value);
+                                Round_Lot_Size = SystemLibrary.ToInt32(currentRow.Cells["Round_Lot_Size"].Value);
                             if (Round_Lot_Size <= 0)
                                 Round_Lot_Size = 1;
                             SystemLibrary.SQLExecute("Exec sp_OrderSplits '" + dr["OrderRefID"].ToString() + "', " + FundID.ToString() + ", " + PortfolioID.ToString() + ", " + Round_Lot_Size.ToString());
@@ -6104,7 +6751,7 @@ namespace T1MultiAsset
                     foreach (DataGridViewRow currentRow in dg_PortfolioTranspose.Rows)
                     {
                         // See if there is a value in Incr
-                        if (SystemLibrary.ToInt32(currentRow.Cells["Incr"].Value) == 0)
+                        if (SystemLibrary.ToDecimal(currentRow.Cells["Incr"].Value) == 0)
                             continue;
 
                         // Reset the flags
@@ -6116,12 +6763,12 @@ namespace T1MultiAsset
                             String[] myFundIDFundAmount = AllFunds[af].Split('\t');
                             if (myFundIDFundAmount.Length == 2)
                             {
-                                Int32 myQty = SystemLibrary.ToInt32(currentRow.Cells["Incr_" + myFundIDFundAmount[0]].Value);
+                                Decimal myQty = SystemLibrary.ToDecimal(currentRow.Cells["Incr_" + myFundIDFundAmount[0]].Value);
                                 if (myQty > 0)
                                     FoundLong = true;
                                 else if (myQty < 0)
                                     FoundShort = true;
-                                Int32 myExistingQty = SystemLibrary.ToInt32(currentRow.Cells["Quantity_" + myFundIDFundAmount[0]].Value);
+                                Decimal myExistingQty = SystemLibrary.ToDecimal(currentRow.Cells["Quantity_" + myFundIDFundAmount[0]].Value);
                                 if (myExistingQty > 0)
                                     FoundExistingLong = true;
                                 else if (myExistingQty < 0)
@@ -6151,7 +6798,11 @@ namespace T1MultiAsset
                     foreach (DataGridViewRow currentRow in dg_PortfolioTranspose.Rows)
                     {
                         // See if there is a value in Incr
-                        Quantity_incr = SystemLibrary.ToInt32(currentRow.Cells["Incr"].Value);
+                        if (SystemLibrary.BBGDataType(SystemLibrary.ToString(currentRow.Cells["BBG_Ticker"].Value)).ToLower() == "Curncy".ToLower())
+                            Quantity_incr = SystemLibrary.ToDecimal(currentRow.Cells["Incr"].Value);
+                        else
+                            Quantity_incr = SystemLibrary.ToInt32(currentRow.Cells["Incr"].Value);
+
                         if (Quantity_incr == 0)
                             continue;
 
@@ -6173,7 +6824,7 @@ namespace T1MultiAsset
                             String[] myFundIDFundAmount = AllFunds[af].Split('\t');
                             if (myFundIDFundAmount.Length == 2)
                             {
-                                Int32 myExistingQty = SystemLibrary.ToInt32(currentRow.Cells["Quantity_" + myFundIDFundAmount[0]].Value);
+                                Decimal myExistingQty = SystemLibrary.ToInt32(currentRow.Cells["Quantity_" + myFundIDFundAmount[0]].Value);
                                 ExistingOrder = ExistingOrder + myExistingQty;
                             }
                         }
@@ -6193,7 +6844,7 @@ namespace T1MultiAsset
                         dr["IdentifierType"] = "C"; // C = Cusip, But unused field
                         dr["Currency"] = currentRow.Cells["crncy"].Value.ToString().ToUpper();
                         dr["OrderType"] = "MKT"; //MKT = market, But unused field
-                        dr["Side"] = SendToBloomberg.GetSide(Ticker, YellowKey, Country, ExistingOrder, (int)Quantity_incr).ToUpper();
+                        dr["Side"] = SendToBloomberg.GetSide(Ticker, YellowKey, Country, (int)ExistingOrder, (int)Quantity_incr).ToUpper();
                         dr["OrderQuantity"] = Math.Abs(Quantity_incr); // Always positive # of shares
                         dr["TimeinForce"] = "DAY";
                         dr["OrderRefID"] = OrderRefID;
@@ -6230,7 +6881,7 @@ namespace T1MultiAsset
                             if (myFundIDFundAmount.Length == 2)
                             {
                                 String myFund = myFundIDFundAmount[0];
-                                Int32 myQty = SystemLibrary.ToInt32(currentRow.Cells["Incr_" + myFund].Value);
+                                Decimal myQty = SystemLibrary.ToDecimal(currentRow.Cells["Incr_" + myFund].Value);
                                 if (myQty != 0)
                                 {
                                     // Process the Splits
@@ -6314,6 +6965,7 @@ namespace T1MultiAsset
                     break;
                 case "BROKERMAINTENANCE":
                     BrokerMaintenance frmNew = new BrokerMaintenance();
+                    frmNew = (BrokerMaintenance)SystemLibrary.FormExists(frmNew, true);
                     frmNew.FromParent(this);
                     frmNew.Show();
                     break;
@@ -6324,16 +6976,19 @@ namespace T1MultiAsset
                     break;
                 case "PROCESSORDERS":
                     ProcessOrders frm_po = new ProcessOrders();
+                    frm_po = (ProcessOrders)SystemLibrary.FormExists(frm_po, true);
                     frm_po.FromParent(this);
                     frm_po.Show();
                     break;
                 case "PROCESSTRADES":
                     ProcessTrades frm_pt = new ProcessTrades();
+                    frm_pt = (ProcessTrades)SystemLibrary.FormExists(frm_pt, true);
                     frm_pt.FromParent(this);
                     frm_pt.Show();
                     break;
                 case "ASICSHORTREPORT":
                     ASICShortReport frm_a = new ASICShortReport();
+                    frm_a = (ASICShortReport)SystemLibrary.FormExists(frm_a, true);
                     frm_a.FromParent(this);
                     frm_a.Show();
                     break;
@@ -6344,6 +6999,7 @@ namespace T1MultiAsset
                     break;
                 case "MAINTAINFUNDS":
                     MaintainFunds frm_mf = new MaintainFunds();
+                    frm_mf = (MaintainFunds)SystemLibrary.FormExists(frm_mf, true);
                     frm_mf.FromParent(this);
                     frm_mf.Show();
                     break;
@@ -6359,6 +7015,7 @@ namespace T1MultiAsset
                     break;
                 case "FORWARDDIVIDENDS":
                     ForwardDividends frm_fd = new ForwardDividends();
+                    frm_fd = (ForwardDividends)SystemLibrary.FormExists(frm_fd, true);
                     frm_fd.FromParent(this);
                     frm_fd.Show();
                     break;
@@ -6421,6 +7078,7 @@ namespace T1MultiAsset
         private void processOrdersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ProcessOrders f = new ProcessOrders();
+            f = (ProcessOrders)SystemLibrary.FormExists(f, true);
             f.FromParent(this);
             f.Show(); //(this);
         }
@@ -6435,6 +7093,7 @@ namespace T1MultiAsset
         private void processTradeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ProcessTrades f = new ProcessTrades();
+            f = (ProcessTrades)SystemLibrary.FormExists(f, true);
             f.FromParent(this);
             f.Show(); //(this);
         }
@@ -6526,6 +7185,7 @@ namespace T1MultiAsset
         private void forwardDividendsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ForwardDividends f = new ForwardDividends();
+            f = (ForwardDividends)SystemLibrary.FormExists(f, true);
             f.FromParent(this);
             f.Show(); //(this);
 
@@ -6534,6 +7194,7 @@ namespace T1MultiAsset
         private void brokerMaintenanceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BrokerMaintenance f = new BrokerMaintenance();
+            f = (BrokerMaintenance)SystemLibrary.FormExists(f, true);
             f.FromParent(this);
             f.Show(); //(this);
         }
@@ -6664,6 +7325,7 @@ namespace T1MultiAsset
         private void maintainFundstoolStripMenuItem_Click(object sender, EventArgs e)
         {
             MaintainFunds f = new MaintainFunds();
+            f = (MaintainFunds)SystemLibrary.FormExists(f, true);
             f.FromParent(this);
             f.Show(); //(this);
 
@@ -6915,12 +7577,12 @@ namespace T1MultiAsset
 
         } //SetIncr_PortfolioTranspose()
 
-        private int GetIncr_PortfolioTranspose(int myRow)
+        private Decimal GetIncr_PortfolioTranspose(int myRow)
         {
             // Find all the funds & set Incr = Sum(Incr_<FundID>)
 
             // Local Variables
-            int Incr = 0;
+            Decimal Incr = 0;
 
 
             Char[] mySeperatorRow = { ',' };
@@ -6933,7 +7595,7 @@ namespace T1MultiAsset
                     if (myFundIDFundAmount.Length == 2)
                     {
                         String myFund = myFundIDFundAmount[0];
-                        int myFundIncr = SystemLibrary.ToInt32(dg_PortfolioTranspose["Incr_"+myFund,myRow].Value);
+                        Decimal myFundIncr = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Incr_" + myFund, myRow].Value);
                         Incr = Incr + myFundIncr;
                     }
                 }
@@ -6965,6 +7627,8 @@ namespace T1MultiAsset
             Decimal myValue;
             int myQty;
             int ExistingOrder;
+            Decimal myFXExistingOrder;
+            Decimal myFXQty;
             Decimal myPrice;
             String myTicker;
             Decimal myFund_Amount = 0;
@@ -6986,7 +7650,7 @@ namespace T1MultiAsset
                 //dg_Port["POS_Mult_Factor", e.RowIndex].Value = 1;
             }
 
-            Round_Lot_Size = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Round_Lot_Size", e.RowIndex].Value));
+            Round_Lot_Size = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Round_Lot_Size", e.RowIndex].Value));
             if (Round_Lot_Size <= 0)
                 Round_Lot_Size = 1;
             FXRate = SystemLibrary.ToDecimal(dg_PortfolioTranspose["FXRate", e.RowIndex].Value);
@@ -7084,8 +7748,8 @@ namespace T1MultiAsset
                             {
                                 myFund = myFundIDFundAmount[0];
                                 myFund_Amount = SystemLibrary.ToDecimal(myFundIDFundAmount[1]);
-                                ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value));
-                                myQty = Convert.ToInt32(myValue / 100m * myFund_Amount / (myPrice * POS_Mult_Factor * FXRate));
+                                ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value));
+                                myQty = SystemLibrary.ToInt32(myValue / 100m * myFund_Amount / (myPrice * POS_Mult_Factor * FXRate));
                                 myQty = myQty - ExistingOrder;
                                 myQty = SendToBloomberg.RoundLot(ExistingOrder, myQty, Round_Lot_Size);
                                 myIncr_Sum = myIncr_Sum + myQty;
@@ -7104,8 +7768,8 @@ namespace T1MultiAsset
                 case "Incr":
                     // Cant switch short/Long or Long/Short - Make sure This Quantity_incr < - Quantity
                     // - If the individual funds are both L & S, then dont allow this. NB: Zero is neutral
-                    int myIncr = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value));
-                    int myTotal_Quantity = 0;
+                    Decimal myIncr = SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                    Decimal myTotal_Quantity = 0;
 
                     AllFunds = dg_PortfolioTranspose.Columns["BBG_Ticker"].Tag.ToString().Split(mySeperatorRow, StringSplitOptions.RemoveEmptyEntries);
                     if (AllFunds.Length == 0)
@@ -7146,7 +7810,7 @@ namespace T1MultiAsset
                         {
                             myTotal_Amount = myTotal_Amount + SystemLibrary.ToDecimal(myFundIDFundAmount[1]);
                             // Add the Total Quantity - ignore the existing Incr_<Fund> as that is what we are replacing
-                            myTotal_Quantity = myTotal_Quantity + SystemLibrary.ToInt32(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["Quantity_" + myFundIDFundAmount[0]].Value);
+                            myTotal_Quantity = myTotal_Quantity + SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["Quantity_" + myFundIDFundAmount[0]].Value);
                             Decimal Value = SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["Quantity_" + myFundIDFundAmount[0]].Value) +
                                             SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["Incr_" + myFundIDFundAmount[0]].Value);
                             if (Value > 0)
@@ -7166,9 +7830,9 @@ namespace T1MultiAsset
                             if (myFundIDFundAmount.Length == 2)
                             {
                                 myFund = myFundIDFundAmount[0];
-                                ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value));
-                                myQty = -ExistingOrder;
-                                SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myQty);
+                                myFXExistingOrder = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value);
+                                myFXQty = -myFXExistingOrder;
+                                SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myFXQty);
                             }
                         }
                         LastValue = null;
@@ -7178,7 +7842,8 @@ namespace T1MultiAsset
                         dg_PortfolioTranspose["ModelWeight", e.RowIndex].Value = DBNull.Value;
                         return;
                     }
-                    myIncr = SendToBloomberg.RoundLot(myTotal_Quantity, myIncr, Round_Lot_Size);
+                    if (!(SystemLibrary.BBGDataType(SystemLibrary.ToString(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["BBG_Ticker"].Value)).ToLower() == "Curncy".ToLower()))
+                        myIncr = SendToBloomberg.RoundLot(SystemLibrary.ToInt32(myTotal_Quantity), SystemLibrary.ToInt32(myIncr), Round_Lot_Size);
 
                     if (FoundLong && FoundShort)
                     {
@@ -7200,6 +7865,7 @@ namespace T1MultiAsset
                     //   Identify the Largest Fund along the way, so can put residual after rounding back into that fund.
                     Decimal Largest_Amount = 0;
                     String Largest_FundID = "";
+                    Decimal myFXIncr_Sum = 0;
                     for (Int32 af = 0; af < AllFunds.Length; af++)
                     {
                         String[] myFundIDFundAmount = AllFunds[af].Split('\t');
@@ -7212,15 +7878,16 @@ namespace T1MultiAsset
                                 Largest_Amount = myFund_Amount;
                                 Largest_FundID = myFund;
                             }
-                            ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value));
-                            myQty = Convert.ToInt32((myFund_Amount / myTotal_Amount * Convert.ToDecimal(myIncr + myTotal_Quantity))) - ExistingOrder;
-                            if (Math.Sign(myQty) != Math.Sign(myIncr))
-                                myQty = 0;
-                            myQty = SendToBloomberg.RoundLot(ExistingOrder, myQty, Round_Lot_Size);
-                            if (Math.Abs(myQty) > Math.Abs(myIncr))
-                                myQty = myIncr;
-                            myIncr_Sum = myIncr_Sum + myQty;
-                            SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myQty);
+                            myFXExistingOrder = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value);
+                            myFXQty = ((myFund_Amount / myTotal_Amount * SystemLibrary.ToDecimal(myIncr + myTotal_Quantity))) - myFXExistingOrder;
+                            if (Math.Sign(myFXQty) != Math.Sign(myIncr))
+                                myFXQty = 0;
+                            if (!(SystemLibrary.BBGDataType(SystemLibrary.ToString(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["BBG_Ticker"].Value)).ToLower() == "Curncy".ToLower()))
+                                myFXQty = SendToBloomberg.RoundLot(SystemLibrary.ToInt32(myFXExistingOrder), SystemLibrary.ToInt32(myFXQty), Round_Lot_Size);
+                            if (Math.Abs(myFXQty) > Math.Abs(myIncr))
+                                myFXQty = myIncr;
+                            myFXIncr_Sum = myFXIncr_Sum + myFXQty;
+                            SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myFXQty);
                             // Set the Background color to show a change was driven by this column
                             // Set the Background color to show a change was driven by this column
                             // TODO(1) - Need to mimic TidyTRADEColumns() for this object
@@ -7229,11 +7896,11 @@ namespace T1MultiAsset
                         }
                     }
                     // Now allocate the remainder.
-                    if (myIncr != myIncr_Sum)
+                    if (myIncr != myFXIncr_Sum)
                     {
                         myFund = Largest_FundID;
-                        myQty = (myIncr - myIncr_Sum) + Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Incr_" + myFund, e.RowIndex].Value));
-                        SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myQty);
+                        myFXQty = (myIncr - myFXIncr_Sum) + SystemLibrary.ToDecimal(dg_PortfolioTranspose["Incr_" + myFund, e.RowIndex].Value);
+                        SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myFXQty);
                     }
                     SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr", myIncr);
 
@@ -7250,11 +7917,11 @@ namespace T1MultiAsset
                     // TODO (1) EXPOSURE - Needs to deal with Delta
                     myValue = SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                     myPrice = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Price", e.RowIndex].Value);
-                    ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_"+myFund, e.RowIndex].Value));
+                    ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_"+myFund, e.RowIndex].Value));
                     myFund_Amount = GetFundAmount(myFund);
 
                     if (myPrice > 0 && FXRate > 0)
-                        myQty = SendToBloomberg.RoundLot(ExistingOrder, Convert.ToInt32((myValue / FXRate / 100m * myFund_Amount) / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size); //100m is %
+                        myQty = SendToBloomberg.RoundLot(ExistingOrder, SystemLibrary.ToInt32((myValue / FXRate / 100m * myFund_Amount) / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size); //100m is %
                     else
                         myQty = 0;
 
@@ -7300,9 +7967,9 @@ namespace T1MultiAsset
                     // TODO (1) EXPOSURE - Needs to deal with Delta
                     myValue = SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                     myPrice = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Price", e.RowIndex].Value);
-                    ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_"+myFund, e.RowIndex].Value));
+                    ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_"+myFund, e.RowIndex].Value));
                     if (myPrice > 0 && FXRate > 0)
-                        myQty = SendToBloomberg.RoundLot(ExistingOrder, Convert.ToInt32(myValue / FXRate / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size);
+                        myQty = SendToBloomberg.RoundLot(ExistingOrder, SystemLibrary.ToInt32(myValue / FXRate / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size);
                     else
                         myQty = 0;
 
@@ -7325,6 +7992,18 @@ namespace T1MultiAsset
                                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].OwningColumn.HeaderText + " = " + dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = LastValue;
                     }
+                    else if (SystemLibrary.BBGDataType(SystemLibrary.ToString(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["BBG_Ticker"].Value)).ToLower() == "Curncy".ToLower())
+                    {
+                        // 20140319
+                        Decimal myFXValue = Math.Round(SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value), 2);
+                        myFXExistingOrder = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value);
+                        myFXQty = myFXValue / FXRate / myPrice / POS_Mult_Factor - myFXExistingOrder;
+                        dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = myFXValue;
+                        SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myFXQty);
+                        SetIncr_PortfolioTranspose(e.RowIndex);
+                        // Now calculate column values
+                        SetCalc(dg_PortfolioTranspose["BBG_Ticker", e.RowIndex].Value.ToString(), Color.Empty);
+                    }
                     else
                     {
                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = myValue; // Deals with non-numeric
@@ -7332,8 +8011,8 @@ namespace T1MultiAsset
                         SetIncr_PortfolioTranspose(e.RowIndex);
                         // Set the Background color to show a change was driven by this column
                         // TODO(1) - Need to mimic TidyTRADEColumns() for this object
-                            //TidyTRADEColumns(dg_Port.Rows[e.RowIndex]);
-                            //dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Style.BackColor = Color.Goldenrod;
+                        //TidyTRADEColumns(dg_Port.Rows[e.RowIndex]);
+                        //dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Style.BackColor = Color.Goldenrod;
 
                         // Now calculate column values
                         SetCalc(dg_PortfolioTranspose["BBG_Ticker", e.RowIndex].Value.ToString(), Color.Empty);
@@ -7348,9 +8027,9 @@ namespace T1MultiAsset
                     // TODO (1) EXPOSURE - Needs to deal with Delta
                     myValue = SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                     myPrice = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Price", e.RowIndex].Value);
-                    ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value));
+                    ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value));
                     if (myPrice > 0 && FXRate > 0)
-                        myQty = SendToBloomberg.RoundLot(ExistingOrder, Convert.ToInt32(myValue / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size);
+                        myQty = SendToBloomberg.RoundLot(ExistingOrder, SystemLibrary.ToInt32(myValue / myPrice / POS_Mult_Factor - ExistingOrder), Round_Lot_Size);
                     else
                         myQty = 0;
 
@@ -7372,6 +8051,18 @@ namespace T1MultiAsset
                                         "Please Close out Order to Zero and add a Second trade for the switch",
                                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].OwningColumn.HeaderText + " = " + dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = LastValue;
+                    }
+                    else if (SystemLibrary.BBGDataType(SystemLibrary.ToString(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["BBG_Ticker"].Value)).ToLower() == "Curncy".ToLower())
+                    {
+                        // 20140319
+                        Decimal myFXValue = Math.Round(SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value), 2);
+                        myFXExistingOrder = SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_" + myFund, e.RowIndex].Value);
+                        myFXQty = myFXValue / myPrice / POS_Mult_Factor - myFXExistingOrder;
+                        dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = myFXValue;
+                        SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myFXQty);
+                        SetIncr_PortfolioTranspose(e.RowIndex);
+                        // Now calculate column values
+                        SetCalc(dg_PortfolioTranspose["BBG_Ticker", e.RowIndex].Value.ToString(), Color.Empty);
                     }
                     else
                     {
@@ -7394,13 +8085,22 @@ namespace T1MultiAsset
                     break;
                 case "Incr_":
                     // Cant switch short/Long or Long/Short - Make sure This Quantity_incr < - Quantity
-                    myQty = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value));
-                    ExistingOrder = Convert.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_"+myFund    , e.RowIndex].Value));
+                    myQty = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value));
+                    ExistingOrder = SystemLibrary.ToInt32(SystemLibrary.ToDecimal(dg_PortfolioTranspose["Quantity_"+myFund    , e.RowIndex].Value));
                     if (ExistingOrder != 0 && Math.Sign(ExistingOrder) != Math.Sign(SystemLibrary.ToDecimal(ExistingOrder) + myQty) && (ExistingOrder + myQty) !=0)
                     {
                         MessageBox.Show("Can't switch from 'Long to Short' or 'Short to Long' in one step",
                                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].OwningColumn.HeaderText + " = " + dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                         dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = LastValue;
+                    }
+                    else if (SystemLibrary.BBGDataType(SystemLibrary.ToString(dg_PortfolioTranspose.Rows[e.RowIndex].Cells["BBG_Ticker"].Value)).ToLower() == "Curncy".ToLower())
+                    {
+                        // 20140319
+                        myFXQty = SystemLibrary.ToDecimal(dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                        SetValueRG(dg_PortfolioTranspose.Rows[e.RowIndex], "Incr_" + myFund, myFXQty);
+                        SetIncr_PortfolioTranspose(e.RowIndex);
+                        // Now calculate column values
+                        SetCalc(dg_PortfolioTranspose["BBG_Ticker", e.RowIndex].Value.ToString(), Color.Empty);
                     }
                     else
                     {
@@ -7952,7 +8652,7 @@ namespace T1MultiAsset
                             object myTestValue = ((System.Windows.Forms.DataGridView)(sender)).Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
                             if (!(myTestValue == null || myTestValue == DBNull.Value))
                             {
-                                Decimal myValue = Convert.ToDecimal(myTestValue);
+                                Decimal myValue = SystemLibrary.ToDecimal(myTestValue);
                                 if ((Decimal)myValue < Decimal.Zero)
                                 {
                                     if (e.CellStyle.ForeColor != Color.Red)
@@ -7980,7 +8680,100 @@ namespace T1MultiAsset
 
         } //Generic_CellFormatting()
 
-   
+        private void dg_Port_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            // Dont need to report what is wrong, just reject.
+            e.Cancel = false;
+            dg_Port.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = LastValue;
+
+        } //dg_Port_DataError()
+
+        private void dg_PortfolioTranspose_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            // Dont need to report what is wrong, just reject.
+            e.Cancel = false;
+            dg_PortfolioTranspose.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = LastValue;
+
+        } //dg_PortfolioTranspose_DataError()
+
+        private void dg_Port_CellEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            // Local Variables
+            String DataTypeName;
+
+            if (e.ColumnIndex > -1 && RitchViewerInstalled && cb_Animate.Checked)
+            {
+                if (((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].ValueType == null)
+                    DataTypeName = "System.String"; 
+                else
+                    DataTypeName = SystemLibrary.ToString(((System.Windows.Forms.DataGridView)(sender)).Columns[e.ColumnIndex].ValueType.FullName);
+                switch (DataTypeName)
+                {
+                    case "System.DateTime":
+                    case "System.String":
+                    case "System.Char":
+                        break;
+                    default:
+                        // Take the data from this column and pass it to RitchViewer
+                        String myMessage = "Source:\t" + this.Text +"\rTemplate:\tT1\rChart:\tColumn";
+                        String myLabels = "Ticker";
+                        String myData = dg_Port.Columns[e.ColumnIndex].HeaderText;
+
+                        for (int i=0;i<dg_Port.Rows.Count;i++)
+                        {
+                            myLabels = myLabels + "\t" + SystemLibrary.ToString(dg_Port["Ticker", i].Value);
+                            myData = myData + "\t" + SystemLibrary.ToString(dg_Port[e.ColumnIndex, i].FormattedValue);
+                        }
+                        myMessage = myMessage + "\r" + myLabels + "\r" + myData;
+                        SystemLibrary.SendData("Ritch Viewer", myMessage);
+                        break;
+                }
+            }
+        } //dg_Port_CellEnter()
+
+        private Boolean FoundRitchViewer()
+        {
+            // Local Variables
+            Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
+            Boolean RetVal = false;
+
+            String myValue = SystemLibrary.ToString(myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\RitchViewer\State", "AlwaysOnTop"));
+            if (myValue.Length > 0)
+            {
+                // See if the process is runnning
+                if (SystemLibrary.FindWindow(null, "Ritch Viewer") != 0)
+                    RetVal = true;
+            }
+
+            return (RetVal);
+
+        } //FoundRitchViewer()
+
+        private void cb_Animate_CheckedChanged(object sender, EventArgs e)
+        {
+            Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
+
+            myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset", "Animate", SystemLibrary.Bool_To_YN(cb_Animate.Checked));
+
+        } //cb_Animate_CheckedChanged()
+
+        private void isAnimateLoad()
+        {
+            // Local Variables
+            String myValue = "";
+
+            Registry.Registry myReg = new T1MultiAsset.Registry.Registry();
+
+            myValue = myReg.RegGetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset", "Animate").ToString();
+            if (myValue.Length > 0)
+                cb_Animate.Checked = SystemLibrary.YN_To_Bool(myValue);
+            else
+            {
+                cb_Animate.Checked = false;
+                myReg.RegSetValue("HKEY_CURRENT_USER", @"SOFTWARE\T1 MultiAsset", "Animate", SystemLibrary.Bool_To_YN(cb_Animate.Checked));
+            }
+        } //isAnimateLoad()
+
     }
 
 }
